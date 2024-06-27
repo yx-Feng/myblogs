@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">          <!--设置语言环境-->
+<head>
+    <meta charset="utf-8">
+    <title>Hello</title>
+</head>
+<body>
+<div id="app">
+    <h3>{{title}}</h3>
+    <ul>
+        <li v-for="item in movies">{{item}}</li>
+    </ul>
+    <h3>{{title2}}</h3>
+    <div>当前计数：{{counter}}</div>
+    <button @click="add">+</button>
+    <button @click="sub">-</button>
+</div>
+
+<!-- 开发环境版本，包含了有帮助的命令行警告 -->
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script>
+    //编程范式：声明式编程
+    const app = new Vue({
+        el:'#app',      //该属性决定我们要挂载到哪一个元素上
+        data:{          //data属性用于存储数据(数据可以我们自己定义，也可以从服务器申请过来)
+            title:'最喜欢的电影：',
+            movies:['小丑', '阿甘正传','爆裂鼓手','天使爱美丽'],
+            title2: '计数器',
+            counter: 0
+        },
+        methods:{
+            add:function (){
+                this.counter++;
+            },
+            sub:function (){
+                this.counter--;
+            }
+        }
+    })
+    //原始js做法(编程范式：命令式编程)
+    //1.创建div元素，设置id属性
+    //2.定义message变量
+    //3.在div中显示message => (document.getElementById('xxx').innerHTML="xxx“)
+</script>
+</body>
+</html>

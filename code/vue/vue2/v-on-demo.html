@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Title</title>
+</head>
+<body>
+<div id="app">
+    <!--  1.事件调用的方法没有参数，方法后面的参数可省略-->
+  <button @click="btnClick">按钮1</button>
+  <button @click="btnClick()">按钮1</button>
+
+  <!-- 2.在事件定义时，写方法时省略了小括号，但是方法本身如果需要传一个参数，那么vue会默认将浏览器产生的事件对象当作实参传入到方法中 -->
+  <button @click="btnClick2">按钮2</button>
+  <button @click="btnClick2(123)">按钮2</button>
+  <!--  有小括号却什么也不传，则方法的形参就变成undefined-->
+  <button @click="btnClick2()">按钮2</button>
+
+  <!--  3.方法定义时，我们需要event对象，又需要其它参数，获取事件对象：$event-->
+  <button @click="btnClick3(123, $event)">按钮3</button>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script>
+  const app = new Vue({
+    el:'#app',
+    methods: {
+      btnClick(){
+        console.log("btnClick");
+      },
+      btnClick2(event){
+        console.log(event);
+      },
+      btnClick3(arg, event){
+        console.log(arg, event)
+      }
+    }
+  })
+</script>
+</body>
+</html>
