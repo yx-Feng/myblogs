@@ -9,4 +9,4 @@
 
 [GitHub](https://gitee.com/yongxuanf) 
 
-[启动 🚀](/guide)
+[启动 🚀](/home)
