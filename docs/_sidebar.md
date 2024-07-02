@@ -1,10 +1,10 @@
 <!-- docs/_sidebar.md -->
 
-- 🏠主页
+- [🏠主页](/home)
 
 - JavaScript
-
-- [ES6](js/es6/note)
+  
+  - [ES6](js/es6/note)
 * Vue
   
   * [Vue2](vue/vue2/note)
