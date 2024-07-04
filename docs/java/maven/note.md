@@ -122,7 +122,7 @@ mvn -v
 
 ![2e00be59f14944e39aee271a7a4af6d0.png](assets/bcfccbae82cfe521e9b7b551f16b48cc43cc5d25.png)
 
-**案例：**[拆分一下这个SSM整合案例]()
+**案例：**[拆分一下这个SSM整合案例](https://github.com/yx-Feng/myblogs/tree/main/code/java/springmvc)
 
 **（1）创建maven模块**
 

@@ -40,11 +40,11 @@ src/main/java/org/example/controller/UserController.java
 
 ```
 package org.example.controller;
- 
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
- 
+
 @Controller
 public class UserController {
     // 设置当前操作的访问路径
@@ -64,10 +64,10 @@ src/main/java/org/example/config/SpringMvcConfig.java
 
 ```
 package org.example.config;
- 
+
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
- 
+
 @Configuration
 @ComponentScan("org.example.controller")
 public class SpringMvcConfig {
@@ -80,13 +80,13 @@ src/main/java/org/example/config/ServletContainerConfig.java
 
 ```
 package org.example.config;
- 
+
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.support.AbstractDispatcherServletInitializer;
- 
+
 public class ServletContainerConfig extends AbstractDispatcherServletInitializer {
- 
+
     // 加载springMVC容器配置
     @Override
     protected WebApplicationContext createServletApplicationContext() {
@@ -94,13 +94,13 @@ public class ServletContainerConfig extends AbstractDispatcherServletInitializer
         ctx.register(SpringMvcConfig.class);
         return ctx;
     }
- 
+
     // 加载spring容器配置
     @Override
     protected WebApplicationContext createRootApplicationContext() {
         return null;
     }
- 
+
     // 设置哪些请求归属springMVC处理
     @Override
     protected String[] getServletMappings() {
@@ -157,10 +157,10 @@ src/main/java/org/example/config/SpringConfig.java
 
 ```
 package org.example.config;
- 
+
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
- 
+
 @Configuration
 @ComponentScan({"org.example.dao", "org.example.service"})
 public class SpringConfig {
@@ -173,13 +173,13 @@ src/main/java/org/example/config/ServletContainerConfig.java
 
 ```
 package org.example.config;
- 
+
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.support.AbstractDispatcherServletInitializer;
- 
+
 public class ServletContainerConfig extends AbstractDispatcherServletInitializer {
- 
+
     // 加载springMVC容器配置
     @Override
     protected WebApplicationContext createServletApplicationContext() {
@@ -187,7 +187,7 @@ public class ServletContainerConfig extends AbstractDispatcherServletInitializer
         ctx.register(SpringMvcConfig.class);
         return ctx;
     }
- 
+
     // 加载spring容器配置
     @Override
     protected WebApplicationContext createRootApplicationContext() {
@@ -195,7 +195,7 @@ public class ServletContainerConfig extends AbstractDispatcherServletInitializer
         ctx.register(SpringConfig.class);
         return ctx;
     }
-    
+
     // 设置哪些请求归属springMVC处理
     @Override
     protected String[] getServletMappings() {
@@ -211,17 +211,17 @@ package org.example.config;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 public class ServletContainerConfig extends AbstractAnnotationConfigDispatcherServletInitializer {
- 
+
     @Override
     protected Class<?>[] getRootConfigClasses() {
         return new Class[]{SpringConfig.class};
     }
- 
+
     @Override
     protected Class<?>[] getServletConfigClasses() {
         return new Class[]{SpringMvcConfig.class};
     }
- 
+
     @Override
     protected String[] getServletMappings() {
         return new String[]{"/"};
@@ -241,11 +241,11 @@ src/main/java/org/example/controller/UserController.java
 
 ```
 package org.example.controller;
- 
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
- 
+
 @Controller
 @RequestMapping("/user")
 public class UserController {
@@ -257,7 +257,7 @@ public class UserController {
         System.out.println("user save...");
         return "{'module':'springmvc'}";
     }
- 
+
     @RequestMapping("/delete")
     // 设置当前操作的返回值类型
     @ResponseBody
@@ -274,14 +274,14 @@ src/main/java/org/example/controller/UserController.java
 
 ```
 package org.example.controller;
- 
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
- 
+
 @Controller
 public class UserController {
- 
+
     @RequestMapping("/commonParam")
     @ResponseBody
     public String commonParam(String name, int age) {
@@ -316,23 +316,23 @@ src/main/java/org/example/controller/UserController.java
 
 ```
 package org.example.controller;
- 
+
 import org.example.domain.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
- 
+
 @Controller
 public class UserController {
- 
+
     @RequestMapping("/pojoParam")
     @ResponseBody
     public String pojoParam(User user) {
         System.out.println("pojo类参数 =>" + user);
         return "{'module':'pojo param'}";
     }
- 
+
     @RequestMapping("/pojoParamForJson")
     @ResponseBody
     public String pojoParamForJson(@RequestBody User user) {
@@ -346,11 +346,11 @@ src/main/java/org/example/domain/User.java
 
 ```
 package org.example.domain;
- 
+
 public class User {
     private String name;
     private int age;
- 
+
     @Override
     public String toString() {
         return "User{" +
@@ -358,19 +358,19 @@ public class User {
                 ", age=" + age +
                 '}';
     }
- 
+
     public String getName() {
         return name;
     }
- 
+
     public void setName(String name) {
         this.name = name;
     }
- 
+
     public int getAge() {
         return age;
     }
- 
+
     public void setAge(int age) {
         this.age = age;
     }
@@ -383,11 +383,11 @@ src/main/java/org/example/config/SpringMvcConfig.java
 
 ```
 package org.example.config;
- 
+
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
- 
+
 @Configuration
 @ComponentScan("org.example.controller")
 @EnableWebMvc
@@ -403,17 +403,17 @@ src/main/java/org/example/controller/UserController.java
 
 ```
 package org.example.controller;
- 
+
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
- 
+
 import java.util.Date;
- 
+
 @Controller
 public class UserController {
- 
+
     @RequestMapping("/dateParam")
     @ResponseBody
     public String pojoParam(Date date,
@@ -435,28 +435,28 @@ src/main/java/org/example/controller/UserController.java
 
 ```
 package org.example.controller;
- 
+
 import org.example.domain.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
- 
+
 @Controller
 public class UserController {
- 
+
     @RequestMapping("/toJumpPage")
     public String toJumpPage(){
        System.out.println("跳转页面");
        return "page.jsp";
     }
- 
+
     @RequestMapping("/toText")
     @ResponseBody
     public String toText(){
         System.out.println("返回文本数据");
         return "response text";
     }
- 
+
     @RequestMapping("/toJsonPOJO")
     @ResponseBody
     public User toJsonPOJO(){
@@ -520,38 +520,38 @@ package org.example.controller;
 import org.example.domain.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
- 
+
 @Controller
 public class UserController {
- 
+
     @RequestMapping(value = "/users", method = RequestMethod.POST)
     @ResponseBody
     public String save(@RequestBody User user) {
         System.out.println("user save..." + user);
         return "{'module':'user save'}";
     }
- 
+
     @RequestMapping(value = "/users/{id}", method = RequestMethod.DELETE)
     @ResponseBody
     public String delete(@PathVariable Integer id) {
         System.out.println("user delete..." + id);
         return "{'module':'user delete'}";
     }
- 
+
     @RequestMapping(value = "/users", method = RequestMethod.PUT)
     @ResponseBody
     public String update(@RequestBody User user) {
         System.out.println("user update..." + user);
         return "{'module':'user update'}";
     }
- 
+
     @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
     @ResponseBody
     public String getById(@PathVariable Integer id) {
         System.out.println("user getById..." + id);
         return "{'module':'user getById'}";
     }
- 
+
     @RequestMapping(value = "/users", method = RequestMethod.GET)
     @ResponseBody
     public String getAll() {
@@ -567,38 +567,38 @@ public class UserController {
 
 ```
 package org.example.controller;
- 
+
 import org.example.domain.User;
 import org.springframework.web.bind.annotation.*;
- 
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
- 
+
     @PostMapping
     public String save(@RequestBody User user) {
         System.out.println("user save..." + user);
         return "{'module':'user save'}";
     }
- 
+
     @DeleteMapping("/{id}")
     public String delete(@PathVariable Integer id) {
         System.out.println("user delete..." + id);
         return "{'module':'user delete'}";
     }
- 
+
     @PutMapping
     public String update(@RequestBody User user) {
         System.out.println("user update..." + user);
         return "{'module':'user update'}";
     }
- 
+
     @GetMapping("/{id}")
     public String getById(@PathVariable Integer id) {
         System.out.println("user getById..." + id);
         return "{'module':'user getById'}";
     }
- 
+
     @GetMapping
     public String getAll() {
         System.out.println("user getAll...");
@@ -609,7 +609,7 @@ public class UserController {
 
 ## 6. SSM整合案例
 
-[SSM整合小案例 · 源码]()
+[SSM整合小案例 · 源码](https://github.com/yx-Feng/myblogs/tree/main/code/java/springmvc)
 
 ### 6.1 整合配置(config目录)
 
@@ -703,13 +703,13 @@ src/main/java/org/example/controller/interceptor/ProjectInterceptor.java
 
 ```
 package org.example.controller.interceptor;
- 
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
- 
+
 @Component
 public class ProjectInterceptor implements HandlerInterceptor {
     @Override
@@ -718,12 +718,12 @@ public class ProjectInterceptor implements HandlerInterceptor {
         return true;
         // return false; // 用来终止原始操作
     }
- 
+
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
         System.out.println("postHandle...");
     }
- 
+
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
         System.out.println("afterCompletion...");
@@ -737,7 +737,7 @@ src/main/java/org/example/config/SpringMvcConfig.java
 
 ```
 package org.example.config;
- 
+
 import org.example.controller.interceptor.ProjectInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
@@ -745,14 +745,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
- 
+
 @Configuration
 @ComponentScan({"org.example.controller"})
 @EnableWebMvc
 public class SpringMvcConfig implements WebMvcConfigurer {
     @Autowired
     private ProjectInterceptor projectInterceptor;
- 
+
     // 配置拦截器
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -765,21 +765,21 @@ src/main/java/org/example/config/ServletConfig.java
 
 ```
 package org.example.config;
- 
+
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
- 
+
 public class ServletConfig extends AbstractAnnotationConfigDispatcherServletInitializer {
- 
+
     @Override
     protected Class<?>[] getRootConfigClasses() {
         return new Class[0];
     }
- 
+
     @Override
     protected Class<?>[] getServletConfigClasses() {
         return new Class[]{SpringMvcConfig.class};
     }
- 
+
     @Override
     protected String[] getServletMappings() {
         return new String[]{"/"};
@@ -791,38 +791,38 @@ src/main/java/org/example/controller/BookController.java
 
 ```
 package org.example.controller;
- 
+
 import org.example.domain.Book;
 import org.springframework.web.bind.annotation.*;
- 
+
 @RestController
 @RequestMapping("/books")
 public class BookController {
- 
+
     @PostMapping
     public String save(@RequestBody Book book) {
         System.out.println("book save..." + book);
         return "{'module':'book save'}";
     }
- 
+
     @PutMapping
     public String update(@RequestBody Book book) {
         System.out.println("book save..." + book);
         return "{'module':'book update'}";
     }
- 
+
     @DeleteMapping("/{id}")
     public String delete(@PathVariable Integer id) {
         System.out.println("book save..." + id);
         return "{'module':'book delete'}";
     }
- 
+
     @GetMapping("/{id}")
     public String getById(@PathVariable Integer id) {
         System.out.println("book getById..." + id);
         return "{'module':'book getById'}";
     }
- 
+
     @GetMapping
     public String getAll() {
         System.out.println("book getAll...");
@@ -835,13 +835,13 @@ src/main/java/org/example/domain/Book.java
 
 ```
 package org.example.domain;
- 
+
 public class Book {
     private Integer id;
     private String type;
     private String name;
     private String description;
- 
+
     @Override
     public String toString() {
         return "Book{" +
@@ -851,35 +851,35 @@ public class Book {
                 ", description='" + description + '\'' +
                 '}';
     }
- 
+
     public Integer getId() {
         return id;
     }
- 
+
     public void setId(Integer id) {
         this.id = id;
     }
- 
+
     public String getType() {
         return type;
     }
- 
+
     public void setType(String type) {
         this.type = type;
     }
- 
+
     public String getName() {
         return name;
     }
- 
+
     public void setName(String name) {
         this.name = name;
     }
- 
+
     public String getDescription() {
         return description;
     }
- 
+
     public void setDescription(String description) {
         this.description = description;
     }
