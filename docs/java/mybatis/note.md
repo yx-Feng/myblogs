@@ -13,9 +13,9 @@
 ```
 create database mybatis;
 use mybatis;
- 
+
 drop table if exists tb_user;
- 
+
 create table tb_user(
     id int primary key auto_increment,
     username varchar(20),
@@ -23,7 +23,7 @@ create table tb_user(
     gender char(1),
     addr varchar(30)
 );
- 
+
 INSERT INTO tb_user VALUES(1, '张三', '123', '男', '北京');
 INSERT INTO tb_user VALUES(2, '李四', '234', '女', '天津');
 INSERT INTO tb_user VALUES(3, '王五', '11', '男', '西安');
@@ -40,26 +40,26 @@ mybatis、mysql-connector-java、junit、log4j-slf4j-impl、logback-classic
             <artifactId>mybatis</artifactId>
             <version>3.5.13</version>
         </dependency>
- 
+
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.32</version>
         </dependency>
- 
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
- 
+
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
             <version>2.20.0</version>
         </dependency>
- 
+
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
@@ -117,45 +117,45 @@ mybatis、mysql-connector-java、junit、log4j-slf4j-impl、logback-classic
 
 ```
 package org.example.pojo;
- 
+
 public class User {
     private  Integer id;
     private  String username;
     private  String password;
     private  String addr;
- 
+
     public Integer getId() {
         return id;
     }
- 
+
     public void setId(Integer id) {
         this.id = id;
     }
- 
+
     public String getUsername() {
         return username;
     }
- 
+
     public void setUsername(String username) {
         this.username = username;
     }
- 
+
     public String getPassword() {
         return password;
     }
- 
+
     public void setPassword(String password) {
         this.password = password;
     }
- 
+
     public String getAddr() {
         return addr;
     }
- 
+
     public void setAddr(String addr) {
         this.addr = addr;
     }
- 
+
     @Override
     public String toString() {
         return "User{" +
@@ -172,16 +172,16 @@ public class User {
 
 ```
 package org.example.pojo;
- 
+
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
- 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
- 
+
 public class MyBatisDemo {
     public static void main(String[] args) throws IOException {
         //1. 加载mybatis的核心配置文件，获取SqlSessionFactory
@@ -211,12 +211,12 @@ src/main/java/org/example/mapper/UserMapper.java
 
 ```
 package org.example.mapper;
- 
+
 import org.example.pojo.User;
 import java.util.List;
- 
+
 public interface UserMapper {
- 
+
     List<User> selectAll();
 }
 ```
@@ -250,17 +250,17 @@ src/main/resources/org/example/mapper/UserMapper.xml
 
 ```
 package org.example.pojo;
- 
+
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.example.mapper.UserMapper;
- 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
- 
+
 public class MyBatisDemo {
     public static void main(String[] args) throws IOException {
         //1. 加载mybatis的核心配置文件，获取SqlSessionFactory
@@ -293,7 +293,7 @@ mybatis-config.xml
     <typeAliases>
         <package name="org.example.pojo"/>
     </typeAliases>
- 
+
     <environments default="development">
     <!-- environments配置数据库连接环境信息，可以配置多个environment，通过default属性切换不同的environment  -->
         <environment id="development">
@@ -344,7 +344,7 @@ UserMapper.xml（这里的resultType可以简写）
 
 ```
 drop table if exists tb_brand;
- 
+
 create table tb_brand
 (
     id int primary key auto_increment,
@@ -354,12 +354,12 @@ create table tb_brand
     description varchar(100),
     status int
 );
- 
+
 insert into tb_brand(brand_name, company_name, ordered, description, status) values 
                 ('三只松鼠', '三只松鼠股份有限公司', 5, '好吃不上火', 0),
        ('华为', '华为技术有限公司', 100, '全球领先的ICT基础设施和智能终端提供商', 1),
              ('小米', '小米科技有限公司', 50, '让每个人都能享受科技的乐趣', 1);
-             
+
 select * from tb_brand;
 ```
 
@@ -367,7 +367,7 @@ src/main/java/org/example/pojo/Brand.java
 
 ```
 package org.example.pojo;
- 
+
 public class Brand {
     private Integer id;
     private String brandName;
@@ -375,55 +375,55 @@ public class Brand {
     private Integer ordered;
     private String description;
     private Integer status;
- 
+
     public Integer getId() {
         return id;
     }
- 
+
     public void setId(Integer id) {
         this.id = id;
     }
- 
+
     public String getBrandName() {
         return brandName;
     }
- 
+
     public void setBrandName(String brandName) {
         this.brandName = brandName;
     }
- 
+
     public String getCompanyName() {
         return companyName;
     }
- 
+
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
     }
- 
+
     public Integer getOrdered() {
         return ordered;
     }
- 
+
     public void setOrdered(Integer ordered) {
         this.ordered = ordered;
     }
- 
+
     public String getDescription() {
         return description;
     }
- 
+
     public void setDescription(String description) {
         this.description = description;
     }
- 
+
     public Integer getStatus() {
         return status;
     }
- 
+
     public void setStatus(Integer status) {
         this.status = status;
     }
- 
+
     @Override
     public String toString() {
         return "Brand{" +
@@ -464,7 +464,7 @@ src/main/resources/mybatis-config.xml
     <typeAliases>
         <package name="org.example.pojo"/>
     </typeAliases>
- 
+
     <environments default="development">
     <!-- environments配置数据库连接环境信息，可以配置多个environment，通过default属性切换不同的environment  -->
         <environment id="development">
@@ -490,7 +490,7 @@ src/main/resources/mybatis-config.xml
 
 **解决：**
 
--  起别名，select xx as xx
+- 起别名，select xx as xx
 
 - sql片段
 
@@ -539,10 +539,10 @@ src/main/java/org/example/mapper/BrandMapper.java
 
 ```
 package org.example.mapper;
- 
+
 import org.example.pojo.Brand;
 import java.util.List;
- 
+
 public interface BrandMapper {
     public List<Brand> selectAll();
 
@@ -561,7 +561,7 @@ src/test/java/org/example/test/MyBatisTest.java
 
 ```
 package org.example.test;
- 
+
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -569,13 +569,13 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.example.mapper.BrandMapper;
 import org.example.pojo.Brand;
 import org.junit.Test;
- 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
- 
+
 public class MyBatisTest {
- 
+
     @Test
     public void testSelectAll() throws IOException {
         // 1. 加载mybatis的核心配置文件，获取SqlSessionFactory
@@ -668,18 +668,18 @@ BrandMapper.java
 
 ```
 package org.example.mapper;
- 
+
 import org.apache.ibatis.annotations.Param;
 import org.example.pojo.Brand;
 import java.util.List;
- 
+
 public interface BrandMapper {
     public List<Brand> selectAll();
- 
+
     Brand selectAllById(int id);
-    
+
     List<Brand> selectByCondition(Brand brand);
- 
+
     List<Brand> selectByConditionSingle(Brand brand);
 }
 ```
@@ -739,20 +739,20 @@ BrandMapper.java
 
 ```
 package org.example.mapper;
- 
+
 import org.apache.ibatis.annotations.Param;
 import org.example.pojo.Brand;
 import java.util.List;
- 
+
 public interface BrandMapper {
     public List<Brand> selectAll();
- 
+
     Brand selectAllById(int id);
- 
+
     List<Brand> selectByCondition(Brand brand);
- 
+
     List<Brand> selectByConditionSingle(Brand brand);
- 
+
     void add(Brand brand);
 }
 ```
@@ -765,7 +765,7 @@ String companyName = "字节跳动";
 String brandName = "字节跳动";
 String description = "激发创造, 丰富生活";
 int ordered = 100;
- 
+
 Brand brand = new Brand();
 brand.setStatus(status);
 brand.setCompanyName(companyName);
@@ -822,22 +822,22 @@ BrandMapper.java
 
 ```
 package org.example.mapper;
- 
+
 import org.apache.ibatis.annotations.Param;
 import org.example.pojo.Brand;
 import java.util.List;
- 
+
 public interface BrandMapper {
     public List<Brand> selectAll();
- 
+
     Brand selectAllById(int id);
- 
+
     List<Brand> selectByCondition(Brand brand);
- 
+
     List<Brand> selectByConditionSingle(Brand brand);
- 
+
     void add(Brand brand);
- 
+
     int update(Brand brand);
 }
 ```
@@ -851,7 +851,7 @@ String brandName = "字节跳动";
 String description = "字节，激发创造, 丰富生活";
 int ordered = 100;
 int id = 5;
- 
+
 Brand brand = new Brand();
 brand.setStatus(status);
 brand.setCompanyName(companyName);
@@ -889,26 +889,26 @@ BrandMapper.java
 
 ```
 package org.example.mapper;
- 
+
 import org.apache.ibatis.annotations.Param;
 import org.example.pojo.Brand;
 import java.util.List;
- 
+
 public interface BrandMapper {
     public List<Brand> selectAll();
- 
+
     Brand selectAllById(int id);
- 
+
     List<Brand> selectByCondition(Brand brand);
- 
+
     List<Brand> selectByConditionSingle(Brand brand);
- 
+
     void add(Brand brand);
- 
+
     int update(Brand brand);
- 
+
     void deleteById(int id);
- 
+
     void deleteByIds(@Param("ids") int[] ids);
 }
 ```
@@ -943,7 +943,7 @@ src/main/resources/mybatis-config.xml
     <typeAliases>
         <package name="org.example.pojo"/>
     </typeAliases>
- 
+
     <environments default="development">
     <!-- environments配置数据库连接环境信息，可以配置多个environment，通过default属性切换不同的environment  -->
         <environment id="development">
@@ -967,12 +967,12 @@ src/main/java/org/example/mapper/UserMapper.java
 
 ```
 package org.example.mapper;
- 
+
 import org.apache.ibatis.annotations.Select;
 import org.example.pojo.User;
- 
+
 public interface UserMapper {
- 
+
     @Select("select * from tb_user where id = #{id}")
     User selectById(int id);
 }
@@ -982,45 +982,45 @@ src/main/java/org/example/pojo/User.java
 
 ```
 package org.example.pojo;
- 
+
 public class User {
     private  Integer id;
     private  String username;
     private  String password;
     private  String addr;
- 
+
     public Integer getId() {
         return id;
     }
- 
+
     public void setId(Integer id) {
         this.id = id;
     }
- 
+
     public String getUsername() {
         return username;
     }
- 
+
     public void setUsername(String username) {
         this.username = username;
     }
- 
+
     public String getPassword() {
         return password;
     }
- 
+
     public void setPassword(String password) {
         this.password = password;
     }
- 
+
     public String getAddr() {
         return addr;
     }
- 
+
     public void setAddr(String addr) {
         this.addr = addr;
     }
- 
+
     @Override
     public String toString() {
         return "User{" +
@@ -1037,7 +1037,7 @@ src/test/java/org/example/test/UserMapperTest.java
 
 ```
 package org.example.test;
- 
+
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -1045,12 +1045,12 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.example.mapper.UserMapper;
 import org.example.pojo.User;
 import org.junit.Test;
- 
+
 import java.io.IOException;
 import java.io.InputStream;
- 
+
 public class UserMapperTest {
- 
+
     @Test
     public void test() throws IOException {
         String resource = "mybatis-config.xml";
@@ -1060,7 +1060,7 @@ public class UserMapperTest {
         SqlSession sqlSession = sqlSessionFactory.openSession();
         // 获取Mapper接口的代理对象，执行方法
         UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
- 
+
         User user = userMapper.selectById(1);
         System.out.println(user);
         sqlSession.close();

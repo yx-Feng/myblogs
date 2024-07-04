@@ -163,7 +163,7 @@ demo_pojo项目下的pom.xml文件（关注groupId和artifactId）
 <groupId>org.example</groupId>
 <artifactId>demo_dao</artifactId>
 <version>1.0-SNAPSHOT</version>
- 
+
 <dependencies>
     <!--依赖domain运行-->
     <dependency>
@@ -329,7 +329,7 @@ demo_pojo项目下的pom.xml文件（关注groupId和artifactId）
 <properties>
     <spring.version>6.0.10</spring.version>
 </properties>
- 
+
 <dependencies>
     <dependency>
         <groupId>org.springframework</groupId>
@@ -359,7 +359,7 @@ demo_pojo项目下的pom.xml文件（关注groupId和artifactId）
 <properties>
     <jdbc.url>jdbc:mysql://localhost:3306/ssm_db</jdbc.url>
 </properties>
- 
+
 <!--开启资源文件目录加载属性的过滤器-->
 <build>
     <resources>
@@ -458,3 +458,97 @@ maven install -D skipTests
 ```
 
 ![0c8bab77259a4a1da53e644308dfbc53.png](assets/f78f5aa1dfffde0edc453a967e5ab68c51a1af06.png)
+
+## 10. 私服（Nexus）
+
+私服是一台独立的服务器，用于解决团队内部的资源共享与资源同步问题。
+
+![9995872ff6e8434abda7c2718534a0cd.png](assets/a3a389254cffd47c774a8e0421fdfb264942230c.png)
+
+### 10.1 Nexus
+
+**Nexus**是sonatype公司的一款maven私服产品。[下载地址](https://help.sonatype.com/repomanager3/product-information/download "下载地址")
+
+**启动**
+
+```
+nexus.exe /run nexus
+```
+
+![51d3094c2a5f4b819f2d3d2bd402fbc9.png](assets/4561f0525fe0334fad3197dfe3ee041b535dffd1.png)
+
+**访问 & 登录**
+
+![433546dcf78944c6a11f1f5a8023825d.png](assets/5c7e2d1e4ed048544d9ae982bd95f95e7e172735.png)
+
+### 10.2 资源上传和下载
+
+![2d0fd81cccb6467f92c6f3df015cc9f9.png](assets/bfe6d8a695e3fc31672424e1f079e1106fed3dbe.png)
+
+本地仓库上传和访问资源需要进行**配置**。
+
+**①创建两个仓库demo-snapshot和demo-release**
+
+![1545ae2a8a66465d910d2375d5999d41.png](assets/b095a4d9c6ddca92b02ddf94ff9768c40d3c049a.png)
+
+**②配置访问私服的权限**
+
+![a99d467d7ffd4ec69c0a238da844ceac.png](assets/27f1f711133179689101a90d04bf59ad2297925f.png)
+
+```
+<servers>
+  <!--配置访问私服权限-->
+  <server>
+      <id>demo-snapshot</id>
+      <username>admin</username>
+      <password>root</password>
+  </server>
+  <server>
+      <id>demo-release</id>
+      <username>admin</username>
+      <password>root</password>
+  </server>
+</servers>
+```
+
+**③配置私服访问路径**
+
+还是在setting.xml文件中配置
+
+```
+<mirrors>
+    <!--私服的访问路径-->
+    <mirror>
+      <id>maven-public</id>
+      <mirrorOf>*</mirrorOf>
+      <url>http://localhost:8081/repository/maven-public/</url>
+    </mirror>
+ </mirrors>
+```
+
+配置信息和下图的**maven-group仓库组**保持一致，并且将demo-snapshot和demo-release仓库添加到仓库组中。
+
+![beba7b7be26843328d45ebac6cc5236f.png](assets/00dd3688a6ba46fa67da3aae9256acc5b602212d.png)
+
+**④在上文demo_aggregate工程中配置私服的具体位置（pom.xml文件）**
+
+```
+<distributionManagement>
+    <snapshotRepository>
+        <id>demo-snapshot</id>
+        <url>http://localhost:8081/repository/demo-snapshot/</url>
+    </snapshotRepository>
+    <repository>
+        <id>demo-release</id>
+        <url>http://localhost:8081/repository/demo-release/</url>
+    </repository>
+</distributionManagement>
+```
+
+**⑤上传**
+
+![e88cf57b1a284b15ae74ade0c6d42041.png](assets/8dd0cf62518fc7ef219a6dc0360f20076be5e7ec.png)
+
+**查看一下**
+
+![078dc9bffc374b258d6f723ea294a614.png](assets/6cb22670d9c52cf74081350af31de19ddd9b6e5d.png)
