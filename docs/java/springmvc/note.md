@@ -619,11 +619,11 @@ public class UserController {
 
 ### 6.2 功能模块
 
-**模型(domain目录)**：Book.java  
+**模型（domain目录）**：Book.java  
 
-**数据层(dao目录)**：BookDao.java  
+**数据层（dao目录）**：BookDao.java  
 
-**业务层(service目录)**：BookService.java、BookServiceImpl.java(service/impl目录)
+**业务层（service目录）**：BookService.java、BookServiceImpl.java(service/impl目录)
 
 **业务层接口测试**：BookServiceTest.java  
 
@@ -656,9 +656,11 @@ public class UserController {
 
 **项目异常分类**
 
-**业务异常(BusinessException)**：规范的用户行为产生的异常、不规范的用户行为产生的异常  
-**系统异常(SystemException)**：项目运行过程中可预计且无法避免的异常  
-**其他异常(Exception)**：编程人员未预期到的异常
+**业务异常（BusinessException）**：规范的用户行为产生的异常、不规范的用户行为产生的异常  
+
+**系统异常（SystemException）**：项目运行过程中可预计且无法避免的异常  
+
+**其他异常（Exception）**：编程人员未预期到的异常
 
 **异常处理器**：集中、统一地处理项目中出现的异常。
 
