@@ -1067,3 +1067,397 @@ public class UserMapperTest {
     }
 }
 ```
+
+## 6. MyBatisPlus
+
+MyBatisPlus是基于MyBatis框架基础上开发的增强型工具，旨在简化开发、提高效率。
+
+### 6.1 入门案例
+
+**①创建SpringBoot项目，添加Spring Web和Mysql driver**
+
+**②手动在pom.xml文件中添加mybatis plus和druid依赖**
+
+```
+<dependency>
+  <groupId>com.baomidou</groupId>
+  <artifactId>mybatis-plus-boot-starter</artifactId>
+  <version>3.5.3.1</version>
+</dependency>
+<dependency>
+  <groupId>com.alibaba</groupId>
+  <artifactId>druid</artifactId>
+  <version>1.2.18</version>
+</dependency>
+```
+
+**③创建数据库mp，创建User表。**
+
+![cff4bd09601c41a982e8bc17277a3497.png](assets/401278c28ae53ea5b855365d2fe9d4a189594bfe.png)
+
+**④ JDBC配置（application.yml）**
+
+```
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/mp?serverTimezone=UTC
+    username: root
+    password: root
+```
+
+**⑤制作实体类（类名与数据库表名类似，类的属性和表字段对应）**
+
+domain.User.java
+
+```
+package com.example.domain;
+
+public class User {
+    private long id;
+    private int age;
+    private String name, password, tel;
+
+    public long getId() {
+        return id;
+    }
+
+    @java.lang.Override
+    public java.lang.String toString() {
+        return "User{" +
+                "id=" + id +
+                ", age=" + age +
+                ", name='" + name + '\'' +
+                ", password='" + password + '\'' +
+                ", tel='" + tel + '\'' +
+                '}';
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getTel() {
+        return tel;
+    }
+
+    public void setTel(String tel) {
+        this.tel = tel;
+    }
+}
+```
+
+**⑥定义数据接口，继承BaseMapper**
+
+dao.UserDao.java
+
+```
+package com.example.dao;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.example.domain.User;
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper
+public interface UserDao extends BaseMapper<User> {
+}
+```
+
+**⑦测试类测试功能**
+
+数据层CRUD开发
+
+```
+package com.example;
+
+import com.example.dao.UserDao;
+import com.example.domain.User;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.List;
+
+@SpringBootTest
+class MpDemoApplicationTests {
+
+    @Autowired
+    private UserDao userDao;
+
+    @Test
+    void testSave() {
+        User user = new User();
+        user.setName("鼠鼠");
+        user.setPassword("666");
+        user.setAge(13);
+        user.setTel("88888");
+        userDao.insert(user);
+    }
+
+    @Test
+    void testDelete() {
+        userDao.deleteById(4);
+    }
+
+    @Test
+    void testUpdate() {
+        User user = new User();
+        user.setId(1L);
+        user.setName("Tom88");
+        user.setPassword("tom888");
+        userDao.updateById(user);
+    }
+
+    @Test
+    void testGetById() {
+        User user = userDao.selectById(2L);
+        System.out.println(user);
+    }
+
+    @Test
+    void testGetAll() {
+        List<User> userList = userDao.selectList(null);
+        System.out.println(userList);
+    }
+}
+```
+
+![e86ba0fbe59a45cdada2760d19caf16d.png](assets/dd25d282730c8c77b7c135bc1ed605738629068f.png)
+
+### 6.2 Lombok
+
+**Lombok，一个Java类库，提供了一组注解，简化POJO实体类的开发。**
+
+在pom.xml中添加依赖
+
+```
+<dependency>
+  <groupId>org.projectlombok</groupId>
+  <artifactId>lombok</artifactId>
+</dependency>
+```
+
+domain.User.java
+
+```
+package com.example.domain;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Setter
+@Getter
+@ToString
+public class User {
+    private long id;
+    private int age;
+    private String name, password, tel;
+}
+```
+
+或
+
+```
+package com.example.domain;
+
+import lombok.Data;
+
+@Data
+public class User {
+    private long id;
+    private int age;
+    private String name, password, tel;
+}
+```
+
+### 6.3 分页查询
+
+设置分页拦截器作为Spring管理的bean。
+
+config.Mpconfig.java
+
+```
+package com.example.config;
+
+import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class MpConfig {
+    @Bean
+    public MybatisPlusInterceptor mpInterceper() {
+        // 1. 定义Mp拦截器
+        MybatisPlusInterceptor mpInterceptor = new MybatisPlusInterceptor();
+        mpInterceptor.addInnerInterceptor(new PaginationInnerInterceptor());
+        return mpInterceptor;
+    }
+}
+```
+
+测试类
+
+```
+@Test
+void testGetByPage() {
+  IPage page = new Page(1, 2);
+  userDao.selectPage(page, null);
+  System.out.println("当前页码值：" + page.getCurrent());
+  System.out.println("每页显示数：" + page.getSize());
+  System.out.println("一共多少页：" + page.getPages());
+  System.out.println("一共多少条数据：" + page.getTotal());
+  System.out.println("数据：" + page.getRecords());
+}
+```
+
+## 7. 条件查询、多条件查询
+
+MyBatisPlus将书写复杂的SQL查询条件进行了封装，使用编程的形式完成查询条件的组合。
+
+```
+@Test
+void testGetByCondition() {
+    // 方式一：按条件查询
+    QueryWrapper<User> qw = new QueryWrapper<User>();
+    qw.lt("age", 20);
+    List<User> userList = userDao.selectList(qw);
+    System.out.println(userList);
+
+    // 方式二：lambda格式
+    QueryWrapper<User> qw2 = new QueryWrapper<User>();
+    qw2.lambda().lt(User::getAge, 10);
+    List<User> userList2 = userDao.selectList(qw2);
+    System.out.println(userList2);
+
+    // 方式三：lambda格式
+    LambdaQueryWrapper<User> qw3 = new LambdaQueryWrapper<User>();
+    qw3.lt(User::getAge, 10);
+    List<User> userList3 = userDao.selectList(qw3);
+    System.out.println(userList3);
+ 
+    // 多条件查询
+    LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<User>();
+    // 10到30岁之间
+    // lqw.lt(User::getAge, 30).gt(User::getAge, 10);
+    // 小于10岁或大于30岁
+    lqw.lt(User::getAge, 10).or().gt(User::getAge, 30);
+    List<User> userList4 = userDao.selectList(lqw);
+}
+```
+
+## 8. 条件查询null判定
+
+封装User模型的查询条件，这里age是具有上下限的，User类里面的age作为下限，这里的age2作为上限。
+
+domain.query.UserQuery.java
+
+```
+package com.example.domain.query;
+ 
+import com.example.domain.User;
+import lombok.Data;
+ 
+@Data
+public class UserQuery extends User {
+    private int age2;
+}
+```
+
+**① if语句控制**
+
+![d7f3fc6e964641bf83f8b92d2f7d8832.png](assets/d8dbec9b1e54b6ba8fb08678eff6a5afcecfa32f.png)
+
+**②条件参数控制**
+
+![b06d630771634c0a978e34e8e43037f7.png](assets/db01c717f73b40bdd78ad0082c45738d5c9a1116.png)
+
+## 9. 查询投影
+
+查询结果包含模型类中的部分属性。
+
+![026d36159031450497302a8c07ab136b.png](assets/39fd876529562cc6ddedc5af7da5c2ad526d85d9.png)
+
+查询结果包含模型类中未定义的属性。
+
+![32f1476a0450445992ac01e2315d654d.png](assets/dccac02927e9628dfe8d0f55addda254c90ecaba.png)
+
+## 10. 查询条件
+
+![b18cefa29bb9456185989dbafd376505 (1).png](assets/ccdd9921a5d923e62a37dfdf52abfd12f98fe0cd.png)
+
+![92e7ff7533064763a9d1a441f266d8c9.png](assets/c16b0999ef8b34d748eb9122d0b3924fa8d0f8f8.png)
+
+## 11. @TableField注解和@TableName注解
+
+问题一：表字段和编码属性设计不同步  
+
+问题二：编码中添加了数据库中未定义的属性  
+
+问题三：设定某个字段不参与查询，比如密码pwd字段  
+
+问题四：表名与编码开发设计不同步
+
+前三个问题采用`@TableField注解`，问题四采用`@TableName注解`
+
+![5ae820c46fb94b48a638e8a6b4bc635f.png](assets/8a26d681fce0683c50b8ae0e45f6fa20fc30c536.png)
+
+## 12. id生成策略控制
+
+不同的表，应用不同的id生成策略。
+
+- 日志：自增（1，2，3....）
+- 购物订单：特殊规则（FQ23948c232e）
+- 外卖单：关联地区、日期等信息
+
+**使用@TableId注解**
+
+![0aeaee7e4e88441d80700f8d20b940d7.png](assets/e0d2420fb534c4ab40612f0d4916f82a2f182924.png)
+
+- AUTO(0)：使用数据库id自增策略控制id生成
+
+- NONE(1)：不设置id生成策略
+
+- INPUT(2)：用户手工输入id
+
+- ASSIGN_ID(3)：雪花算法生成id(可兼容数值型与字符串型)
+
+- ASSIGN_UUID(4)：以UUID生成算法作为id生成策略
+
+## 13. 多记录操作
+
+![e5f3ed1a3ef046428e9b5fa27b3c985b.png](assets/6e4863dfb1ba8d5d54121fce3ab2d3b30fb97763.png)
+
+## 14. 逻辑删除
+
+删除操作的问题：业务数据从数据库中丢弃
+
+逻辑删除：为数据设置是否可用状态字段，删除时设置字段为不可用状态，数据保留在数据库中。
+
+具体使用`@TableLogic`注解
