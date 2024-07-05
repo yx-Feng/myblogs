@@ -764,7 +764,7 @@ src/main/java/com/itheima/dao/BookDao.java
 
 ```
 package com.itheima.dao;
- 
+
 public interface BookDao {
     public void save();
 }
@@ -809,7 +809,7 @@ package com.itheima;
 import com.itheima.dao.BookDao;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
- 
+
 public class App {
     public static void main( String[] args ) {
         ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
@@ -831,7 +831,7 @@ Spring3.0开启了纯注解开发模式，使用Java类代替配置文件
 package com.itheima.config;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
- 
+
 // @Configuration用于设定当前类为配置类
 // @ComponentScan用于设定扫描路径，此注解只能添加一次，多个数据使用{"",""}的格式
 @Configuration
@@ -848,7 +848,7 @@ import com.itheima.config.SpringConfig;
 import com.itheima.dao.BookDao;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
- 
+
 public class App {
     public static void main( String[] args ) {
         ApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfig.class);
@@ -871,7 +871,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
- 
+
 @Repository("bookDao")
 @Scope("singleton")
 public class BookDaoImpl implements BookDao {
@@ -895,7 +895,7 @@ public class BookDaoImpl implements BookDao {
 package com.itheima;
 import com.itheima.config.SpringConfig;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
- 
+
 public class App {
     public static void main( String[] args ) {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfig.class);
@@ -921,7 +921,7 @@ package com.itheima.config;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
- 
+
 @Configuration
 @ComponentScan("com.itheima")
 @PropertySource({"jdbc.properties"})
@@ -948,18 +948,18 @@ import com.itheima.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
- 
+
 @Service
 public class BookServiceImpl implements BookService {
     @Autowired
     private BookDao bookDao;
- 
+
     @Value("100")
     private String connectionNum;
- 
+
     @Value("${name}")
     private String name;
- 
+
     public void save() {
         System.out.println("book service save ..."+connectionNum+name);
         bookDao.save();
@@ -974,7 +974,7 @@ package com.itheima;
 import com.itheima.config.SpringConfig;
 import com.itheima.service.BookService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
- 
+
 public class App {
     public static void main( String[] args ) {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfig.class);
@@ -1005,7 +1005,7 @@ import com.itheima.dao.BookDao;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import javax.sql.DataSource;
- 
+
 public class JdbcConfig {
     //1.定义一个方法获得要管理的对象
     @Value("com.mysql.jdbc.Driver")
@@ -1039,7 +1039,7 @@ package com.itheima.config;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
- 
+
 @Configuration
 @ComponentScan("com.itheima")
 // @Import:导入配置信息
@@ -1055,7 +1055,7 @@ package com.itheima;
 import com.itheima.config.SpringConfig;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import javax.sql.DataSource;
- 
+
 public class App {
     public static void main(String[] args) {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfig.class);
@@ -1109,7 +1109,7 @@ pom.xml
 
 ```
 package com.itheima.dao;
- 
+
 public interface BookDao {
     public void save();
     public void update();
@@ -1122,15 +1122,15 @@ public interface BookDao {
 package com.itheima.dao.Impl;
 import com.itheima.dao.BookDao;
 import org.springframework.stereotype.Repository;
- 
+
 @Repository
 public class BookDaoImpl implements BookDao {
- 
+
     public void save() {
         System.out.println(System.currentTimeMillis());
         System.out.println("book dao save ...");
     }
- 
+
     public void update(){
         System.out.println("book dao update ...");
     }
@@ -1147,7 +1147,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
- 
+
 //通知类必须配置成Spring管理的bean
 @Component
 //设置当前类为切面类类
@@ -1156,7 +1156,7 @@ public class MyAdvice {
     //设置切入点，要求配置在方法上方
     @Pointcut("execution(void com.itheima.dao.BookDao.update())")
     private void pt(){}
- 
+
     //设置在切入点pt()的前面运行当前操作（前置通知）
     @Before("pt()")
     public void method(){
@@ -1172,7 +1172,7 @@ package com.itheima.config;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
- 
+
 @Configuration
 @ComponentScan("com.itheima")
 //开启注解开发AOP功能
@@ -1191,7 +1191,7 @@ import com.itheima.config.SpringConfig;
 import com.itheima.dao.BookDao;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
- 
+
 public class App {
     public static void main(String[] args) {
         ApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfig.class);
@@ -1251,7 +1251,7 @@ pom.xml和SpringConfig.java同上面的案例
 
 ```
 package com.itheima.dao;
- 
+
 public interface BookDao {
     public String findName(int id);
 }
@@ -1261,10 +1261,10 @@ public interface BookDao {
 
 ```
 package com.itheima.dao.impl;
- 
+
 import com.itheima.dao.BookDao;
 import org.springframework.stereotype.Repository;
- 
+
 @Repository
 public class BookDaoImpl implements BookDao {
     public String findName(int id) {
@@ -1283,7 +1283,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.springframework.stereotype.Component;
 import java.util.Arrays;
- 
+
 //通知类必须配置成Spring管理的bean
 @Component
 //设置当前类为切面类类
@@ -1292,7 +1292,7 @@ public class MyAdvice {
     //设置切入点，要求配置在方法上方
     @Pointcut("execution(* com.itheima.dao.BookDao.findName(..))")
     private void pt(){}
- 
+
     //设置在切入点pt()的前面运行当前操作（前置通知）
     @Before("pt()")
     public void before(JoinPoint jp) {
@@ -1300,14 +1300,14 @@ public class MyAdvice {
         System.out.println(Arrays.toString(args));
         System.out.println("before advice ...");
     }
- 
+
     // @After("pt()")
     public void after(JoinPoint jp) {
         Object[] args = jp.getArgs();
         System.out.println(Arrays.toString(args));
         System.out.println("after advice ...");
     }
- 
+
     //@Around("pt()")
     public Object around(ProceedingJoinPoint pjp) throws Throwable {
         Object[] args = pjp.getArgs();
@@ -1316,12 +1316,12 @@ public class MyAdvice {
         Object ret = pjp.proceed(args); // 获取参数处理之后再发送回去
         return ret;
     }
- 
+
     //@AfterReturning(value="pt()",returning = "ret")
     public void afterReturning(String ret) {
         System.out.println("afterReturning advice " + ret);
     }
- 
+
     //@AfterThrowing(value="pt()",throwing = "t")
     public void afterThrowing(Throwable t) {
         System.out.println("afterThrowing advice " + t);
@@ -1333,12 +1333,12 @@ public class MyAdvice {
 
 ```
 package com.itheima;
- 
+
 import com.itheima.config.SpringConfig;
 import com.itheima.dao.BookDao;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
- 
+
 public class App {
     public static void main(String[] args) {
         ApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfig.class);
@@ -1359,7 +1359,7 @@ pom.xml和/src/main/java/com/itheima/config/SpringConfig.java同上面的案例
 
 ```
 package com.itheima.dao;
- 
+
 public interface ResourcesDao {
     boolean readResources(String url, String password);
 }
@@ -1369,10 +1369,10 @@ public interface ResourcesDao {
 
 ```
 package com.itheima.dao.impl;
- 
+
 import com.itheima.dao.ResourcesDao;
 import org.springframework.stereotype.Repository;
- 
+
 @Repository
 public class ResourcesDaoImpl implements ResourcesDao {
     public boolean readResources(String url, String password) {
@@ -1386,7 +1386,7 @@ public class ResourcesDaoImpl implements ResourcesDao {
 
 ```
 package com.itheima.service;
- 
+
 public interface ResourcesService {
     public boolean openURL(String url, String password);
 }
@@ -1396,17 +1396,17 @@ public interface ResourcesService {
 
 ```
 package com.itheima.service.impl;
- 
+
 import com.itheima.dao.ResourcesDao;
 import com.itheima.service.ResourcesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
- 
+
 @Service
 public class ResourcesServiceImpl implements ResourcesService {
     @Autowired
     private ResourcesDao resourcesDao;
- 
+
     @Override
     public boolean openURL(String url, String password) {
         return resourcesDao.readResources(url, password);
@@ -1418,18 +1418,18 @@ public class ResourcesServiceImpl implements ResourcesService {
 
 ```
 package com.itheima.aop;
- 
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.springframework.stereotype.Component;
- 
+
 @Component
 @Aspect
 public class DateAdvice {
     //设置切入点，要求配置在方法上方
     @Pointcut("execution(boolean com.itheima.service.*Service.openURL(*,*))")
     private void servicePt(){}
- 
+
     @Around("DateAdvice.servicePt()")
     public Object around(ProceedingJoinPoint pjp) throws Throwable {
         Object[] args = pjp.getArgs();
@@ -1449,12 +1449,12 @@ public class DateAdvice {
 
 ```
 package com.itheima;
- 
+
 import com.itheima.config.SpringConfig;
 import com.itheima.service.ResourcesService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
- 
+
 public class App {
     public static void main(String[] args) {
         ApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfig.class);
@@ -1511,12 +1511,12 @@ pom.xml中导入的依赖有：spring-context、spring-jdbc、mybatis、mybatis-
 
 ```
 package com.itheima.config;
- 
+
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.mapper.MapperScannerConfigurer;
 import org.springframework.context.annotation.Bean;
 import javax.sql.DataSource;
- 
+
 public class MybatisConfig {
     @Bean
     public SqlSessionFactoryBean sqlSessionFactory(DataSource dataSource) {
@@ -1525,7 +1525,7 @@ public class MybatisConfig {
         ssfb.setDataSource(dataSource);
         return ssfb;
     }
- 
+
     @Bean
     public MapperScannerConfigurer mapperScannerConfigurer() {
         MapperScannerConfigurer msc = new MapperScannerConfigurer();
@@ -1539,14 +1539,14 @@ public class MybatisConfig {
 
 ```
 package com.itheima.config;
- 
+
 import com.alibaba.druid.pool.DruidDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import javax.sql.DataSource;
- 
+
 public class JdbcConfig {
     // 读取配置文件jdbc.properties的信息
     @Value("${jdbc.driver}")
@@ -1557,7 +1557,7 @@ public class JdbcConfig {
     private String userName;
     @Value("${jdbc.password}")
     private String password;
- 
+
     @Bean
     public DataSource dataSource() {
         DruidDataSource ds = new DruidDataSource();
@@ -1567,7 +1567,7 @@ public class JdbcConfig {
         ds.setPassword(password);
         return ds;
     }
- 
+
     // 配置事物管理器,mybatis使用的是jdbc事务
     @Bean
     public PlatformTransactionManager transactionManager(DataSource dataSource) {
@@ -1582,13 +1582,13 @@ public class JdbcConfig {
 
 ```
 package com.itheima.config;
- 
+
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
- 
+
 @Configuration
 @ComponentScan("com.itheima")
 @PropertySource("classpath:jdbc.properties")
@@ -1605,14 +1605,14 @@ public class SpringConfig {
 
 ```
 package com.itheima.dao;
- 
+
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Update;
- 
+
 public interface AccountDao {
     @Update("update tbl_account set money = money + #{money} where name = #{name}")
     void inMoney(@Param("name") String name, @Param("money") Double money);
- 
+
     @Update("update tbl_account set money = money - #{money} where name = #{name}")
     void outMoney(@Param("name") String name, @Param("money") Double money);
 }
@@ -1623,7 +1623,7 @@ public interface AccountDao {
 ```
 package com.itheima.service;
 import org.springframework.transaction.annotation.Transactional;
- 
+
 public interface AccountService {
     /**
      * 转账操作
@@ -1641,18 +1641,18 @@ public interface AccountService {
 
 ```
 package com.itheima.service.impl;
- 
+
 import com.itheima.dao.AccountDao;
 import com.itheima.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
- 
+
 @Service
 public class AccountServiceImpl implements AccountService {
- 
+
     @Autowired
     private AccountDao accountDao;
- 
+
     public void transfer(String out,String in ,Double money) {
         accountDao.outMoney(out,money);
         // int i = 1/0;
@@ -1667,7 +1667,7 @@ public class AccountServiceImpl implements AccountService {
 
 ```
 package com.itheima.service;
- 
+
 import com.itheima.config.SpringConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -1675,14 +1675,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.io.IOException;
- 
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = SpringConfig.class)
 public class AccountServiceTest {
- 
+
     @Autowired
     private AccountService accountService;
- 
+
     @Test
     public void testTransfer() throws IOException {
         accountService.transfer("Jack","Rose",100D);
@@ -1727,7 +1727,7 @@ public class AccountServiceTest {
 ```
 package com.itheima.dao;
 import org.apache.ibatis.annotations.Insert;
- 
+
 public interface LogDao {
     @Insert("insert into tbl_log(info,createDate) values(#{info},now())" )
     void log(String info);
@@ -1738,10 +1738,10 @@ public interface LogDao {
 
 ```
 package com.itheima.service;
- 
+
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
- 
+
 public interface LogService {
     //propagation设置事务属性：传播行为设置为当前操作需要新事务
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -1753,17 +1753,17 @@ public interface LogService {
 
 ```
 package com.itheima.service.impl;
- 
+
 import com.itheima.dao.LogDao;
 import com.itheima.service.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
- 
+
 @Service
 public class LogServiceImp implements LogService {
     @Autowired
     private LogDao logDao;
- 
+
     public void log(String out, String in, Double money) {
         logDao.log("转账操作由"+out+"到"+in+",金额："+money);
     }
@@ -1776,22 +1776,22 @@ public class LogServiceImp implements LogService {
 
 ```
 package com.itheima.service.impl;
- 
+
 import com.itheima.dao.AccountDao;
 import com.itheima.service.AccountService;
 import com.itheima.service.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
- 
+
 @Service
 public class AccountServiceImpl implements AccountService {
     @Autowired
     private AccountDao accountDao;
- 
+
     // 该接口类只有一个实现类，这里自动装配的其实是实现类
     @Autowired
     private LogService logService;
- 
+
     public void transfer(String out,String in ,Double money) {
         try {
             accountDao.outMoney(out,money);

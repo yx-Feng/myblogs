@@ -1361,7 +1361,7 @@ void testGetByCondition() {
     qw3.lt(User::getAge, 10);
     List<User> userList3 = userDao.selectList(qw3);
     System.out.println(userList3);
- 
+
     // 多条件查询
     LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<User>();
     // 10到30岁之间
@@ -1380,10 +1380,10 @@ domain.query.UserQuery.java
 
 ```
 package com.example.domain.query;
- 
+
 import com.example.domain.User;
 import lombok.Data;
- 
+
 @Data
 public class UserQuery extends User {
     private int age2;
