@@ -26,8 +26,6 @@
   
   - [MyBatis](java/mybatis/note)
   
-  - [MyBatisPlus](java/mybatisplus/note)
-  
   - [微服务](java/microservice/note01)
 
 - Git
