@@ -29,6 +29,8 @@
   - [微服务](java/microservice/note01)
 
 - Git
+  
+  - [理论](git/theory/note)
 
 - Docker
 
