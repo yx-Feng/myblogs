@@ -357,7 +357,7 @@ public class BookDaoImpl implements BookDao, InitializingBean, DisposableBean {
 
 ## 3. 依赖注入
 
-**依赖注入(DI：dependence injection)**：在容器中建立bean与bean之间的依赖关系的整个过程。
+**依赖注入（DI：dependence injection）**：在容器中建立bean与bean之间的依赖关系的整个过程。
 
 向一个bean中传递数据有三种方法：**setter注入**、**构造器注入**、**自动装配**
 
@@ -1073,13 +1073,13 @@ public class App {
 
 **作用**：在不惊动原始设计的基础上为其进行功能增强。
 
-**连接点(JoinPoint)**：程序执行过程中的任意位置
+**连接点（JoinPoint）**：程序执行过程中的任意位置
 
-**切入点(PointCut)**：匹配连接点的式子
+**切入点（PointCut）**：匹配连接点的式子
 
-**通知(Advice)**：在切入点执行的操作
+**通知（Advice）**：在切入点执行的操作
 
-**切面(Aspect)**：描述通知与切入点的对应关系
+**切面（Aspect）**：描述通知与切入点的对应关系
 
 ### 7.2 小案例
 

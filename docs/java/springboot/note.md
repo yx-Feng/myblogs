@@ -167,10 +167,10 @@ application.yml
 
 ```
 lesson: SpringBoot
- 
+
 server:
   port: 80
- 
+
 enterprise:
   name: abc
   age: 16
@@ -187,26 +187,26 @@ enterprise:
 
 ```
 package com.example.controller;
- 
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
- 
+
 @RestController
 @RequestMapping("/books")
 public class BookController {
- 
+
     @Value("${lesson}")
     private String lesson;
- 
+
     @Value("${server.port}")
     private Integer port;
- 
+
     @Value("${enterprise.subject[0]}")
     private String subject_0;
- 
+
     @GetMapping("/{id}")
     public String getById(@PathVariable Integer id) {
         System.out.println(lesson);
@@ -221,21 +221,21 @@ public class BookController {
 
 ```
 package com.example.controller;
- 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
- 
+
 @RestController
 @RequestMapping("/books")
 public class BookController {
-    
+
     @Autowired
     private Environment environment;
- 
+
     @GetMapping("/{id}")
     public String getById(@PathVariable Integer id) {
         System.out.println(environment.getProperty("lesson"));
@@ -251,21 +251,21 @@ public class BookController {
 
 ```
 package com.example.controller;
- 
+
 import com.example.domain.Enterprise;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
- 
+
 @RestController
 @RequestMapping("/books")
 public class BookController {
- 
+
     @Autowired
     private Enterprise enterprise;
- 
+
     @GetMapping("/{id}")
     public String getById(@PathVariable Integer id) {
         System.out.println(enterprise);
@@ -278,12 +278,12 @@ public class BookController {
 
 ```
 package com.example.domain;
- 
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
- 
+
 @Component
 @ConfigurationProperties(prefix = "enterprise")
 public class Enterprise {
@@ -291,23 +291,23 @@ public class Enterprise {
     private Integer age;
     private String tel;
     private String[] subject;
- 
+
     public void setName(String name) {
         this.name = name;
     }
- 
+
     public void setAge(Integer age) {
         this.age = age;
     }
- 
+
     public void setTel(String tel) {
         this.tel = tel;
     }
- 
+
     public void setSubject(String[] subject) {
         this.subject = subject;
     }
- 
+
     @Override
     public String toString() {
         return "Enterprise{" +
@@ -338,7 +338,7 @@ resources/application.xml
 spring:
   profiles:
     active: pro
- 
+
 ---
 # 开发
 spring:
@@ -347,7 +347,7 @@ spring:
       on-profile: dev
 server:
   port: 80
- 
+
 ---
 # 生产
 spring:
@@ -356,7 +356,7 @@ spring:
       on-profile: pro
 server:
   port: 81
- 
+
 ---
 # 测试
 spring:
@@ -385,28 +385,28 @@ pom.xml
 
 ```
   <profiles>
-		<profile>
-			<id>dev</id>
-			<properties>
-				<profile.active>dev</profile.active>
-			</properties>
-		</profile>
-		<profile>
-			<id>pro</id>
-			<properties>
-				<profile.active>pro</profile.active>
-			</properties>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-		</profile>
-		<profile>
-			<id>test</id>
-			<properties>
-				<profile.active>test</profile.active>
-			</properties>
-		</profile>
-	</profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <profile.active>dev</profile.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>pro</id>
+            <properties>
+                <profile.active>pro</profile.active>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>test</id>
+            <properties>
+                <profile.active>test</profile.active>
+            </properties>
+        </profile>
+    </profiles>
 ```
 
 使用插件对资源文件开启对默认占位符的解析
@@ -562,7 +562,7 @@ public interface UserDao {
 > 2.application.yml
 > 设置数据源、端口等
 > 
-> 3,配置类
+> 3.配置类
 > 全部删除
 > 
 > 4.dao
@@ -593,7 +593,7 @@ public interface UserDao {
 ```
 server:
   port: 80
- 
+
 spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
