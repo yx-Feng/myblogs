@@ -1,6 +1,6 @@
 <!-- docs/_sidebar.md -->
 
-- [主页](/home)🏠
+- [🏠主页](/home)
 
 - JavaScript
   
