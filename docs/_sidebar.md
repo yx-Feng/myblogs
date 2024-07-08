@@ -28,6 +28,10 @@
   
   - [微服务](java/microservice/note01)
 
+- Go
+  
+  - [理论](go/theory/note)
+
 - Git
   
   - [理论](git/theory/note)
