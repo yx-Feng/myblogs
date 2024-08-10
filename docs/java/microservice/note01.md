@@ -108,7 +108,7 @@ nginx.exe -s restart
 
 例如，黑马商城项目，我们就可以把商品、用户、购物车、交易等模块拆分，交给不同的团队去开发，并独立部署：
 
-<img title="" src="assets/c664537e99cf0eddcbaa076dc0038cef9860363b.jpg" alt="e007b564-cc3b-46fd-bdbe-7dee392f5f54.jpg" width="718">
+![c664537e99cf0eddcbaa076dc0038cef9860363b.jpg](assets/bdc45253f1eb44d28f5acc5863d141c5801d7ebc.jpg)
 
 ## 1.3.SpringCloud
 
@@ -116,7 +116,7 @@ SpringCloud框架可以说是目前Java领域最全面的微服务组件的集�
 
 而且SpringCloud依托于SpringBoot的自动装配能力，大大降低了其项目搭建、组件使用的成本。对于没有自研微服务组件能力的中小型企业，使用SpringCloud全家桶来实现微服务开发可以说是最合适的选择了！
 
-<img src="assets/6eccac3adab8fce5e4d964e1327b39e298bf7be4.png" title="" alt="62a0454a-01d2-408d-8363-0152c4a1ea33.png" width="784">
+![6eccac3adab8fce5e4d964e1327b39e298bf7be4.png](assets/db8ed0b9734f5e75b2ed9b7fef585f3978d3577c.png)
 
 # 2.微服务拆分
 
