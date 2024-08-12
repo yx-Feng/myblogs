@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8"></meta>
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="test1"></div>
+    <div id="test2"></div>
+ 
+    <script type="text/javascript" src="./js/react.development.js"></script>
+    <script type="text/javascript" src="./js/react-dom.development.js"></script>
+    <script type="text/javascript" src="./js/babel.min.js"></script>
+    <!-- 引入prop-types，全局就多了一个propTypes对象，用于对组件标签属性进行限制 -->
+    <script type="text/javascript" src="./js/prop-types.js"></script>
+ 
+    <script type="text/babel">
+      class Person extends React.Component {
+        render() {
+          const {name,age,sex,speak} = this.props
+          return (
+            <ul>
+              <li>姓名：{name}</li>
+              <li>性别：{sex}</li>
+              <li>年龄：{age}</li>
+            </ul>
+          )
+        }
+      }
+      // 对标签属性进行类型、必要性的限制
+      Person.propTypes = {
+        name: PropTypes.string.isRequired,
+        sex: PropTypes.string,
+        age: PropTypes.number,
+        speak: PropTypes.func
+      }
+      // 指定默认标签属性值
+      Person.defaultProps = {
+        sex: '男',
+        age: 18
+      }
+      const p1 = {name: 'Tom', age:18, sex: '男', speak: speak}
+      const p2 = {name: 'Nancy', age:19, sex: '女'}
+      function speak() {
+        console.log('我说话了')
+      }
+      ReactDOM.render(<Person {...p1}/>, document.getElementById('test1'))
+      ReactDOM.render(<Person {...p2}/>, document.getElementById('test2'))
+    </script>
+  </body>
+</html>
