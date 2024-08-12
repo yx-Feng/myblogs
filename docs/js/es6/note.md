@@ -397,3 +397,9 @@ console.log(all.flag)
 ```
 
 ![Snipaste_2024-06-21_21-30-28.png](assets/880eaf7d190ad4b0f006bba0daec61cde47290db.png)
+
+## 7. 原生js中绑定点击事件的三种方式
+
+```
+
+```
