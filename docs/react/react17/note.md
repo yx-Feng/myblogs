@@ -285,13 +285,13 @@ props_demo.html
   <body>
     <div id="test1"></div>
     <div id="test2"></div>
- 
+
     <script type="text/javascript" src="./js/react.development.js"></script>
     <script type="text/javascript" src="./js/react-dom.development.js"></script>
     <script type="text/javascript" src="./js/babel.min.js"></script>
     <!-- 引入prop-types，全局就多了一个propTypes对象，用于对组件标签属性进行限制 -->
     <script type="text/javascript" src="./js/prop-types.js"></script>
- 
+
     <script type="text/babel">
       class Person extends React.Component {
         render() {
@@ -383,7 +383,7 @@ class Person extends React.Component {
     sex: '男',
     age: 18
   }
- 
+
   const p1 = {name: 'Tom', age:18, sex: '男'}
   const p2 = {name: 'Nancy', age:19, sex: '女'}   
   ReactDOM.render(<Person {...p1}/>, document.getElementById('test1'))   
@@ -418,7 +418,7 @@ refs_demo.html
     render() {
       return (
         <div>
-          <input ref="input1" type="text" placeholder="点击按钮提示数据" />&nbsp;
+          <input ref="input1" type="text" placeholder="点击按钮提示数据" /> 
           <button onClick={this.showData}>点我提示左侧的数据</button><br/>
           <input ref="input2" onBlur={this.showData2} type="text" placeholder="失去焦点提示数据" />
         </div>
@@ -448,7 +448,7 @@ refs_demo.html
     render() {
       return (
         <div>
-         <input ref={this.assignment1} type="text" placeholder="点击按钮提示数据" />&nbsp;
+         <input ref={this.assignment1} type="text" placeholder="点击按钮提示数据" /> 
          <button onClick={this.showData}>点我提示左侧的数据</button><br/>
          <input ref={this.assignment2} onBlur={this.showData2} type="text" placeholder="失去焦点提示数据" />
         </div>
@@ -477,7 +477,7 @@ refs_demo.html
     render() {
       return (
         <div>
-          <input ref={this.myRef} type="text" placeholder="点击按钮提示数据" />&nbsp;
+          <input ref={this.myRef} type="text" placeholder="点击按钮提示数据" /> 
           <button onClick={this.showData}>点我提示左侧的数据</button><br/>
           <input ref={this.myRef2} onBlur={this.showData2} type="text" placeholder="失去焦点提示数据" />
         </div>
@@ -491,5 +491,27 @@ refs_demo.html
 官方文档告诉我们不要过多使用refs，当发生事件的元素和事件操作的元素是同一个时，我们可以省略标签的ref，用**event.target**获取该元素
 
 ```
-
+// 其它代码同上
+<script type="text/babel">
+  class Demo extends React.Component {
+    myRef = React.createRef()
+    myRef2 = React.createRef()
+    showData = () => {
+      alert(this.myRef.current.value)
+    }
+    showData2 = (event) => {
+      alert(event.target.value)
+    }
+    render() {
+      return (
+        <div>
+          <input ref={this.myRef} type="text" placeholder="点击按钮提示数据" />&nbsp;
+          <button onClick={this.showData}>点我提示左侧的数据</button><br/>
+          <input onBlur={this.showData2} type="text" placeholder="失去焦点提示数据" />
+        </div>
+      )
+    }
+  }
+  ReactDOM.render(<Demo/>, document.getElementById('test'))
+</script>
 ```
