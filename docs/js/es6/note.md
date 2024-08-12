@@ -401,5 +401,23 @@ console.log(all.flag)
 ## 7. 原生js中绑定点击事件的三种方式
 
 ```
-
+<button id="btn1">按钮1</button>
+<button id="btn2">按钮2</button>
+<button onclick="demo()">按钮3</button>
+<script type="text/javascript">
+// 第一种
+const btn1 = document.getElementById('btn1')
+btn1.addEventListener('click', ()=>{
+   alert('按钮1被点击了')
+})
+// 第二种
+const btn2 = document.getElementById('btn2')
+btn2.onclick = ()=>{
+   alert('按钮2被点击了')
+}
+// 第三种
+function demo() {
+   alert('按钮3被点击了')
+}
+</script>
 ```
