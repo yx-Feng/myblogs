@@ -531,11 +531,11 @@ refs_demo.html
   </head>
   <body>
     <div id="test"></div>
- 
+
     <script type="text/javascript" src="./js/react.development.js"></script>
     <script type="text/javascript" src="./js/react-dom.development.js"></script>
     <script type="text/javascript" src="./js/babel.min.js"></script>
- 
+
     <script type="text/babel">
       class Login extends React.Component {
         handleSubmit = (event) => {
@@ -633,5 +633,27 @@ refs_demo.html
 不用柯里化，我怎么改？？
 
 ```
-
+<script type="text/babel">
+  class Login extends React.Component {
+    //保存表单数据到状态中
+    saveFormData = (dataType, event) => {
+      this.setState({[dataType]:event.target.value})
+    }
+    handleSubmit = (event) => {
+      event.preventDefault()
+      const {username,password} = this.state
+      alert(`你输入的用户名是：${username},你输入的密码是：${password}`)
+    }
+    render() {
+      return (
+        <form onSubmit={this.handleSubmit}>
+          用户名：<input onChange={event => this.saveFormData('username', event)} type="text" name="username" autoComplete="off"/>
+          密码：<input onChange={event => this.saveFormData('password', event)} type="password" name="password"/>
+          <button>登录</button>
+        </form>
+      )
+    }
+  }
+  ReactDOM.render(<Login/>, document.getElementById('test'))
+</script>
 ```
