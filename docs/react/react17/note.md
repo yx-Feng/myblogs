@@ -505,7 +505,7 @@ refs_demo.html
     render() {
       return (
         <div>
-          <input ref={this.myRef} type="text" placeholder="点击按钮提示数据" />&nbsp;
+          <input ref={this.myRef} type="text" placeholder="点击按钮提示数据" /> 
           <button onClick={this.showData}>点我提示左侧的数据</button><br/>
           <input onBlur={this.showData2} type="text" placeholder="失去焦点提示数据" />
         </div>
@@ -514,4 +514,124 @@ refs_demo.html
   }
   ReactDOM.render(<Demo/>, document.getElementById('test'))
 </script>
+```
+
+## 3. 收集表单数据
+
+需求：定义一个包含表单的组件，输入用户名密码后，点击登录提示输入信息(页面不刷新)
+
+**① 非受控组件（uncontrolled component）**
+
+```
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8"></meta>
+    <title></title>
+  </head>
+  <body>
+    <div id="test"></div>
+ 
+    <script type="text/javascript" src="./js/react.development.js"></script>
+    <script type="text/javascript" src="./js/react-dom.development.js"></script>
+    <script type="text/javascript" src="./js/babel.min.js"></script>
+ 
+    <script type="text/babel">
+      class Login extends React.Component {
+        handleSubmit = (event) => {
+          event.preventDefault()
+          const {username,password} = this
+          alert(`你输入的用户名是：${username.value},你输入的密码是：${password.value}`)
+        }
+        render() {
+          return (
+            <form onSubmit={this.handleSubmit}>
+              用户名：<input ref={c => this.username = c} type="text" name="username"/>
+              密码：<input ref={c => this.password = c} type="password" name="password"/>
+              <button>登录</button>
+            </form>
+          )
+        }
+      }
+      ReactDOM.render(<Login/>, document.getElementById('test'))
+    </script>
+  </body>
+</html>
+```
+
+**② 受控组件（controlled component）**
+
+其值由 `React` 控制的输入表单元素称为 “**受控组件**”。**优势**：比上面的非受控组件少用了**refs**。
+
+例如，对于这种像input这样输入类的DOM，随着用户的输入，输入的数据被维护在状态state里，等需要用的时候再从状态state里面取出来。
+
+**类似于Vue中的双向数据绑定**
+
+```
+<script type="text/babel">
+        class Login extends React.Component {
+          //保存用户名和密码到状态中
+          saveUsername = (event) => {
+            this.setState({username: event.target.value})
+          }
+          savePassword = (event) => {
+            this.setState({password: event.target.value})
+          }
+          handleSubmit = (event) => {
+            event.preventDefault()
+            const {username,password} = this.state
+            alert(`你输入的用户名是：${username},你输入的密码是：${password}`)
+          }
+          render() {
+            return (
+              <form onSubmit={this.handleSubmit}>
+                用户名：<input onChange={this.saveUsername} type="text" name="username"/>
+                密码：<input onChange={this.savePassword} type="password" name="password"/>
+                <button>登录</button>
+              </form>
+            )
+          }
+        }
+        ReactDOM.render(<Login/>, document.getElementById('test'))
+</script>
+```
+
+## 4. 函数柯里化
+
+函数柯里化（currying）：通过函数调用继续返回函数的方式，实现多次接收参数最后统一处理的函数编码形式
+
+下面的saveFormData函数就用到了函数柯里化
+
+```
+<script type="text/babel">
+  class Login extends React.Component {
+    //保存表单数据到状态中
+    saveFormData = (dataType) => {
+      return (event) => {
+        this.setState({[dataType]:event.target.value})
+      }
+    }
+    handleSubmit = (event) => {
+      event.preventDefault()
+      const {username,password} = this.state
+      alert(`你输入的用户名是：${username},你输入的密码是：${password}`)
+    }
+    render() {
+      return (
+        <form onSubmit={this.handleSubmit}>
+          用户名：<input onChange={this.saveFormData('username')} type="text" name="username" autoComplete="off"/>
+          密码：<input onChange={this.saveFormData('password')} type="password" name="password"/>
+          <button>登录</button>
+        </form>
+      )
+    }
+  }
+  ReactDOM.render(<Login/>, document.getElementById('test'))
+</script>
+```
+
+不用柯里化，我怎么改？？
+
+```
+
 ```
