@@ -657,3 +657,160 @@ refs_demo.html
   ReactDOM.render(<Login/>, document.getElementById('test'))
 </script>
 ```
+
+## 5. 生命周期
+
+组件从创建到死亡会经历一些特定的阶段，React组件中包含一系列hook函数（钩子函数、生命周期回调函数），会在特定时刻调用。我们在定义组件时，会在特定的hook函数中，做特定的工作。
+
+![Snipaste_2024-08-13_22-17-49.png](assets/a13994702bc51163b5a5091e3d94ea60c2035baf.png)
+
+[官方生命周期图的地址](https://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/ "官方生命周期图的地址")
+
+（1）初始化阶段
+
+  constructor() =>  render() => componentDidMount()
+（2）更新阶段：由组件内部 this.setState() 或 父组件 render 触发
+
+  强制刷新页面，不更新状态state，可以去调 this.forceUpdate()
+
+  shouldComponentUpdate() =>  render() => componentDidUpdate()
+
+（3）卸载组件：由 ReactDOM.unmountComponentAtNode() 触发
+  componentWillUnmount()
+
+**重要的三个钩子函数**
+
+**render()**                                 初始化渲染或更新渲染时调用  
+**componentDidMount()**        组件挂载完毕时调用，开启监听，发送ajax请求  
+**componentWillUnmount()**   组件卸载时调用，做一些收尾工作，如：清理定时器
+
+**案例**
+
+需求：①让指定文本做显示/隐藏的渐变动画
+
+            ②从完全可见到彻底消失，耗时2s
+
+            ③点击按钮卸载组件
+
+```
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8"></meta>
+    <title></title>
+  </head>
+  <body>
+    <div id="test"></div>
+ 
+    <script type="text/javascript" src="./js/react.development.js"></script>
+    <script type="text/javascript" src="./js/react-dom.development.js"></script>
+    <script type="text/javascript" src="./js/babel.min.js"></script>
+ 
+    <script type="text/babel">
+      class Love extends React.Component {
+        state = { opacity: 1 }
+        death = () => {
+          // 卸载组件
+          ReactDOM.unmountComponentAtNode(document.getElementById('test'))
+        }
+        //组件挂载完毕
+        componentDidMount() {
+          this.timer = setInterval(() => {
+            let {opacity} = this.state  //获取原状态
+            opacity -= 0.1              //减小0.1
+            if(opacity <= 0) opacity = 1
+            this.setState({opacity})    //设置新的透明度
+          }, 200);
+        }
+        //组件将要卸载
+        componentWillUnmount() {
+          clearInterval(this.timer)   // 清除定时器
+        }
+        //初始化渲染、状态更新之后触发render
+        render() {
+          console.log('render')
+          return(
+            <div>
+              <h2 style={{opacity:this.state.opacity}}>所以爱会消失吗？</h2>
+              <button onClick={this.death}>会</button>
+            </div>
+          )
+        }
+      }
+      ReactDOM.render(<Love/>, document.getElementById('test'))
+    </script>
+  </body>
+</html>
+```
+
+**其它钩子函数**
+
+getDerivedStateFromProps：从props中获取派生的state
+
+getSnapshotBeforeUpdate：在更新之前获取快照，也就是说，在组件发生更改之前从DOM中捕获一些信息，该函数的返回值将作为参数传递给componentDidUpdate()
+
+**案例**
+
+需求：一条条新闻不断生成，我想让滚轮滚到某一条新闻时，画面相对静止，而不是随着新新闻的生成向下移动  
+
+做法：其实就是利用新旧状态拿到新生成的一条新闻的宽度（这里都是30px），用这个宽度调整滚轮的位置
+
+```
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8"></meta>
+    <title></title>
+    <style>
+      .list{
+        width: 200px;
+        height: 150px;
+        background-color: skyblue;
+        overflow: auto;
+      }
+      .news{
+        height: 30px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="test"></div>
+ 
+    <script type="text/javascript" src="./js/react.development.js"></script>
+    <script type="text/javascript" src="./js/react-dom.development.js"></script>
+    <script type="text/javascript" src="./js/babel.min.js"></script>
+    <script type="text/babel">
+      class NewsList extends React.Component {
+        state = { newsArr:[] }
+        componentDidMount() {
+          setInterval(() => {
+            const { newsArr } = this.state       //获取原状态   
+            const news = '新闻' + (newsArr.length+1)    //模拟一条新闻
+            this.setState({ newsArr:[news,...newsArr] })  //更新状态
+          }, 1000);
+        }
+        render() {
+          return(
+            <div className="list" ref="list">
+              {
+                this.state.newsArr.map((n,index)=>{
+                  return <div key={index} className="news">{n}</div>
+                })
+              }
+            </div>
+          )
+        }
+        getSnapshotBeforeUpdate() {
+          return this.refs.list.scrollHeight
+        }
+        componentDidUpdate(prevProps,prevState,height) {
+          this.refs.list.scrollTop += this.refs.list.scrollHeight - height
+        }
+      }
+      ReactDOM.render(<NewsList/>, document.getElementById('test'))
+    </script>
+  </body>
+</html>
+```
+
+![Snipaste_2024-08-13_22-50-00.png](assets/25a307e88d9deb254a1c49cfce4bd6e673418215.png)

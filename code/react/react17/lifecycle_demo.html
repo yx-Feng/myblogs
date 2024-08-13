@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8"></meta>
+    <title></title>
+  </head>
+  <body>
+    <div id="test"></div>
+ 
+    <script type="text/javascript" src="./js/react.development.js"></script>
+    <script type="text/javascript" src="./js/react-dom.development.js"></script>
+    <script type="text/javascript" src="./js/babel.min.js"></script>
+ 
+    <script type="text/babel">
+      class Love extends React.Component {
+        state = { opacity: 1 }
+        death = () => {
+          // 卸载组件
+          ReactDOM.unmountComponentAtNode(document.getElementById('test'))
+        }
+        //组件挂载完毕
+        componentDidMount() {
+          this.timer = setInterval(() => {
+            let {opacity} = this.state  //获取原状态
+            opacity -= 0.1              //减小0.1
+            if(opacity <= 0) opacity = 1
+            this.setState({opacity})    //设置新的透明度
+          }, 200);
+        }
+        //组件将要卸载
+        componentWillUnmount() {
+          clearInterval(this.timer)   // 清除定时器
+        }
+        //初始化渲染、状态更新之后触发render
+        render() {
+          console.log('render')
+          return(
+            <div>
+              <h2 style={{opacity:this.state.opacity}}>所以爱会消失吗？</h2>
+              <button onClick={this.death}>会</button>
+            </div>
+          )
+        }
+      }
+      ReactDOM.render(<Love/>, document.getElementById('test'))
+    </script>
+  </body>
+</html>
