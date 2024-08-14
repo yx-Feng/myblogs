@@ -701,11 +701,11 @@ refs_demo.html
   </head>
   <body>
     <div id="test"></div>
- 
+
     <script type="text/javascript" src="./js/react.development.js"></script>
     <script type="text/javascript" src="./js/react-dom.development.js"></script>
     <script type="text/javascript" src="./js/babel.min.js"></script>
- 
+
     <script type="text/babel">
       class Love extends React.Component {
         state = { opacity: 1 }
@@ -775,7 +775,7 @@ getSnapshotBeforeUpdate：在更新之前获取快照，也就是说，在组件
   </head>
   <body>
     <div id="test"></div>
- 
+
     <script type="text/javascript" src="./js/react.development.js"></script>
     <script type="text/javascript" src="./js/react-dom.development.js"></script>
     <script type="text/javascript" src="./js/babel.min.js"></script>
@@ -814,3 +814,67 @@ getSnapshotBeforeUpdate：在更新之前获取快照，也就是说，在组件
 ```
 
 ![Snipaste_2024-08-13_22-50-00.png](assets/25a307e88d9deb254a1c49cfce4bd6e673418215.png)
+
+## 6. DOM的diffing算法
+
+我们知道，当调用 React 的 **`render()`** 方法时，会创建一棵由 React 元素组成的树   
+
+为了更高效的更新DOM树，我们引入了 **diffing算法**
+
+**算法细节如下**
+
+①当对比两棵树时，React 首先比较两棵树的根节点 
+②若根节点为不同类型的元素（如从 `<a>` 变成 `<img>`），React 会拆卸原有的树并且建立起新的树  
+③当对比两个相同类型的React 元素时，React 会保留 DOM 节点，仅更新有改变的属性 
+④当一个组件更新时，组件实例会保持不变，因此可以在不同的渲染时保持 state一致。React 更新该组件实例的 props 以保证与最新的元素保持一致
+⑤递归 DOM 节点的子元素时，React 会同时遍历两个子元素的列表 
+**在子元素列表末尾新增元素时，更新开销比较小，如果将新增元素插入到表头，更新开销会比较大**
+
+**为了解决上述问题，React 引入了** **`key` 属性**
+
+key是虚拟DOM的标识，当状态中的数据发生变化的时候，React会根据新数据生成新的虚拟DOM，随后React会进行新旧虚拟DOM的Diffing比较，除了上面说的，还增加了一些规则：  
+①新虚拟DOM如果找到和旧虚拟DOM一样的key，若虚拟DOM内容不变，直接用之前的真实DOM，变了，就生成新的DOM，替换掉原来的  
+②如果没找到和旧虚拟DOM一样的key，直接根据数据创建新的真实DOM，渲染到页面上
+
+**用index作为key会引发问题**
+
+仅用于渲染列表进行展示，其实没有问题   
+但是，如果对数据进行逆序添加、逆序删除等破坏顺序的操作，会导致没有必要的DOM更新，影响效率
+
+```
+//虚拟DOM的初始化
+<li key=0>张三</li>
+<li key=1>李四</li>
+
+//头部插入一条数据，原来DOM的key变化了，所以还得更新，其实是没有必要的
+<li key=0>王五</li>
+<li key=1>张三</li>
+<li key=2>李四</li>
+```
+
+如果结构中还包含输入类的DOM，会产生错误DOM更新，界面会出问题
+
+```cobol
+//虚拟DOM的初始化
+<li key=0>张三<input type="text"/></li>
+<li key=1>李四<input type="text"/></li>
+
+//由于我们进行Diff比较时，是一层一层比较的
+//数据更新后，此时王五后面的输入框DOM其实还是原来张三后面的输入框DOM
+//但是，如果张三后面的输入框还残留着他的相关信息，页面就会出问题
+<li key=0>王五<input type="text"/></li>
+<li key=1>张三<input type="text"/></li>
+<li key=2>李四<input type="text"/></li>
+```
+
+**所以，最好使用数据的唯一标识作为key，如id、学号、身份证号。。。**
+
+## 7. React脚手架
+
+React提供了一个用于创建react项目的脚手架库：**create-react-app**
+
+```
+npm i -g create-react-app   //全局安装，首先确保装了npm
+create-react-app demo       //在你想要的路径下面，创建一个名为demo的项目
+npm start                   //启动项目
+```
