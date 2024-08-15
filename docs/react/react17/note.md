@@ -813,7 +813,7 @@ getSnapshotBeforeUpdate：在更新之前获取快照，也就是说，在组件
 </html>
 ```
 
-![Snipaste_2024-08-13_22-50-00.png](assets/25a307e88d9deb254a1c49cfce4bd6e673418215.png)
+![25a307e88d9deb254a1c49cfce4bd6e673418215.png](assets/e852e7c561a2b30505b05a36052e785dfe4aefe0.png)
 
 ## 6. DOM的diffing算法
 
@@ -939,14 +939,14 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
- 
+
 ReactDOM.render(
   <React.StrictMode>
     <App />
   </React.StrictMode>,
   document.getElementById('root')
 );
- 
+
 reportWebVitals();
 ```
 
@@ -960,7 +960,7 @@ reportWebVitals();
 import React,{Component} from 'react'
 import Hello from './components/Hello/Hello'
 import Welcome from './components/Welcome/Welcome'
- 
+
 class App extends Component{
   render(){
     return (
@@ -971,7 +971,7 @@ class App extends Component{
     )
   }
 }
- 
+
 export default App
 ```
 
@@ -980,7 +980,7 @@ export default App
 ```
 import React,{Component} from "react"
 import './Hello.css'
- 
+
 export default class Hello extends Component{
   render() {
     return <h2 className="title">Hello,React!</h2>
@@ -1001,7 +1001,7 @@ export default class Hello extends Component{
 ```
 import React,{Component} from "react"
 import './Welcome.css'
- 
+
 export default class Welcome extends Component{
   render() {
     return <h2 className="title2">Welcome!</h2>
@@ -1033,7 +1033,7 @@ export default class Welcome extends Component{
 ```
 import React,{Component} from "react"
 import hello from './Hello.module.css'
- 
+
 export default class Hello extends Component{
   render() {
     return <h2 className={hello.title}>Hello,React!</h2>
@@ -1043,4 +1043,166 @@ export default class Hello extends Component{
 
 **推荐vscode开发扩展**：ES7+ React/Redux/React-Native snippets
 
-## 8.
+## 8. 案例 - 任务清单
+
+## 9. ajax请求和跨域
+
+**简单模拟ajax请求**
+
+ ①**客户端** --- 客户端页面所在地址为本机地址，端口为3000
+
+```
+npx create-react-app client
+cd client
+npm start
+```
+
+React本身并不包含发送ajax请求的代码，需要自己引入一个第三方库
+
+不推荐使用**jQuery**，因为它比较重，而且使用js操作DOM，在React中不推荐这样，这里推荐轻量级框架**axios**
+
+```
+npm i axios
+```
+
+**/client/src/App.js**
+
+```
+import React,{Component} from 'react'
+import axios from 'axios'
+ 
+export default class App extends Component{
+  getStudentData = ()=>{
+    axios.get('http://localhost:3000/api1/students').then(
+      response => {console.log('成功',response.data)},
+      error => {console.log('失败',error);}
+    )
+  }
+  getCarData = ()=>{
+    axios.get('http://localhost:3000/api2/cars').then(
+      response => {console.log('成功',response.data)},
+      error => {console.log('失败',error);}
+    )
+  }
+  render(){
+    return (
+      <div>
+        <button onClick={this.getStudentData}>获取学生数据</button>
+        <button onClick={this.getCarData}>获取汽车数据</button>
+      </div>
+    )
+  }
+}
+```
+
+②**服务器端** --- Node + Express
+
+```
+npm i express
+```
+
+在本机模拟了两台服务器，分别监听端口5000和5001，开启服务
+
+```
+ node server1.js
+ node server2.js
+```
+
+**/server/server1.js**
+
+```
+const express = require('express')
+const app = express()
+ 
+app.use((req,res,next)=>{
+  console.log('有人请求服务器1')
+  next()
+})
+ 
+app.use('/students',(req,res)=>{
+  const students = [
+    {id:'001',name:'Tom',age:18},
+    {id:'002',name:'Nancy',age:19},
+    {id:'003',name:'John',age:20},
+  ]
+  res.send(students)
+})
+ 
+app.listen(5000,err=>{
+  if(!err) console.log('服务器1启动成功,监听端口为5000...')
+})
+```
+
+**/server/server2.js**
+
+```
+const express = require('express')
+const app = express()
+ 
+app.use((req,res,next)=>{
+  console.log('有人请求服务器2了')
+  next()
+})
+ 
+app.use('/cars',(req,res)=>{
+  const cars = [
+    {id:'001',name:'奔驰',price:199},
+    {id:'002',name:'宝马',age:109},
+    {id:'003',name:'奥迪',age:120},
+  ]
+  res.send(cars)
+})
+ 
+app.listen(5001,err=>{
+  if(!err) console.log('服务器2启动成功,监听端口为5001...')
+})
+```
+
+**解决跨域问题**
+
+**（1）方法一**
+
+在`/client/src/package.json`中追加如下配置
+
+```csharp
+"proxy":"http://localhost:5000"
+```
+
+缺点：不能配置多个代理  
+
+工作方式：按上述方式配置代理，当请求了3000端口不存在的资源时，才会将该请求转发给5000（优先匹配前端资源）
+
+**（2）方法二**
+
+创建代理配置文件：`/client/src/setupProxy.js`
+
+（我的React版本为18，不同版本的React配置可能不一样）
+
+```
+const {createProxyMiddleware} = require('http-proxy-middleware') //这个库在初始化脚手架时就安装了，所以不用额外安装
+ 
+module.exports = function(app) {
+  app.use(
+    createProxyMiddleware('/api1', {
+      target: 'http://localhost:5000',     //配置转发目标地址
+      //控制服务器接收到的请求头中host字段的值，默认为false。
+      //为true,这里的host为：localhost:5000;为false,这里的host为：localhost:3000
+      changeOrigin: true,
+      pathRewrite: {'^/api1':''}           //修改url，去除请求前缀'/api1'
+    }),
+    createProxyMiddleware('/api2', {
+      target: 'http://localhost:5001',
+      changeOrigin: true,
+      pathRewrite: {'^/api2':''}
+    })
+  )
+}
+```
+
+优点：可以配置多个代理，可以灵活地控制请求是否走代理
+
+**效果**
+
+![Snipaste_2024-08-15_15-09-19.png](assets/c323fc489e359bfdb5718e39fbc68a31cd7aaead.png)
+
+## 10. 案例 - github用户搜索框
