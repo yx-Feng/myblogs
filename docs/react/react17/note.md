@@ -874,7 +874,173 @@ key是虚拟DOM的标识，当状态中的数据发生变化的时候，React会
 React提供了一个用于创建react项目的脚手架库：**create-react-app**
 
 ```
-npm i -g create-react-app   //全局安装，首先确保装了npm
-create-react-app demo       //在你想要的路径下面，创建一个名为demo的项目
-npm start                   //启动项目
+npx create-react-app demo
+cd demo
+npm start
 ```
+
+**项目结构分析**
+
+public文件夹里面放的都是一些静态资源  
+
+React和Vue一样，都是SPA(single page web application)单页面应用，所以整个项目只有一个html文件 => index.html（文件名不能自己改）  
+
+我们从项目自动生成的index.html中分析一下其它文件的作用
+
+```
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <!-- %PUBLIC_URL%代表public文件夹的路径 -->
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <!-- 开启理想视口，用于做移动端页面的适配 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- 用于配置浏览器页签+地址栏的颜色（仅支持安卓手机浏览器） -->
+    <meta name="theme-color" content="#000000" />
+    <!-- 对页面的一些描述，方便搜索引擎搜到你的页面 -->
+    <meta name="description" content="Web site created using create-react-app"/>
+    <!-- 用于指定页面添加到手机主屏幕后的图标 -->
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <!-- 应用加壳时的配置文件 -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <title>React App</title>
+  </head>
+  <body>
+    <!-- 若浏览器不支持js则展示标签中的内容 -->
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+</html>
+```
+
+**robots.txt**是爬虫规则文件，规定页面什么内容能爬，什么不能爬
+
+**src**是源码文件夹
+
+**App.css** --- App组件的样式 
+**App.js** --- App组件 
+**App.test.js** --- 用于给App做测试 
+**index.css** --- 样式文件，放一些通用性的样式 
+**index.js** --- 入口文件 
+**logo.svg** --- logo图 
+**reportWebVitals.js** -- 页面性能分析文件(需要web-vitals库的支持) 
+**setupTests.js** --- 组件单元测试的文件(需要jest-dom库的支持)
+
+**我们从入口文件index.js了解一下项目文件的执行顺序**
+
+①引入React、ReactDOM两个库 ，引入index.css，引入App.js作为一个模块，引入reportWebVitals.js  
+②渲染APP组件，渲染到public文件下面的index.html中的id为root的容器中 
+③。。。
+
+```
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.css';
+import App from './App';
+import reportWebVitals from './reportWebVitals';
+ 
+ReactDOM.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+  document.getElementById('root')
+);
+ 
+reportWebVitals();
+```
+
+**小案例（为了和其它普通js文件区分开来，可以把后缀改成jsx，如Hello.jsx）**
+
+**/src/App.js**
+
+```
+//创建组件App
+//{Component}不是解构赋值,而是'react'既导出了React对象，又导出了React对象中的Component属性
+import React,{Component} from 'react'
+import Hello from './components/Hello/Hello'
+import Welcome from './components/Welcome/Welcome'
+ 
+class App extends Component{
+  render(){
+    return (
+      <div>
+        <Hello/>
+        <Welcome/>
+      </div>
+    )
+  }
+}
+ 
+export default App
+```
+
+**/src/components/Hello/Hello.js**
+
+```
+import React,{Component} from "react"
+import './Hello.css'
+ 
+export default class Hello extends Component{
+  render() {
+    return <h2 className="title">Hello,React!</h2>
+  }
+}
+```
+
+**/src/components/Hello/Hello.css**
+
+```
+.title {
+  background-color: orange;
+}
+```
+
+**/src/components/Welcome/Welcome.js**
+
+```
+import React,{Component} from "react"
+import './Welcome.css'
+ 
+export default class Welcome extends Component{
+  render() {
+    return <h2 className="title2">Welcome!</h2>
+  }
+}
+```
+
+**/src/components/Welcome/Welcome.css**
+
+```
+.title2 {
+  background-color: skyblue;
+}
+```
+
+![Snipaste_2024-08-15_09-10-05.png](assets/0ea69949f096a9edcda02696907b5bb68e917b0f.png)
+
+**样式的模块化**
+
+当多个组件的样式文件中有名称一样的，后面引入的就会覆盖前面的  
+
+例如，在上面的案例中，Hello和Welcome组件的css文件中的样式名都为title，就会出问题
+
+为避免冲突 => **样式模块化**
+
+①在上面的基础上，样式名改为 Hello.module.css 
+②/src/components/Hello/Hello.js
+
+```
+import React,{Component} from "react"
+import hello from './Hello.module.css'
+ 
+export default class Hello extends Component{
+  render() {
+    return <h2 className={hello.title}>Hello,React!</h2>
+  }
+}
+```
+
+**推荐vscode开发扩展**：ES7+ React/Redux/React-Native snippets
+
+## 8.
