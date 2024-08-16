@@ -1,0 +1,25 @@
+
+.container {
+  width: 600px;
+  margin: 20px auto;
+}
+
+.container .wrap {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.btn {
+  line-height: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  border:  4px;
+  box-shadow: inset 0 1 px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.btn-danger {
+  color: #fff;
+  background-color: #da4f49;
+  border: 1px solid #bd362f;
+}

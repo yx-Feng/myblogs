@@ -1045,6 +1045,352 @@ export default class Hello extends Component{
 
 ## 8. 案例 - 任务清单
 
+```
+npx create-react-app task_checklist
+cd task_checklist
+```
+
+安装一个包nanoid，用于生成UUID(Universally Unique Identifier) ，用这个UUID当作id
+
+```
+npm i nanoid
+```
+
+安装prop-types库，用于类型限定
+
+```
+npm i prop-types
+```
+
+src/App.js
+
+```
+import { Component } from 'react';
+import Header from './components/Header'
+import List from './components/List'
+import Footer from './components/Footer'
+import './App.css';
+
+class App extends Component {
+  // 初始化状态
+  state = {
+    todos: [
+      {id: '001', name: '吃饭', done: true},
+      {id: '002', name: '工作', done: true},
+      {id: '003', name: '睡觉', done: false}
+    ]
+  }
+
+  // 添加一个todo对象
+  addTodo  = (obj) => {
+    const {todos} = this.state
+    const newTodos = [obj, ...todos]
+    this.setState({todos: newTodos})
+  }
+
+  // 更新一个todo对象
+  updateTodo = (id, done) => {
+    const {todos} = this.state
+    const newTodos = todos.map(obj => {
+      if(obj.id === id) return {...obj, done}
+      else return obj
+    })
+    this.setState({todos: newTodos})
+  }
+
+  // 删除一个todo对象
+  deleteTodo = (id) => {
+    const {todos} = this.state
+    const newTodos = todos.filter(obj => {
+      return obj.id !== id
+    })
+    this.setState({todos: newTodos})
+  }
+
+  // 全选
+  checkAllTodo = (done)=>{
+    const {todos} = this.state
+    const newTodos = todos.map(obj => {
+      return {...obj,done}
+    })
+    this.setState({todos:newTodos})
+  }
+
+  // 删除所有已完成的
+  clearAllDone = ()=>{
+    const {todos} = this.state
+    const newTodos = todos.filter(obj => {
+      return !obj.done
+    })
+    this.setState({todos:newTodos})
+  }
+
+  render() {
+    const { todos } = this.state
+    return (
+      <div className='container'>
+        <div className='wrap'>
+          <Header addTodo={this.addTodo} />
+          <List todos={todos} updateTodo={this.updateTodo} deleteTodo={this.deleteTodo} />
+          <Footer todos={todos} checkAllTodo={this.checkAllTodo} clearAllDone={this.clearAllDone} />
+        </div>
+      </div>
+    )
+  }
+}
+
+export default App;
+
+```
+
+src/App.css
+
+```
+.container {
+  width: 600px;
+  margin: 20px auto;
+}
+
+.container .wrap {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.btn {
+  line-height: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  border:  4px;
+  box-shadow: inset 0 1 px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.btn-danger {
+  color: #fff;
+  background-color: #da4f49;
+  border: 1px solid #bd362f;
+}
+```
+
+src/components/Header/index.jsx
+
+```
+import { Component } from "react";
+import PropTypes from 'prop-types';
+import { nanoid } from 'nanoid';
+import './index.css';
+
+export default class Header extends Component {
+    // 对接收的props进行：类型、必要性的限制
+    static propTypes = {
+        addTodo:PropTypes.func.isRequired
+    }
+
+    handleKeyUp = (event) => {
+        const {keyCode,target} = event
+        if(keyCode !== 13) return
+        if(target.value.trim() === '') {
+            alert('输入不能为空')
+            return
+        }
+        const obj = {id:nanoid(),name:target.value,done:false}
+        this.props.addTodo(obj)
+        target.value = ''
+    }
+
+    render() {
+        return (
+            <div className="header">
+                <input onKeyUp={this.handleKeyUp} type="text" placeholder="请输入任务名称，按回车键确认"/>
+            </div>
+        )
+    }
+}
+```
+
+src/components/Header/index.css
+
+```
+.header input {
+    width: 550px;
+    height: 28px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px 7px;
+}
+
+.header input:focus {
+    outline: none;
+    border-color: rgba(82, 168, 236, 0.8);
+    box-shadow: inset 0 1 px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+}
+```
+
+src/components/Footer/index.jsx
+
+```
+import { Component } from "react";
+import './index.css';
+
+export default class Footer extends Component {
+    handleCheckAll = (event)=>{
+        this.props.checkAllTodo(event.target.checked)
+      }
+
+    handleClearAllDone = () => {
+        this.props.clearAllDone()
+    }
+
+    render() {
+        const { todos } = this.props
+        const hasDone_num = todos.reduce((pre, cur) => { return pre + (cur.done ? 1 : 0) }, 0)
+        const total_num = todos.length
+        return (
+            <div className="footer">
+                <label>
+                    <input type='checkbox' onChange={this.handleCheckAll} checked={hasDone_num === total_num && total_num !== 0 ? true:false}/>
+                </label>
+                <span>已完成{hasDone_num} / 全部 { total_num }</span>
+                <button onClick={this.handleClearAllDone} className="btn btn-danger">清除已完成任务</button>
+            </div>
+        )
+    }
+}
+```
+
+src/components/Footer/index.css
+
+```
+.footer {
+    height:px ;
+    padding-left: 6px;
+    margin-top: 5px;
+    line-height: 40px;
+}
+
+.footer label {
+    margin-right: 20px;
+    cursor: pointer;
+}
+
+.footer label input {
+    margin-right: 5px;
+}
+
+.footer button {
+    float: right;
+    margin-top: 5px;
+}
+```
+
+src/components/List/index.jsx
+
+```
+import { Component } from "react";
+import Item from "../Item";
+import PropTypes from 'prop-types';
+import './index.css'
+
+export default class List extends Component {
+    //对接收的props进行：类型、必要性的限制
+    static propTypes = {
+        todos:PropTypes.array.isRequired,
+        updateTodo:PropTypes.func.isRequired,
+        deleteTodo:PropTypes.func.isRequired
+    }
+    
+    render() {
+        const {todos,updateTodo,deleteTodo} = this.props
+        return (
+            <ul className="main">
+                {
+                    todos.map(todo => {
+                        return <Item key={todo.id} {...todo} updateTodo={updateTodo} deleteTodo={deleteTodo}/>
+                    })
+                }
+            </ul>
+        )
+    }
+}
+```
+
+src/components/List/index.css
+
+```
+.main {
+    margin-left: 0px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    padding: 0px;
+}
+```
+
+src/components/Item/index.jsx
+
+```
+import { Component } from "react";
+import './index.css';
+
+export default class Item extends Component {
+    state = {mouse_over : false}
+    handleMouse = (flag) => {
+        return ()=>{
+            this.setState({mouse_over: flag})
+        }
+    }
+    handleCheck = (id)=>{
+        return (event)=>{
+            this.props.updateTodo(id, event.target.checked)
+        }
+    }
+    handleDelete = (id)=>{
+        return ()=>{
+            if(window.confirm('确定删除吗？')){
+            this.props.deleteTodo(id)
+            }
+        }
+    }
+    render() {
+        const { id, name, done } = this.props
+        const {mouse_over} = this.state
+        return (
+            <li style={{backgroundColor: mouse_over ? '#ddd' : '#fff'}} onMouseEnter={this.handleMouse(true)} onMouseLeave={this.handleMouse(false)}>
+                <label>
+                    <input type="checkbox" checked={done} onChange={this.handleCheck(id)}/>
+                    <span>{ name }</span>
+                </label>
+                <button onClick={this.handleDelete(id)} className="btn btn-danger">删除</button>
+            </li>
+        )
+    }
+}
+```
+
+src/components/Item/index.css
+
+```
+li {
+    list-style: none;
+    height: 36px;
+    line-height: 36px;
+    padding: 0 5px;
+}
+
+li label li input {
+    margin-right: 6px;
+}
+
+li button {
+    float: right;
+    margin-top: 5px;
+}
+```
+
+**效果**
+
+![Snipaste_2024-08-16_20-03-39.png](assets/504f634e06df792d12de7959c690b7b3a557466b.png)
+
 ## 9. ajax请求和跨域
 
 **简单模拟ajax请求**
@@ -1070,7 +1416,7 @@ npm i axios
 ```
 import React,{Component} from 'react'
 import axios from 'axios'
- 
+
 export default class App extends Component{
   getStudentData = ()=>{
     axios.get('http://localhost:3000/api1/students').then(
@@ -1113,12 +1459,12 @@ npm i express
 ```
 const express = require('express')
 const app = express()
- 
+
 app.use((req,res,next)=>{
   console.log('有人请求服务器1')
   next()
 })
- 
+
 app.use('/students',(req,res)=>{
   const students = [
     {id:'001',name:'Tom',age:18},
@@ -1127,7 +1473,7 @@ app.use('/students',(req,res)=>{
   ]
   res.send(students)
 })
- 
+
 app.listen(5000,err=>{
   if(!err) console.log('服务器1启动成功,监听端口为5000...')
 })
@@ -1138,12 +1484,12 @@ app.listen(5000,err=>{
 ```
 const express = require('express')
 const app = express()
- 
+
 app.use((req,res,next)=>{
   console.log('有人请求服务器2了')
   next()
 })
- 
+
 app.use('/cars',(req,res)=>{
   const cars = [
     {id:'001',name:'奔驰',price:199},
@@ -1152,7 +1498,7 @@ app.use('/cars',(req,res)=>{
   ]
   res.send(cars)
 })
- 
+
 app.listen(5001,err=>{
   if(!err) console.log('服务器2启动成功,监听端口为5001...')
 })
@@ -1180,7 +1526,7 @@ app.listen(5001,err=>{
 
 ```
 const {createProxyMiddleware} = require('http-proxy-middleware') //这个库在初始化脚手架时就安装了，所以不用额外安装
- 
+
 module.exports = function(app) {
   app.use(
     createProxyMiddleware('/api1', {
@@ -1206,3 +1552,150 @@ module.exports = function(app) {
 ![Snipaste_2024-08-15_15-09-19.png](assets/c323fc489e359bfdb5718e39fbc68a31cd7aaead.png)
 
 ## 10. 案例 - github用户搜索框
+
+```
+npx create-react-app github_user_search
+cd github_user_search
+```
+
+安装axios库
+
+```
+npm i axios
+```
+
+获取bootstrap.css(找到链接ctrl+s保存网页即可)：[bootstrap](https://www.bootcdn.cn/twitter-bootstrap/ "https://www.bootcdn.cn/twitter-bootstrap/")
+
+存放路径：**/public/css/bootstrap.css**
+
+`/public/index.html `加一行
+
+```
+<link rel="stylesheet" href="./css/bootstrap.css" />
+```
+
+src/App.js
+
+```
+import React,{Component} from 'react'
+import Search from './components/Search'
+import List from './components/List'
+ 
+export default class App extends Component{
+  state = {
+    users:[],        //存放用户数据
+    isFirst:true,    //是否为第一次打开页面
+    isLoading:false, //标识是否处于加载中
+    err:''           //存储请求相关的错误信息
+  }
+  //更新App的state
+  updateAppState = (stateObj)=>{
+    this.setState(stateObj)
+  }
+  render(){
+    return (
+      <div className="container">
+        <Search updateAppState={this.updateAppState}/>
+        <List {...this.state}/>
+      </div>
+    )
+  }
+}
+```
+
+src/components/Search/index.jsx
+
+```
+import React, { Component } from 'react'
+import axios from 'axios'
+ 
+export default class Search extends Component {
+  search = ()=>{
+    const { keyWordElement:{value:keyWord} } = this  //获取用户的输入内容
+    //发送请求前更新APP状态
+    this.props.updateAppState({isFirst:false,isLoading:true})
+    //发送网络请求
+    axios.get(`http://api.github.com/search/users?q=${keyWord}`).then(
+      response => {
+        //请求成功后更新APP状态
+        this.props.updateAppState({isLoading:false,users:response.data.items})
+      },
+      error => {
+        //请求失败后更新APP状态
+        this.props.updateAppState({isLoading:false,err:error.message})
+      }
+    )
+  }
+  render() {
+    return (
+      <section className="jumbotron">
+        <h3 className="jumbotron-heading">搜索Github用户</h3>
+        <div>
+          <input ref={c => this.keyWordElement = c} type="text" placeholder="输入用户名称"/>&nbsp;
+          <button onClick={this.search}>搜索</button>
+        </div>
+      </section>
+    )
+  }
+}
+```
+
+src/components/List/index.jsx
+
+```
+import { Component } from 'react'
+import './index.css'
+
+export default class List extends Component {
+    render() {
+      const {users,isFirst,isLoading,err} = this.props
+      return (
+        <div className="row">
+          {
+            isFirst ? <h2>欢迎!</h2> : 
+            isLoading ? <h2>加载中...</h2> :
+            err ? <h2 style={{color:'red'}}>{err}</h2> :
+            users.map((userObj)=>{
+              return (
+                <div key={userObj.id} className="card">
+                  <a rel="noreferrer" href={userObj.html_url} target="_blank">
+                    <img alt="profile_picture" src={userObj.avatar_url} style={{width: '100px'}}/>
+                  </a>
+                  <p className="card-text">{userObj.login}</p>
+                </div>
+              )
+            })
+          }
+        </div>
+      )
+    }
+  }
+```
+
+src/components/List/index.css
+
+```
+.card {
+    float: left;
+    width: 33.333%;
+    padding: .75rem;
+    margin-bottom: 2rem;
+    border: 1px solid #efefef;
+    text-align: center;
+}
+   
+.card > img {
+    margin-bottom: .75rem;
+    border-radius: 100px;
+}
+
+.card-text {
+    font-size: 85%;
+}
+```
+
+**效果**
+
+![Snipaste_2024-08-16_20-59-31.png](assets/55341612540ab148c3720ca0a61f61f2898555bb.png)
+
+## 11.
