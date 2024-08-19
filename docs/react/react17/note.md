@@ -1720,7 +1720,7 @@ npm i pubsub-js
 import React,{Component} from 'react'
 import Search from './components/Search'
 import List from './components/List'
- 
+
 export default class App extends Component{
   render(){
     return (
@@ -1739,7 +1739,7 @@ export default class App extends Component{
 import React, { Component } from 'react'
 import PubSub from 'pubsub-js'
 import axios from 'axios'
- 
+
 export default class Search extends Component {
   search = ()=>{
     const {keyWordElement:{value:keyWord}} = this  //获取用户的输入内容
@@ -1762,7 +1762,7 @@ export default class Search extends Component {
       <section className="jumbotron">
         <h3 className="jumbotron-heading">Search Github Users</h3>
         <div>
-          <input ref={c => this.keyWordElement = c} type="text" placeholder="enter the name you search"/>&nbsp;
+          <input ref={c => this.keyWordElement = c} type="text" placeholder="enter the name you search"/> 
           <button onClick={this.search}>Search</button>
         </div>
       </section>
@@ -1777,7 +1777,7 @@ export default class Search extends Component {
 import React, { Component } from 'react'
 import PubSub from 'pubsub-js'
 import './index.css'
- 
+
 export default class List extends Component {
   state = {
     users:[],        //存放用户数据

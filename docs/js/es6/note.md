@@ -421,3 +421,73 @@ function demo() {
 }
 </script>
 ```
+
+## 8. 利用fetch发送网络请求
+
+**XHR**（XMLHttpRequest）是一个浏览器接口，使得Javascript可以进行HTTP(S)通信。  
+
+因为它太有用，其他浏览器也模仿部署了，**ajax操作**因此得以诞生。  
+
+**AJAX**（Asynchronous JavaScript）：XML 异步的 JavaScript 和 XML。
+
+ajax是基于浏览器提供的XMLHttpRequest对象来实现的，自从有了ajax之后，我们就可以实现异步的加载网页。
+
+**XML**（e**X**tensible **M**arkup **L**anguage）指可扩展标记语言。  
+
+我们在浏览器中使用XMLHTTPRequest对象在服务器之间通信，传输的数据是使用**XML**的方式，但最终还是会被转换成**json数据格式**来被我们使用。
+
+**jQuery和axios**都是对XML的封装，都是为了更方便地用XML。  
+
+但是，我们不用XML，用fetch也可以发网络请求，它解决了XML的一些缺陷，比如XML不符合**关注分离**（Separation of Concerns）的原则。
+
+**所谓关注分离，其实就是将问题进行分解。**
+
+使用 XHR 发送一个 json 请求一般是这样
+
+```
+var xhr = new XMLHttpRequest();
+xhr.open('GET', url);      //启动一个请求以备发送
+xhr.responseType = 'json'; //指定响应的数据类型
+//onload是回调函数，异步请求加载完成，并且readyState变为4后执行
+xhr.onload = function() {
+  console.log(xhr.response);
+};
+//ajax也是回调函数，在ajax请求出错后执行
+xhr.onerror = function() {
+  console.log("Oops, error");
+};
+xhr.send();               //发送特定的请求
+```
+
+使用 **fetch** 后，顿时看起来好一点（**这里体会一下关注分离：先判断有没有联系上服务器）**
+
+```
+fetch(url).then(function(response) {
+  return response.json(); //首先判断能不能联系上服务器，可以就返回一个promise实例response.json()
+}).then(function(data) {
+  console.log(data);          //获取数据成功
+}).catch(function(e) {
+  console.log("Oops, error"); //获取数据失败
+});
+```
+
+使用 ES6 的**箭头函数**之后：
+
+```
+fetch(url).then(response => response.json())
+  .then(data => console.log(data))
+  .catch(e => console.log("Oops, error", e))
+```
+
+使用 **async/await** （属于 ES7）做最终优化
+
+```
+try {
+  let response = await fetch(url);   //首先判断能不能联系上服务器
+  let data = await response.json();  //再判断能不能获取数据
+  console.log(data);
+} catch(e) {
+  console.log("Oops, error", e);
+}
+// 注：这段代码如果想运行，外面需要包一个 async function
+```
