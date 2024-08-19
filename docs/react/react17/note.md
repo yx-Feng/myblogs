@@ -1140,7 +1140,6 @@ class App extends Component {
 }
 
 export default App;
-
 ```
 
 src/App.css
@@ -1299,7 +1298,7 @@ export default class List extends Component {
         updateTodo:PropTypes.func.isRequired,
         deleteTodo:PropTypes.func.isRequired
     }
-    
+
     render() {
         const {todos,updateTodo,deleteTodo} = this.props
         return (
@@ -1580,7 +1579,7 @@ src/App.js
 import React,{Component} from 'react'
 import Search from './components/Search'
 import List from './components/List'
- 
+
 export default class App extends Component{
   state = {
     users:[],        //存放用户数据
@@ -1608,7 +1607,7 @@ src/components/Search/index.jsx
 ```
 import React, { Component } from 'react'
 import axios from 'axios'
- 
+
 export default class Search extends Component {
   search = ()=>{
     const { keyWordElement:{value:keyWord} } = this  //获取用户的输入内容
@@ -1631,7 +1630,7 @@ export default class Search extends Component {
       <section className="jumbotron">
         <h3 className="jumbotron-heading">搜索Github用户</h3>
         <div>
-          <input ref={c => this.keyWordElement = c} type="text" placeholder="输入用户名称"/>&nbsp;
+          <input ref={c => this.keyWordElement = c} type="text" placeholder="输入用户名称"/> 
           <button onClick={this.search}>搜索</button>
         </div>
       </section>
@@ -1683,7 +1682,7 @@ src/components/List/index.css
     border: 1px solid #efefef;
     text-align: center;
 }
-   
+
 .card > img {
     margin-bottom: .75rem;
     border-radius: 100px;
@@ -1698,4 +1697,123 @@ src/components/List/index.css
 
 ![Snipaste_2024-08-16_20-59-31.png](assets/55341612540ab148c3720ca0a61f61f2898555bb.png)
 
-## 11.
+## 11. 消息订阅-发布机制
+
+**安装PubSubJS库**
+
+```
+npm i pubsub-js
+```
+
+[详细用法](https://github.com/mroderick/PubSubJS "详细用法")
+
+可以用PubSubJS库实现消息订阅-发布机制  
+
+**消息订阅-发布机制**：publisher发布不同主题的消息，subscriber可以接收已订阅主题的消息。不同subscriber订阅相同主题的话接收的信息相同。
+**利用该机制可以方便组件之间传递数据**
+
+**改造github用户搜索框案例**
+
+/src/App.js
+
+```
+import React,{Component} from 'react'
+import Search from './components/Search'
+import List from './components/List'
+ 
+export default class App extends Component{
+  render(){
+    return (
+      <div className="container">
+        <Search/>
+        <List/>
+      </div>
+    )
+  }
+}
+```
+
+/src/components/Search/index.jsx
+
+```
+import React, { Component } from 'react'
+import PubSub from 'pubsub-js'
+import axios from 'axios'
+ 
+export default class Search extends Component {
+  search = ()=>{
+    const {keyWordElement:{value:keyWord}} = this  //获取用户的输入内容
+    //发送请求前通知List更新状态
+    PubSub.publish('updateState',{isFirst:false,isLoading:true})
+    //发送网络请求
+    axios.get(`http://api.github.com/search/users?q=${keyWord}`).then(
+      response => {
+        //请求成功后通知List更新状态
+        PubSub.publish('updateState',{isLoading:false,users:response.data.items})
+      },
+      error => {
+        //请求失败后通知List更新状态
+        PubSub.publish('updateState',{isLoading:false,err:error.message})
+      }
+    )
+  }
+  render() {
+    return (
+      <section className="jumbotron">
+        <h3 className="jumbotron-heading">Search Github Users</h3>
+        <div>
+          <input ref={c => this.keyWordElement = c} type="text" placeholder="enter the name you search"/>&nbsp;
+          <button onClick={this.search}>Search</button>
+        </div>
+      </section>
+    )
+  }
+}
+```
+
+/src/components/List/index.jsx
+
+```
+import React, { Component } from 'react'
+import PubSub from 'pubsub-js'
+import './index.css'
+ 
+export default class List extends Component {
+  state = {
+    users:[],        //存放用户数据
+    isFirst:true,    //是否为第一次打开页面
+    isLoading:false, //标识是否处于加载中
+    err:''           //存储请求相关的错误信息
+  }
+  componentDidMount(){
+    this.token = PubSub.subscribe('updateState',(msg,stateObj)=>{
+      this.setState(stateObj)
+    })
+  }
+  componentWillUnmount(){
+    PubSub.unsubscribe(this.token)
+  }
+  render() {
+    const {users,isFirst,isLoading,err} = this.state
+    return (
+      <div className="row">
+        {
+          isFirst ? <h2>Welcome!</h2> : 
+          isLoading ? <h2>Loading...</h2> :
+          err ? <h2 style={{color:'red'}}>{err}</h2> :
+          users.map((userObj)=>{
+            return (
+              <div key={userObj.id} className="card">
+                <a rel="noreferrer" href={userObj.html_url} target="_blank">
+                  <img alt="profile_picture" src={userObj.avatar_url} style={{width: '100px'}}/>
+                </a>
+                <p className="card-text">{userObj.login}</p>
+              </div>
+            )
+          })
+        }
+      </div>
+    )
+  }
+}
+```
