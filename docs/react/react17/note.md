@@ -1953,38 +1953,38 @@ import Home from './pages/Home' //Home是路由组件
 import About from './pages/About' //About是路由组件
 import Header from './components/Header' //Header是一般组件
 import MyNavLink from './components/MyNavLink'
- 
+
 export default class App extends Component {
   render() {
     return (
-	  <div>
-	    <div className="row">
-		  <div className="col-xs-offset-2 col-xs-8">
-		    <Header/>
-		  </div>
-		</div>
-		<div className="row">
-		  <div className="col-xs-2 col-xs-offset-2">
-		    <div className="list-group">
-			  {/* 在React中靠路由链接实现切换组件--编写路由链接 */}
-			  <MyNavLink to="/home">Home</MyNavLink>
-			  <MyNavLink to="/about">About</MyNavLink>
-			</div>
-		  </div>
-		  <div className="col-xs-6">
-		    <div className="panel">
-		      <div className="panel-body">
-		      {/*注册路由,用Routes包起来可实现单一匹配,不包起来只要是path相同的element都会匹配*/}
-			    <Routes>
+      <div>
+        <div className="row">
+          <div className="col-xs-offset-2 col-xs-8">
+            <Header/>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-xs-2 col-xs-offset-2">
+            <div className="list-group">
+              {/* 在React中靠路由链接实现切换组件--编写路由链接 */}
+              <MyNavLink to="/home">Home</MyNavLink>
+              <MyNavLink to="/about">About</MyNavLink>
+            </div>
+          </div>
+          <div className="col-xs-6">
+            <div className="panel">
+              <div className="panel-body">
+              {/*注册路由,用Routes包起来可实现单一匹配,不包起来只要是path相同的element都会匹配*/}
+                <Routes>
                     <Route path="/home/*" element={<Home/>}/>
                     <Route path="/about" element={<About/>}/>
                     <Route path="*" element={<Navigate to ="/home" />}/>
-			    </Routes>
-			  </div>
-		    </div>
-		  </div>
-	    </div>
-	  </div>
+                </Routes>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     )
   }
 }
@@ -2012,10 +2012,10 @@ import {NavLink} from 'react-router-dom'
 
 export default class MyNavLink extends Component {
     render() {
-		return (
-			<NavLink className={({ isActive }) =>"list-group-item" + (isActive ? " activeStyle" : "")} { ...this.props }/>
-		)
-	}
+        return (
+            <NavLink className={({ isActive }) =>"list-group-item" + (isActive ? " activeStyle" : "")} { ...this.props }/>
+        )
+    }
 }
 ```
 
@@ -2026,12 +2026,12 @@ import { Component } from "react";
 
 export default class About extends Component {
     render() {
-		return (
-			<div>
-				<h3>我是About的内容</h3>
-			</div>	
-		)
-	}
+        return (
+            <div>
+                <h3>我是About的内容</h3>
+            </div>    
+        )
+    }
 }
 ```
 
@@ -2043,7 +2043,7 @@ import MyNavLink from '../../components/MyNavLink'
 import {Route,Routes,Navigate,Outlet} from 'react-router-dom'
 import News from './News'
 import Message from './Message'
- 
+
 export default class Home extends Component {
   render() {
     return (
@@ -2060,10 +2060,10 @@ export default class Home extends Component {
           </ul>
           {/* 注册路由 */}
           <Routes>
-			    <Route path="news" element={<News />} />
-		        <Route path="message/*" element={<Message />} />
-			    <Route path="" element={<Navigate to ="/home/news" />}/>
-		  </Routes>
+                <Route path="news" element={<News />} />
+                <Route path="message/*" element={<Message />} />
+                <Route path="" element={<Navigate to ="/home/news" />}/>
+          </Routes>
         </div>
         <Outlet />
       </div>
@@ -2076,17 +2076,17 @@ export default class Home extends Component {
 
 ```
 import React, { Component } from 'react'
- 
+
 export default class News extends Component {
   render() {
     return (
       <div>
         <ul>
           <li>news001</li>
-		  <li>news002</li>
-		</ul>
-	  </div>
-	)
+          <li>news002</li>
+        </ul>
+      </div>
+    )
   }
 }
 ```
@@ -2095,33 +2095,35 @@ export default class News extends Component {
 
 ```
 import { Component } from 'react'
- 
+
 export default class Message extends Component {
   state = {
-	messageArr:[
-	  {id:'01',title:'消息1'},
-	  {id:'02',title:'消息2'}
-	]
+    messageArr:[
+      {id:'01',title:'消息1'},
+      {id:'02',title:'消息2'}
+    ]
   }
   render() {
-	const {messageArr} = this.state
-	return (
-	  <div>
-		<ul>
-		  {
-			messageArr.map((msgObj)=>{
-			  return (
-				<li key={msgObj.id}>{msgObj.title}</li>
-			  )
-			})
-		   }
-		 </ul>
-		 <hr/>
-	  </div>
+    const {messageArr} = this.state
+    return (
+      <div>
+        <ul>
+          {
+            messageArr.map((msgObj)=>{
+              return (
+                <li key={msgObj.id}>{msgObj.title}</li>
+              )
+            })
+           }
+         </ul>
+         <hr/>
+      </div>
     )
   }
 }
 ```
+
+![Snipaste_2024-08-22_18-34-26.png](assets/592750d477479df3c3eb00a622f2e5ff1ba2ea69.png)
 
 ## 13. Ant Design
 
@@ -2150,3 +2152,266 @@ export default class App extends Component {
     }
 }
 ```
+
+## 14. redux和React-Redux
+
+redux 是一个专门用于状态管理的JS库，可用在React、Vue、Angular等项目中。
+
+**什么情况下要用到redux？**  
+
+①某个组件的状态，需要让其它组件拿到 (共享)。  
+
+②一个组件需要改变另一个组件的状态 (通信)。
+
+**redux工作流程**
+
+![c14b84d9dccb8595bb37b2b8eb42e2d1.png](assets/946df0956feedeee3e36908a9287db4be56bf385.png)
+
+**Action**：是一个普通[JS对象](https://so.csdn.net/so/search?q=JS%E5%AF%B9%E8%B1%A1&spm=1001.2101.3001.7020)，type字段用于描述发生事件的类型，payload字段用于描述发生的具体事情。 
+**Action Creator**：是一个创建并返回一个 action 对象的函数。 
+**Reducer**：是一个函数，接收当前的state和action对象，必要时决定如何更新状态，并返回新状态，可以将 reducer 视为一个事件监听器。 
+**Store**：当前 Redux 应用的 state 存在于一个名为 **store** 的对象中。store 是通过传入一个 reducer 来创建的，并且有一个名为getState的方法，它返回当前状态值。 
+**dispatch**：store有一个方法叫dispatch。更新 state 的唯一方法是调用store.dispatch()并传入一个action对象。store 将执行所有 reducer 函数并计算出更新后的 state，调用getState()可以获取新 state。dispatch一个action可以形象的理解为 "触发一个事件"。
+
+**React-Redux 是 React 的官方 Redux UI 绑定库**。如果想要同时使用 Redux 和 React，你也应该使用 React-Redux 来绑定这两个库。
+
+![2a2684f1cf6764b85f547f9fd25afc1c.png](assets/5e02fb3edb43a9e5b456a4761041d811a553b9c7.png)
+
+**UI组件**应该包裹一个**容器组件**，它们是父子关系。 
+**UI组件**不能使用任何redux的api，只负责页面的呈现和交互，**容器组件**负责和redux通信，容器组件可以传给UI组件：redux中保存的状态和用于操作状态的方法。
+
+**求和案例（纯React版本）**
+
+/src/App.js
+
+```
+import Count from "./components/Count";
+
+function App() {
+  return (
+    <div>
+      <Count />
+    </div>
+  );
+}
+
+export default App;
+```
+
+/src/components/Count/index.jsx
+
+```
+import React, { Component } from 'react'
+
+export default class Count extends Component {
+
+  state = {count:0}
+
+  increment=()=>{
+    const {value} = this.selectNumer
+    const {count} = this.state
+    this.setState({count:count+value*1})
+  }
+
+  decrement=()=>{
+    const {value} = this.selectNumer
+    const {count} = this.state
+    this.setState({count:count-value*1})
+  }
+
+  incrementAsync=()=>{
+    const {value} = this.selectNumer
+    const {count} = this.state
+    setTimeout(() => {
+      this.setState({count:count+value*1})
+    }, 500)
+  }
+
+  render() {
+    return (
+      <div>
+        <h1>当前求和为：{this.state.count}</h1>
+        <select ref={c => this.selectNumer = c}>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+        </select> 
+        <button onClick={this.increment}>+</button> 
+        <button onClick={this.decrement}>-</button> 
+        <button onClick={this.incrementAsync}>异步加</button> 
+      </div>
+    )
+  }
+}
+```
+
+**求和案例（react-redux版本）**
+
+```
+npm install react-redux
+```
+
+/src/redux/constant.js
+
+```
+/*
+  该模块用于定义action对象中type类型的常量值
+*/
+export const INCREMENT = 'increment'
+export const DECREMENT = 'decrement'
+```
+
+/src/redux/count_action.js
+
+```
+/*
+  该文件专门为Count组件生成action对象
+*/
+import { INCREMENT, DECREMENT } from "./constant";
+
+// 同步action,就是指action的值为一般object类型的对象
+export const createIncrementAction = data => ({type:INCREMENT,payload: data})
+export const createDecrementAction = data => ({type:DECREMENT,payload: data})
+
+// 异步action,就是指action的值为函数
+export const createIncrementAsyncAction = (data, time) => {
+  return (dispatch)=>{
+    setTimeout(()=>{
+      dispatch(createIncrementAction(data))
+    },time)
+  }
+}
+```
+
+/src/redux/store.js
+
+```
+/*
+  该文件用于暴露一个store对象
+*/
+import {configureStore} from '@reduxjs/toolkit'
+import countReducer from './count_reducer'
+
+export default configureStore({ reducer: countReducer })
+```
+
+/src/redux/count_reducer.js
+
+```
+/*
+  该文件是用于创建一个为Count组件服务的reducer
+*/
+import { INCREMENT,DECREMENT } from "./constant";
+
+const initState = 0;
+export default function countReducer(preState=initState, action) {
+  const {type, payload} = action;
+  switch(type) {
+    case INCREMENT:
+      return preState+payload;
+    case DECREMENT:
+      return preState-payload;
+    default:
+      return preState;
+  }
+}
+```
+
+/src/containers/Count/index.jsx
+
+```
+import {connect} from 'react-redux'
+import React, { Component } from 'react'
+// 引入action
+import {
+  createIncrementAction,
+  createDecrementAction,
+  createIncrementAsyncAction
+} from '../../redux/count_action'
+
+// 定义CountUI组件
+class CountUI extends Component {
+
+  increment=()=>{
+    const {value} = this.selectNumer
+    this.props.add(value*1)
+  }
+
+  decrement=()=>{
+    const {value} = this.selectNumer
+    this.props.subtract(value*1)
+  }
+
+  incrementAsync=()=>{
+    const {value} = this.selectNumer
+    this.props.addAsync(value*1,500)
+  }
+
+  render() {
+    return (
+      <div>
+        <h1>当前求和为：{this.props.count}</h1>
+        <select ref={c => this.selectNumer = c}>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+        </select> 
+        <button onClick={this.increment}>+</button> 
+        <button onClick={this.decrement}>-</button> 
+        <button onClick={this.incrementAsync}>异步加</button> 
+      </div>
+    )
+  }
+}
+
+// 创建并暴露一个Count的容器组件
+export default connect(
+  state => ({count: state}), 
+  {
+    add: createIncrementAction,
+    subtract: createDecrementAction,
+    addAsync: createIncrementAsyncAction
+  }
+)(CountUI)
+```
+
+/src/App.jsx同上
+
+/src/index.js
+
+```
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+import store from './redux/store';
+import { Provider } from 'react-redux';  // provider会自动帮容器组件传store
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+    <Provider store={store}>
+        <App />
+    </Provider>
+);
+```
+
+## 15. 打包项目
+
+全局安装serve库，并配置一下环境变量
+
+```javascript
+npm i serve -g
+```
+
+将上面的项目打包，在项目根目录下面执行如下指令，会生成一个build文件夹
+
+```javascript
+npm run build
+```
+
+在生产环境运行该项目，serve指令后面跟的build文件夹的路径
+
+```javascript
+serve build
+```
+
+## 16.
