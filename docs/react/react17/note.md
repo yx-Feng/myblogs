@@ -1563,7 +1563,7 @@ cd github_user_search
 npm i axios
 ```
 
-获取bootstrap.css(找到链接ctrl+s保存网页即可)：[bootstrap](https://www.bootcdn.cn/twitter-bootstrap/ "https://www.bootcdn.cn/twitter-bootstrap/")
+获取bootstrap.css(找到链接ctrl+s保存网页即可)：[bootstrap](https://www.bootcdn.cn/twitter-bootstrap/)
 
 存放路径：**/public/css/bootstrap.css**
 
@@ -1815,5 +1815,338 @@ export default class List extends Component {
       </div>
     )
   }
+}
+```
+
+## 12. React路由
+
+**SPA**（single page web application, 单页面web应用）：整个应用只有一个完整页面，但可以有多个组件
+
+点击页面的链接，不会刷新页面，只会做页面的**局部更新**  
+
+数据都需要通过ajax请求获取，在前端异步实现
+
+**路由的理解**
+
+一个路由就是一个映射关系（key:value），key为路径，value可能是function或component
+
+**前端路由**：value为component，用于展示页面内容。path为/test时，当前路由组件就变为Test组件  
+
+注册路由：`<Router path="/test" component={Test}> ` 
+
+前端路由有**hash**和**history**两种模式，hash路由模式是这样的：http://xxx.abc.com/#/xx  
+
+**后端路由**：value为function，用来处理客户端提交的请求，返回响应数据  
+
+注册路由：router.get(path,function(req,res))
+
+**React路由的基本使用**
+
+> 1.明确好界面中的导航区、展示区
+> 
+> 2.导航区的a标签改为Link标签
+> 
+>    ` <Link to="/xxxxx">Demo</Link>`
+> 
+> 3.展示区写Route标签进行路径的匹配
+> 
+>     `<Route path='/xxxx' element={<Demo/>}/>`
+> 
+> 4.`<App>`的最外侧包裹了一个`<BrowserRouter>`或`<HashRouter>`
+
+**路由组件与一般组件**
+
+> 1.写法不同：
+> 
+>     一般组件：`<Demo/>`
+> 
+>     路由组件：`<Route path="/demo" element={<Demo/>}/>`
+> 
+> 2.存放位置不同：
+> 
+>     一般组件：components
+> 
+>     路由组件：pages
+> 
+> 3.接收到的props不同：
+> 
+>     一般组件：写组件标签时传递了什么，就能收到什么
+> 
+>     路由组件：接收到三个固定的属性：history、location、match
+
+**严格匹配与模糊匹配**
+
+> 1.默认使用的是模糊匹配（即【输入的路径】包含【匹配的路径】且顺序一致，就能匹配）
+> 
+> 2.开启严格匹配：`<Route exact={true} path="/about" element={<About/>} />`
+
+**Navigate的使用**
+
+> 一般写在所有注册路由的最下方，当所有路由都无法匹配时，跳转到Navigate指定的路由
+
+**向路由组件传递参数**  
+
+有params、search、state三种方式
+
+**BrowserRouter与HashRouter的区别**
+
+> 1.底层原理不一样：
+> 
+>     BrowserRouter使用的是H5的history API，不兼容IE9及以下版本
+> 
+>     HashRouter使用的是URL的哈希值。
+> 
+> 2.path表现形式不一样
+> 
+>     BrowserRouter的路径中没有#,例如：localhost:3000/demo/test
+> 
+>     HashRouter的路径包含#,例如：localhost:3000/#/demo/test
+> 
+> 3.刷新后对路由state参数的影响
+> 
+>     (1).BrowserRouter没有任何影响，因为state保存在history对象中。
+> 
+>     (2).HashRouter刷新后会导致路由state参数的丢失！
+> 
+> 4.备注：HashRouter可以用于解决一些路径错误相关的问题。
+
+**案例**
+
+```
+npx create-react-app route-demo
+cd route-demo
+npm start
+```
+
+/public/index.html
+
+```
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>React App</title>
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
+    <style>
+      /* 将!important是为了将自定义样式优先级提高,盖过bootstrap的样式 */
+      .activeStyle {
+        background-color: rgb(209, 137, 4) !important;
+        color: white !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+```
+
+/src/App.js
+
+```
+import React, { Component } from 'react'
+import {Route,Routes,Navigate} from 'react-router-dom'
+import Home from './pages/Home' //Home是路由组件
+import About from './pages/About' //About是路由组件
+import Header from './components/Header' //Header是一般组件
+import MyNavLink from './components/MyNavLink'
+ 
+export default class App extends Component {
+  render() {
+    return (
+	  <div>
+	    <div className="row">
+		  <div className="col-xs-offset-2 col-xs-8">
+		    <Header/>
+		  </div>
+		</div>
+		<div className="row">
+		  <div className="col-xs-2 col-xs-offset-2">
+		    <div className="list-group">
+			  {/* 在React中靠路由链接实现切换组件--编写路由链接 */}
+			  <MyNavLink to="/home">Home</MyNavLink>
+			  <MyNavLink to="/about">About</MyNavLink>
+			</div>
+		  </div>
+		  <div className="col-xs-6">
+		    <div className="panel">
+		      <div className="panel-body">
+		      {/*注册路由,用Routes包起来可实现单一匹配,不包起来只要是path相同的element都会匹配*/}
+			    <Routes>
+                    <Route path="/home/*" element={<Home/>}/>
+                    <Route path="/about" element={<About/>}/>
+                    <Route path="*" element={<Navigate to ="/home" />}/>
+			    </Routes>
+			  </div>
+		    </div>
+		  </div>
+	    </div>
+	  </div>
+    )
+  }
+}
+```
+
+/src/components/Header/index.jsx
+
+```
+import { Component } from "react";
+
+export default class Header extends Component {
+    render() {
+        return (
+            <div className="page-header"><h2>React Router Demo</h2></div>
+        )
+    }
+}
+```
+
+/src/components/MyNavLink/index.jsx
+
+```
+import { Component } from "react";
+import {NavLink} from 'react-router-dom'
+
+export default class MyNavLink extends Component {
+    render() {
+		return (
+			<NavLink className={({ isActive }) =>"list-group-item" + (isActive ? " activeStyle" : "")} { ...this.props }/>
+		)
+	}
+}
+```
+
+/src/pages/About/index.jsx
+
+```
+import { Component } from "react";
+
+export default class About extends Component {
+    render() {
+		return (
+			<div>
+				<h3>我是About的内容</h3>
+			</div>	
+		)
+	}
+}
+```
+
+/src/pages/Home/index.jsx
+
+```
+import React, { Component } from 'react'
+import MyNavLink from '../../components/MyNavLink'
+import {Route,Routes,Navigate,Outlet} from 'react-router-dom'
+import News from './News'
+import Message from './Message'
+ 
+export default class Home extends Component {
+  render() {
+    return (
+      <div>
+        <h3>我是Home的内容</h3>
+        <div>
+          <ul className="nav nav-tabs">
+            <li>
+              <MyNavLink to="/home/news">News</MyNavLink>
+            </li>
+            <li>
+              <MyNavLink to="/home/message">Message</MyNavLink>
+            </li>
+          </ul>
+          {/* 注册路由 */}
+          <Routes>
+			    <Route path="news" element={<News />} />
+		        <Route path="message/*" element={<Message />} />
+			    <Route path="" element={<Navigate to ="/home/news" />}/>
+		  </Routes>
+        </div>
+        <Outlet />
+      </div>
+    )
+  }
+}
+```
+
+/src/pages/Home/News/index.jsx
+
+```
+import React, { Component } from 'react'
+ 
+export default class News extends Component {
+  render() {
+    return (
+      <div>
+        <ul>
+          <li>news001</li>
+		  <li>news002</li>
+		</ul>
+	  </div>
+	)
+  }
+}
+```
+
+/src/pages/Home/Message/index.jsx
+
+```
+import { Component } from 'react'
+ 
+export default class Message extends Component {
+  state = {
+	messageArr:[
+	  {id:'01',title:'消息1'},
+	  {id:'02',title:'消息2'}
+	]
+  }
+  render() {
+	const {messageArr} = this.state
+	return (
+	  <div>
+		<ul>
+		  {
+			messageArr.map((msgObj)=>{
+			  return (
+				<li key={msgObj.id}>{msgObj.title}</li>
+			  )
+			})
+		   }
+		 </ul>
+		 <hr/>
+	  </div>
+    )
+  }
+}
+```
+
+## 13. Ant Design
+
+**antd**全称**Ant Design**，是蚂蚁金服开发的一套React UI组件库。
+
+```
+npx create-react-app antd-demo
+cd antd-demo
+npm i antd
+npm start
+```
+
+/src/App.js
+
+```
+import React, { Component } from 'react'
+import { Button } from 'antd';
+
+export default class App extends Component {
+    render() {
+        return (
+            <div>
+                <Button type="primary">Primary Button</Button>
+            </div>
+        )
+    }
 }
 ```
