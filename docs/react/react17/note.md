@@ -1990,6 +1990,22 @@ export default class App extends Component {
 }
 ```
 
+/src/index.js
+
+```
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import App from './App';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <BrowserRouter>
+    <App/>
+  </BrowserRouter>
+);
+```
+
 /src/components/Header/index.jsx
 
 ```
@@ -2414,4 +2430,348 @@ npm run build
 serve build
 ```
 
-## 16.
+## 16. 扩展
+
+### 16.1 setState的两种写法
+
+**①setState(对象,[callback])** 
+**②setState(函数,[callback])** 
+
+函数可以接收到state和props，callback回调函数能获取状态更新后的数据
+
+写个Demo组件
+
+```
+import React, { Component } from 'react'
+
+export default class Demo extends Component {
+
+  state = {count:0}
+
+  add = () => {
+    // 对象式的setState
+    // const {count} = this.state
+    // this.setState({count:count+1},()=>{
+    //   console.log(this.state.count);
+    // })
+    // 函数式的setState
+    this.setState((state,props)=>{
+      return {count:state.count+1}
+    })
+  }
+
+  render() {
+    return (
+      <div>
+        <h1>当前求和为：{this.state.count}</h1>
+        <button onClick={this.add}>点我+1</button>
+      </div>
+    )
+  }
+}
+```
+
+### 16.2 lazyLoad
+
+**懒加载**：需要用的加载，不需要用的不加载，一般路由组件都需要懒加载
+
+**bootstrap.css**放在/public/css目录下  
+
+/public/index.html 引入
+
+```
+<link rel="stylesheet" href="/css/bootstrap.css">
+```
+
+**写三个组件**
+
+/src/components/About/index.jsx
+
+```
+import React, { Component } from 'react'
+
+export default class About extends Component {
+  render() {
+    return (
+      <div>About</div>
+    )
+  }
+}
+```
+
+/src/components/Home/index.jsx
+
+```
+import React, { Component } from 'react'
+
+export default class Home extends Component {
+  render() {
+    return (
+      <div>Home</div>
+    )
+  }
+}
+```
+
+/src/components/Loading/index.jsx
+
+```
+import React, { Component } from 'react'
+
+export default class Loading extends Component {
+  render() {
+    return (
+      <div>加载中...</div>
+    )
+  }
+}
+```
+
+/src/App.js
+
+```
+import React, { Component,lazy,Suspense } from 'react'
+import {Route,Routes,Link} from 'react-router-dom'
+import Loading from './components/Loading'
+const Home = lazy(()=>import('./components/Home'))
+const About = lazy(()=>import('./components/About'))
+
+export default class App extends Component {
+  render() {
+    return (
+      <div>
+          <div className="container row">
+              <div className="col-md-3">
+                  <div className="list-group">
+                  {/* 编写路由链接 */}
+                  <li className="list-group-item">
+                      <Link to="/home">Home</Link>
+                  </li>
+                  <li className="list-group-item">
+                      <Link to="/about">About</Link>
+                  </li>    
+              </div>
+          </div>
+          <div className="col-md-6">
+              <div className="card">
+                  <div className="card-body">
+                      <Suspense fallback={<Loading/>}>
+                          <Routes>
+                              <Route path="/home/*" element={<Home/>}/>
+                              <Route path="/about" element={<About/>}/>
+                          </Routes>
+                      </Suspense>
+                  </div>
+                </div>
+            </div>
+        </div>
+      </div>
+    )
+  }
+}
+```
+
+/src/index.js
+
+```
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import App from './App';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <BrowserRouter>
+    <App/>
+  </BrowserRouter>
+);
+```
+
+### 16.3 Hook钩子函数
+
+Hook指能让你不用编写class，在**函数组件**里 "钩入" **React state**及**生命周期**等特性的**函数**。
+
+- State Hook：useState()
+- Effect Hook：useEffect()
+- Ref Hook：useRef()
+
+**① useState()**
+
+**参数**：第一次初始化指定的值内部做缓存 
+**返回值**：包含两个元素的数组，分别为**当前状态**和一个**更新状态的函数** 
+
+```
+import React, {useState} from "react";
+
+function Demo() {
+  const [count,setCount] = useState(0);
+  function add() {
+    //setCount(count+1) // 第一种写法
+    setCount(count => count+1) // 第二种写法
+  }
+  return (
+    <div>
+      <h2>当前求和为：{count}</h2>
+      <button onClick={add}>点我+1</button>
+    </div>
+  )
+}
+
+export default Demo
+```
+
+**② useEffect()**
+
+**useEffect**就是一个 Effect Hook，给**函数组件**增加了操作"**副作用**"的能力(在组件中执行数据获取、订阅或者手动修改过 DOM。我们统一把这些操作称为“副作用”，或简称为“作用”)。 
+它跟 class 组件中的 **`componentDidMount`**、**`componentDidUpdate`** 和 **`componentWillUnmount`** 这些生命周期函数具有相同的用途，只不过被合并成了一个 API。
+
+```
+useEffect(() => {
+    // 在此执行任何副作用操作
+    return () => { // 在组件卸载前执行
+        // 做一些收尾工作
+    }
+}, [stateValue])
+// 省略第二个参数，默认监听第一次组件挂载，和所有状态的更新
+// 如果指定为[]，只监听第一次组件挂载
+// []里面指定什么状态，就能监听该状态的更新
+```
+
+**下面这个组件在 React 更新 DOM 后会设置一个页面标题**
+
+```
+import React, {useState,useEffect} from "react";
+ 
+function Demo() {
+  const [count, setCount] = useState(0);
+ 
+  // 相当于 componentDidMount 和 componentDidUpdate:
+  useEffect(() => {
+    // 使用浏览器的API更新页面标题
+    document.title = `You clicked ${count} times`;
+  });
+ 
+  return (
+    <div>
+      <p>You clicked {count} times</p>
+      <button onClick={() => setCount(count + 1)}>
+        Click me
+      </button>
+    </div>
+  );
+}
+ 
+export default Demo
+```
+
+**③ useRef()**
+
+在函数组件中，可利用**该函数生成的ref对象**绑定一个组件，从而定位该组件，拿到组件内的数据。
+
+```
+import React, {useRef} from "react";
+ 
+function Demo() {
+  const myRef = useRef()
+ 
+  function show() {
+    alert(myRef.current.value)
+  }
+ 
+  return (
+    <div>
+      <input type="text" ref={myRef} />
+      <button onClick={show}>点我</button>
+    </div>
+  )
+}
+ 
+export default Demo
+```
+
+### 16.4 render props
+
+**如何向组件内部传入带数据的标签？**
+
+Vue：使用slot技术，也就是通过组件标签体传入标签，`<A><B/></A>`
+React： 
+**①使用children props**：通过组件标签体传入标签
+
+```
+<A>
+    <B>xxx</B>
+</A>
+{this.props.children}
+缺陷：如果B组件需要A组件内部的数据，做不到
+```
+
+**②使用render props**：通过组件属性传入标签，而且可以携带数据
+
+**index.jsx**
+
+```
+import React, { Component } from 'react'
+import './index.css'
+ 
+export default class Parent extends Component {
+ 
+  render() {
+    return (
+      <div className='parent'>
+        <div>父组件</div>
+        <A render={(name)=><B name={name}/>}></A>
+      </div>
+    )
+  }
+}
+ 
+class A extends Component {
+  state = {name: 'tom'}
+  render() {
+    const {name} = this.state
+    return (
+      <div className='child'>
+        <div>A组件</div>
+        {this.props.render(name)}
+      </div>
+    )
+  }
+}
+ 
+class B extends Component {
+  render() {
+    return (
+      <div className='grandchild'>
+        <div>B组件</div>
+        <div>从A组件接收到的用户名：{this.props.name}</div>
+      </div>
+    )
+  }
+}
+```
+
+index.css
+
+```
+.parent{
+  width: 500px;
+  background-color: orange;
+  padding: 5px;  
+}
+ 
+.child{
+  width: 400px;
+  background-color: skyblue;
+  padding: 5px;
+}
+ 
+.grandchild{
+  width: 300px;
+  background-color: red;
+  padding: 5px;
+}
+```
+
+![6d3421ccc9d703b2cad5d32db4301cd9.png](assets/5e4cd83831ab6e748d070329bea0dcda21cb9e84.png)
+
+# 
