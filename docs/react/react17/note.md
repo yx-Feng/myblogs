@@ -2623,7 +2623,7 @@ export default Demo
 **② useEffect()**
 
 **useEffect**就是一个 Effect Hook，给**函数组件**增加了操作"**副作用**"的能力(在组件中执行数据获取、订阅或者手动修改过 DOM。我们统一把这些操作称为“副作用”，或简称为“作用”)。 
-它跟 class 组件中的 **`componentDidMount`**、**`componentDidUpdate`** 和 **`componentWillUnmount`** 这些生命周期函数具有相同的用途，只不过被合并成了一个 API。
+它跟 class 组件中的 `componentDidMount`、`componentDidUpdate` 和 `componentWillUnmount` 这些生命周期函数具有相同的用途，只不过被合并成了一个 API。
 
 ```
 useEffect(() => {
@@ -2641,16 +2641,16 @@ useEffect(() => {
 
 ```
 import React, {useState,useEffect} from "react";
- 
+
 function Demo() {
   const [count, setCount] = useState(0);
- 
+
   // 相当于 componentDidMount 和 componentDidUpdate:
   useEffect(() => {
     // 使用浏览器的API更新页面标题
     document.title = `You clicked ${count} times`;
   });
- 
+
   return (
     <div>
       <p>You clicked {count} times</p>
@@ -2660,7 +2660,7 @@ function Demo() {
     </div>
   );
 }
- 
+
 export default Demo
 ```
 
@@ -2670,14 +2670,14 @@ export default Demo
 
 ```
 import React, {useRef} from "react";
- 
+
 function Demo() {
   const myRef = useRef()
- 
+
   function show() {
     alert(myRef.current.value)
   }
- 
+
   return (
     <div>
       <input type="text" ref={myRef} />
@@ -2685,7 +2685,7 @@ function Demo() {
     </div>
   )
 }
- 
+
 export default Demo
 ```
 
@@ -2712,9 +2712,9 @@ React：
 ```
 import React, { Component } from 'react'
 import './index.css'
- 
+
 export default class Parent extends Component {
- 
+
   render() {
     return (
       <div className='parent'>
@@ -2724,7 +2724,7 @@ export default class Parent extends Component {
     )
   }
 }
- 
+
 class A extends Component {
   state = {name: 'tom'}
   render() {
@@ -2737,7 +2737,7 @@ class A extends Component {
     )
   }
 }
- 
+
 class B extends Component {
   render() {
     return (
@@ -2758,13 +2758,13 @@ index.css
   background-color: orange;
   padding: 5px;  
 }
- 
+
 .child{
   width: 400px;
   background-color: skyblue;
   padding: 5px;
 }
- 
+
 .grandchild{
   width: 300px;
   background-color: red;
