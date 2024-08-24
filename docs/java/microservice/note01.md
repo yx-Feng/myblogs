@@ -1,4 +1,4 @@
-# 0.导入黑马商城项目
+## 0.导入黑马商城项目
 
 **环境**：CentOS Stream(CentOS 9)， JDK20
 
@@ -419,7 +419,7 @@ spring:
 
 为了测试一个服务多个实例的情况，我们再配置一个`item-service`的部署实例：
 
-![4136c881d7a8fcd6af9bfc16acab663f2a85da7e.png](assets/ca06323003702fdb8c828b7d9579b996bd4af708.png)
+![ca06323003702fdb8c828b7d9579b996bd4af708.png](assets/cb16b2d5903ee33a5d6ddf8772a9ad8941b89310.png)
 
 然后配置启动项，注意重命名并且配置新的端口，避免冲突：
 
