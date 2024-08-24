@@ -32,15 +32,15 @@
 
 - 通过认证后，网关再根据请求判断应该访问哪个微服务，将请求转发过去
   
-  <img title="" src="assets/42776177d6e20e0369e19f89e7d12671cea6189a.jpg" alt="f05b9ce9-215d-4e90-9235-b3410eb3bfd5.jpg" width="660">
+  ![42776177d6e20e0369e19f89e7d12671cea6189a.jpg](assets/91f00a57395345d13eb604e0b97013f61fe5be63.jpg)
 
-在SpringCloud当中，提供了两种网关实现方案：
+  在SpringCloud当中，提供了两种网关实现方案：
 
 - Netflix Zuul：早期实现，目前已经淘汰
 
 - SpringCloudGateway：基于Spring的WebFlux技术，完全支持响应式编程，吞吐能力更强
 
-## 1.2.快速入门
+### 1.2.快速入门
 
 由于网关本身也是一个独立的微服务，因此也需要创建一个模块开发功能。大概步骤如下：
 
@@ -54,9 +54,9 @@
 
 接口测试：http://localhost:8080/items/page?pageNo=1&pageSize=1
 
-<img title="" src="assets/77e756c965328eb6322b4db6cec0190fc540e255.png" alt="a09b7afb-38ec-4949-82c6-6cad5d72793b.png" width="785">
+![77e756c965328eb6322b4db6cec0190fc540e255.png](assets/c25d59d8c80cf27b72bdcc29faa9b5736303c5b1.png)
 
-## 1.3.路由过滤
+### 1.3.路由过滤
 
 路由规则的定义语法如下：
 
@@ -73,7 +73,7 @@ spring:
 
 其中routes对应的类型如下：
 
-<img src="assets/7db8f026c178e0861f15158a771679ac4b833b41.png" title="" alt="db282a2d-4c23-494a-a6e0-40a128db695e.png" width="725">
+![7db8f026c178e0861f15158a771679ac4b833b41.png](assets/a6a79d048f7679b3d7a291384ec4a9c360453673.png)
 
 是一个集合，也就是说可以定义很多路由规则。集合中的`RouteDefinition`就是具体的路由规则定义，其中常见的属性如下：
 
@@ -124,7 +124,7 @@ spring:
 
 此时，登录校验的流程如图
 
-<img src="assets/cd32d0eb2f04b6f3d516ac598a27115dfeaafc39.png" title="" alt="whiteboard_exported_image.png" width="693">
+![42776177d6e20e0369e19f89e7d12671cea6189a.jpg](assets/91f00a57395345d13eb604e0b97013f61fe5be63.jpg)
 
 不过，这里存在几个问题：
 
@@ -138,7 +138,7 @@ spring:
 
 登录校验必须在请求转发到微服务之前做，否则就失去了意义。而网关的请求转发是`Gateway`内部代码实现的，要想在请求转发之前做登录校验，就必须了解`Gateway`内部工作的基本原理。
 
-<img src="assets/f3f0b75c052f0494635816320453fcf1b5359805.png" title="" alt="whiteboard_exported_image2.png" width="505">
+![f3f0b75c052f0494635816320453fcf1b5359805.png](assets/00f714699cf9dd0d3a9197e45d0747546c65a5f4.png)
 
 如图所示：
 
@@ -363,7 +363,7 @@ public class PrintAnyGlobalFilter implements GlobalFilter, Ordered {
 
 登录校验需要用到JWT，而且JWT的加密需要秘钥和加密工具。这些在`hm-service`中已经有了，我们直接拷贝过来：
 
-<img src="assets/240c3b411e43cb20b297f5ee892fe2b1b35463c4.png" title="" alt="643735e8-5dfb-496a-874d-008a3eb072a8.png" width="618">
+![240c3b411e43cb20b297f5ee892fe2b1b35463c4.png](assets/c4518fba4a273bb6766bac4ecabd5ebfd548acef.png)
 
 具体作用如下：
 
@@ -475,7 +475,7 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
 
 据图流程图如下
 
-<img title="" src="assets/97b3b49ec0a8376a6c654269d3e800d77afcb17d.jpg" alt="9167f34e-0766-470c-bc5d-15a511eb32ac.jpg" width="956">
+![97b3b49ec0a8376a6c654269d3e800d77afcb17d.jpg](assets/39fbc13a1fbd66251956337cedb14f0065a4ebd4.jpg)
 
 因此，接下来我们要做的事情有：
 
@@ -590,7 +590,7 @@ List<Cart> carts = lambdaQuery().eq(Cart::getUserId, UserContext.getUser()).list
 
 但有些业务是比较复杂的，请求到达微服务后还需要调用其它多个微服务。比如下单业务，流程如下：
 
-![df3274fc-93dd-4c58-a519-0bcb3cda5a62.jpg](assets/66ffb460a22d757fe32dc0403471aca5f215996e.jpg)
+![66ffb460a22d757fe32dc0403471aca5f215996e.jpg](assets/0c5aa8cb9efde5ee3bae4f50c06c251459766fe0.jpg)
 
 下单的过程中，需要调用商品服务扣减库存，调用购物车服务清理用户购物车。而清理购物车时必须知道当前登录的用户身份。但是，**订单服务调用购物车时并没有传递用户信息**，购物车服务无法知道当前用户是谁！
 
@@ -647,7 +647,7 @@ public RequestInterceptor userInfoRequestInterceptor(){
 
 这些问题都可以通过统一的**配置管理器服务**解决。而Nacos不仅仅具备注册中心功能，也具备配置管理的功能：
 
-<img src="assets/d34c99c29bb2f41a614c55aee9851707ee309b7c.jpg" title="" alt="52ff99d5-8204-4e34-8d3d-cabc8246f9a5.jpg" width="659">
+![d34c99c29bb2f41a614c55aee9851707ee309b7c.jpg](assets/70623fd9cf1bfa2088805dba887245d475e70739.jpg)
 
 微服务共享的配置可以统一交给Nacos保存和管理，在Nacos控制台修改配置后，Nacos会将配置变更推送给相关的微服务，并且无需重启即可生效，实现配置热更新。
 
@@ -671,7 +671,7 @@ public RequestInterceptor userInfoRequestInterceptor(){
 
 首先是jdbc相关配置，在`配置管理`->`配置列表`中点击`+`新建一个配置：
 
-<img title="" src="assets/47e44894f2b1b2a08ea3c55430d88f97f835b963.png" alt="a6608040-b454-4d86-8ed6-0d7b3bd9d8a9.png" width="794">
+![47e44894f2b1b2a08ea3c55430d88f97f835b963.png](assets/3db124fcbe349edcd649313c0fa7661f6e25bd63.png)
 
 shared-jdba.yaml
 
@@ -741,7 +741,7 @@ knife4j:
 
 SpringCloud在初始化上下文的时候会先读取一个名为`bootstrap.yaml`(或者`bootstrap.properties`)的文件，如果我们将nacos地址配置到`bootstrap.yaml`中，那么在项目引导阶段就可以读取nacos中的配置了。
 
-<img src="assets/806d118af78af9b33cb03beae8e28a7a98deaf33.jpg" title="" alt="5582f4d0-c53e-41dc-ae49-352eb42e18fc.jpg" width="643">
+![806d118af78af9b33cb03beae8e28a7a98deaf33.jpg](assets/95751c953a71234cd27be79ba3f9b6c1fe22ecc5.jpg)
 
 因此，微服务整合Nacos配置管理的步骤如下：
 

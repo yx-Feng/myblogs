@@ -29,6 +29,12 @@
   - [MyBatis](java/mybatis/note)
   
   - [微服务](java/microservice/note01)
+  
+  - [微服务2](java/microservice/note02)
+  
+  - [RabbitMQ](java/microservice/RabbitMQ)
+  
+  - [Elasticsearch](java/microservice/Elasticsearch)
 
 - Go
   
