@@ -124,7 +124,7 @@ SpringCloud框架可以说是目前Java领域最全面的微服务组件的集�
 
 **登录业务流程**
 
-![cd32d0eb2f04b6f3d516ac598a27115dfeaafc39.png](assets/b05d505dc38f17dd163edc45b1267fcabed799d4.png)
+![Snipaste_2024-08-24_17-20-18.png](assets/af996fbfdada84b81644ffd0a2161db3e0a08bcd.png)
 
 **搜索商品**
 
@@ -210,7 +210,7 @@ String sqlStatement = "com.hmall.mapper.ItemMapper.updateStock";
 
 导入数据库表`hm-item.sql`，将来的每一个微服务都会有自己的一个database。
 
-接着，启动`item-service`，访问商品微服务的swagger接口文档：http://localhost:8081/doc.html
+接着，启动`item-service`，访问商品微服务的swagger接口文档：`http://localhost:8081/doc.html`
 
 然后测试其中的根据id批量查询商品这个接口，测试参数：100002672302,100002624500,100002533430，结果如下：
 
@@ -236,7 +236,7 @@ String sqlStatement = "com.hmall.mapper.ItemMapper.updateStock";
 
 我们测试其中的`查询我的购物车列表`接口，无需填写参数，直接访问：
 
-![389f0280d2bb6a86c87195276161f15bc64c8d44.png](assets/a2121dc65d3caf1d8382a15d05fa8eef0b2772a7.png)
+![Snipaste_2024-08-24_20-51-42.png](assets/f050c2ba4db8c3956bf02e046b273440ad38b8a8.png)
 
 我们注意到，其中与商品有关的几个字段值都为空！这就是因为刚才我们注释掉了查询购物车时，查询商品信息的相关代码。
 
@@ -250,7 +250,7 @@ String sqlStatement = "com.hmall.mapper.ItemMapper.updateStock";
 
 因此，现在查询购物车列表的流程变成了这样：
 
-<img title="" src="assets/cd32d0eb2f04b6f3d516ac598a27115dfeaafc39.png" alt="whiteboard_exported_image.png" width="709">
+![Snipaste_2024-08-24_20-55-16.png](assets/20c0461709065eeb9e2abc26c66610054ee6a9f4.png)
 
 我们该如何跨服务调用，准确的说，如何在`cart-service`中获取`item-service`服务中的提供的商品数据呢？
 
@@ -266,7 +266,7 @@ Spring给我们提供了一个RestTemplate的API，可以方便的实现Http请�
 
 ### 2.4.2.远程调用
 
-接下来，我们修改`cart-service`中的`com.hmall.cart.service.impl.``CartServiceImpl`的`handleCartItems`方法，发送http请求到`item-service`。
+接下来，我们修改`cart-service`中的`com.hmall.cart.service.impl.CartServiceImpl`的`handleCartItems`方法，发送http请求到`item-service`。
 
 ```
 private void handleCartItems(List<CartVO> vos) {
@@ -298,7 +298,7 @@ private void handleCartItems(List<CartVO> vos) {
 
 重启`cart-service`，再次测试`查询我的购物车列表`接口（item-service服务记得开），可以发现，所有商品相关数据都已经查询到了。
 
-<img src="assets/389f0280d2bb6a86c87195276161f15bc64c8d44.png" title="" alt="output.png" width="853">
+![a2121dc65d3caf1d8382a15d05fa8eef0b2772a7.png](assets/969b980d1c89939327a95a6a28b9d33207f6aa8c.png)
 
 在这个过程中，`item-service`提供了查询接口，`cart-service`利用Http请求调用该接口。因此`item-service`可以称为服务的提供者，而`cart-service`则称为服务的消费者或服务调用者。
 
@@ -308,7 +308,7 @@ private void handleCartItems(List<CartVO> vos) {
 
 试想一下，假如商品微服务被调用较多，为了应对更高的并发，我们进行了多实例部署，如图：
 
-<img title="" src="assets/48a118d55e987d74453d60ad3ab58e52b4e1cd1e.png" alt="whiteboard_exported_image (1).png" width="553">
+![48a118d55e987d74453d60ad3ab58e52b4e1cd1e.png](assets/d7a2e7630b2fc914dcf730580946a27a489ac05e.png)
 
 此时，每个`item-service`的实例其IP或端口不同，问题来了：
 
@@ -332,7 +332,7 @@ private void handleCartItems(List<CartVO> vos) {
 
 在大型微服务项目中，服务提供者的数量会非常多，为了管理这些服务就引入了**注册中心**的概念。注册中心、服务提供者、服务消费者三者间关系如下：
 
-<img title="" src="assets/d7becea796cd723f7b160c7818c56f8acf16f603.jpg" alt="3e198250-895a-4f8d-a854-3d4377b2c04c.jpg" width="711">
+![d7becea796cd723f7b160c7818c56f8acf16f603.jpg](assets/c094906315d29b9468cab2b183a086cedc239fca.jpg)
 
 流程如下：
 
@@ -419,15 +419,15 @@ spring:
 
 为了测试一个服务多个实例的情况，我们再配置一个`item-service`的部署实例：
 
-<img src="assets/4136c881d7a8fcd6af9bfc16acab663f2a85da7e.png" title="" alt="773729b2-8dbc-4ab7-8d63-28ef20f5ce4e.png" width="588">
+![4136c881d7a8fcd6af9bfc16acab663f2a85da7e.png](assets/ca06323003702fdb8c828b7d9579b996bd4af708.png)
 
 然后配置启动项，注意重命名并且配置新的端口，避免冲突：
 
-<img src="assets/d8b105b5963b3a689e014afde8d851e8a006bdf6.png" title="" alt="b9015e52-6c2f-4d87-b2b6-7bdd761f1804.png" width="603">
+![d8b105b5963b3a689e014afde8d851e8a006bdf6.png](assets/9d7d7a97faccd4778a889ec060d19b0c13208288.png)
 
 重启`item-service`的两个实例，访问nacos控制台，可以发现服务注册成功：
 
-<img src="assets/5f46605b6cde759b35800aee52d3b9d38e6784c4.png" title="" alt="82daae17-36c1-435e-b502-a79be54afa1d.png" width="801">
+![5f46605b6cde759b35800aee52d3b9d38e6784c4.png](assets/d217a55051caa4589df4dfa6d427ce2c6572aedb.png)
 
 ## 3.4.服务发现
 
@@ -671,7 +671,7 @@ feign:
 
 Debug方式启动cart-service，请求一次查询我的购物车方法，进入断点，可以发现这里底层的实现已经改为`OkHttpClient`。
 
-<img src="assets/f282a314b38c98203000b160d801a635a9f98444.png" title="" alt="318912c6-94f7-4e8a-ae62-8c32b64f0ffe.png" width="878">
+![f282a314b38c98203000b160d801a635a9f98444.png](assets/e15453de7bfb233d5d46c7e53d24b1695c00d1ff.png)
 
 ## 4.3.最佳实践
 
@@ -693,7 +693,7 @@ Debug方式启动cart-service，请求一次查询我的购物车方法，进入
 
 如图：
 
-<img src="assets/c16fd712450c74b6dc23d1ecfa22876d9e1cf186.jpg" title="" alt="f9c818f7-b61c-4ed1-95b5-5151cb212fc8.jpg" width="677">
+![c16fd712450c74b6dc23d1ecfa22876d9e1cf186.jpg](assets/4781c677bf754fd59f09c45ec844f1a8e481173d.jpg)
 
 方案1抽取更加简单，工程结构也比较清晰，但缺点是整个项目耦合度偏高。
 
@@ -705,7 +705,7 @@ Debug方式启动cart-service，请求一次查询我的购物车方法，进入
 
 在`hmall`下定义一个新的module，命名为hm-api，添加pom.xml依赖，然后把ItemDTO和ItemClient都拷贝过来，最终结构如下。
 
-<img title="" src="assets/57b5afce939ad5add074277d5843fc3036d53ec6.png" alt="353ccf8d-5bdb-480d-a653-1cc4785c5857.png" width="605">
+![57b5afce939ad5add074277d5843fc3036d53ec6.png](assets/d6d4271556b1f01977219222020b47c7ea236898.png)
 
 现在，任何微服务要调用`item-service`中的接口，只需要引入`hm-api`模块依赖即可，无需自己编写Feign客户端了。
 
@@ -829,7 +829,7 @@ public class DefaultFeignConfig {
 
 测试：启动UserApplication，访问：http://localhost:8084/doc.html#/default/用户相关接口/loginUsingPOST
 
-<img title="" src="assets/55475d1f688b75f42d2aff9c5093a4d640480482.png" alt="download_image.png" width="789">
+![55475d1f688b75f42d2aff9c5093a4d640480482.png](assets/0f3185d65fbac984f78f906e780e10d56a9e9faf.png)
 
 ## 5.2 交易微服务
 
@@ -924,7 +924,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
 启动TradeApplication，访问[http://localhost:8085/doc.html](http://localhost:8085/doc.html#/default/%E8%AE%A2%E5%8D%95%E7%AE%A1%E7%90%86%E6%8E%A5%E5%8F%A3/queryOrderByIdUsingGET)，测试查询订单接口(请求参数：1654779387523936258)：
 
-<img src="assets/bfcdb1c0399d6cb6ad13358d5a0f31d79f9072f1.png" title="" alt="56d025ae-62bb-43bb-92c5-fd43e7c66852.png" width="788">
+![bfcdb1c0399d6cb6ad13358d5a0f31d79f9072f1.png](assets/a9f7b5e9c86bf51d7cf5afdb70ac3fbf0a88a996.png)
 
 ## 5.3 支付微服务
 
