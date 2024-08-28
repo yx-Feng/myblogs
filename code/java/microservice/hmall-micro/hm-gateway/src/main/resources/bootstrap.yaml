@@ -3,7 +3,7 @@ spring:
     name: gateway
   cloud:
     nacos:
-      server-addr: 114.116.106.153
+      server-addr: 124.222.115.247
       config:
         file-extension: yaml
         shared-configs:

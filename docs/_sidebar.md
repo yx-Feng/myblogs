@@ -32,6 +32,10 @@
   
   - [微服务2](java/microservice/note02)
   
+  - [微服务保护](java/microservice/protection)
+  
+  - [分布式事务](java/microservice/distributedTransactions)
+  
   - [RabbitMQ](java/microservice/RabbitMQ)
   
   - [Elasticsearch](java/microservice/Elasticsearch)
