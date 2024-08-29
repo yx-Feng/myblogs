@@ -6,11 +6,11 @@
 
 由于数据库模糊查询不走索引，在数据量较大的时候，查询性能很差。黑马商城的商品表中仅仅有不到9万条数据，基于数据库查询时，搜索接口的表现如图：
 
-<img src="assets/b1ccff5ddde7b20f45d2770bade47ca569b9bdfc.png" title="" alt="f2e0992e-7157-477f-ab21-1560e79486f3.png" width="762">
+![b1ccff5ddde7b20f45d2770bade47ca569b9bdfc.png](assets/4b3175cded51d2df4f18f3b64a5c1e8ad69cf8fb.png)
 
 改为基于搜索引擎后，查询表现如下：
 
-<img src="assets/a71c4fb5fe157b9f70c7b925a2e976a0c70af4de.png" title="" alt="dc94ef84-fb2e-4fcd-9d31-02096f41e886.png" width="764">
+![a71c4fb5fe157b9f70c7b925a2e976a0c70af4de.png](assets/8e81a360f5fc15a2798a8f7ed384fac3209d3d8b.png)
 
 需要注意的是，数据库模糊查询随着表数据量的增多，查询性能的下降会非常明显，而搜索引擎的性能则不会随着数据增多而下降太多。目前仅10万不到的数据量差距就如此明显，如果数据量达到百万、千万、甚至上亿级别，这个性能差距会非常夸张。
 
@@ -83,7 +83,7 @@ sudo systemctl restart docker
 
 安装完成后，访问9200端口，即可看到响应的Elasticsearch服务的基本信息：
 
-<img src="assets/7892e006454effecc98f57490cbe8634914f1b7a.png" title="" alt="Snipaste_2024-06-15_19-10-57.png" width="735">
+![7892e006454effecc98f57490cbe8634914f1b7a.png](assets/723f8af5890c3a647ea01066d914c957a3e82f23.png)
 
 ### 1.1.2.安装Kibana
 
@@ -95,11 +95,11 @@ docker run -d --name kibana -e ELASTICSEARCH_HOSTS=http://es:9200 --network=hm-n
 
 安装完成后，直接访问5601端口，即可看到控制台页面。选择`Explore on my own`之后，进入主页面：
 
-<img src="assets/2e73b5cef60b275c022421c044d3e516ec04c8a7.png" title="" alt="ed0a8047-193d-4767-9b38-e99316d22fde.png" width="741">
+![2e73b5cef60b275c022421c044d3e516ec04c8a7.png](assets/426c2a94b01d7519548aec455b7c01f54c17e0b3.png)
 
 然后选中`Dev tools`，进入开发工具页面：
 
-<img src="assets/1bf50edd7f681b9a9f6a0892eeb1ddb6a503da37.png" title="" alt="0c3ddd00-17eb-429e-ab2c-2f104fc52e57.png" width="744">
+![1bf50edd7f681b9a9f6a0892eeb1ddb6a503da37.png](assets/1d647a33331a2c051ae4fd25df42b07a27784bcf.png)
 
 ## 1.2.倒排索引
 

@@ -66,7 +66,7 @@
 
 - 消息接收者：接收和处理消息的人，就是原来的服务提供方
   
-  ![56126515616.png](assets/7cb99da9a49dea9dc5ce4b1035fd5ff5dd406186.png)
+  ![7cb99da9a49dea9dc5ce4b1035fd5ff5dd406186.png](assets/9f41288dda4c282d128749e86c3818ae19fbf2f9.png)
 
 在异步调用中，发送者不再直接同步调用接收者的业务接口，而是发送一条消息投递给消息Broker。然后接收者根据自己的需求从消息Broker那里订阅消息。每当发送方发送消息后，接受者都能获取消息并处理。
 
@@ -78,7 +78,7 @@
 
 假如产品经理提出了新的需求，比如要在支付成功后更新用户积分。支付代码完全不用变更，而仅仅是让积分服务也订阅消息即可：
 
-<img src="assets/5fd79c9f932986fc900211402624060a85ad6fe5.png" title="" alt="98882962615.png" width="777">
+![5fd79c9f932986fc900211402624060a85ad6fe5.png](assets/3b05274f8d00263c6137bd5308168fa5ad87d7d8.png)
 
 不管后期增加了多少消息订阅者，作为支付服务来讲，执行问扣减余额、更新支付流水状态后，发送消息即可。业务耗时仅仅是这三部分业务耗时，仅仅100ms，大大提高了业务性能。
 
@@ -183,11 +183,11 @@ rabbitmqctl  set_permissions -p / fyx '.*' '.*' '.*'
 安装完成后，我们访问 http://114.116.106.153:15672，即可看到管理控制台（云服务器15672、5672端口要放开）。
 首次访问需要登录，默认的用户名和密码在配置文件中已经指定了。登录后即可看到管理控制台总览页面：
 
-<img src="assets/2ace5cbf9102fe769bec427e181d45a754e85b97.png" title="" alt="08bd77e9-5f27-432d-bd6d-11fa319ae722.png" width="831">
+![2ace5cbf9102fe769bec427e181d45a754e85b97.png](assets/86708cb9be7b1b887dc60d28e636fa7162be8ad2.png)
 
 RabbitMQ对应的架构如图：
 
-<img src="assets/fd737a9e1aac1989704c2d289fe94ebd83c48b37.png" title="" alt="97a3f8cb-ed19-4ef1-bebf-9527e7335c04.png" width="903">
+![fd737a9e1aac1989704c2d289fe94ebd83c48b37.png](assets/72a97badf7e831b1af6e0ac5d4fce93973c09560.png)
 
 其中包含几个概念：
 
