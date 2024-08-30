@@ -6,7 +6,9 @@
 
 举个例子，以**余额支付功能**为例来分析，首先看下整个流程：
 
-![Snipaste_2024-08-30_10-17-29.png](assets/ea50068ac0e1b04e2553fc0bb127d980426a14cf.png)目前我们采用的是基于OpenFeign的同步调用，也就是说业务执行流程是这样的：
+![Snipaste_2024-08-30_10-17-29.png](assets/ea50068ac0e1b04e2553fc0bb127d980426a14cf.png)
+
+目前我们采用的是基于OpenFeign的同步调用，也就是说业务执行流程是这样的：
 
 - 支付服务需要先调用用户服务完成余额扣减
 
@@ -227,7 +229,7 @@ RabbitMQ对应的架构如图：
 
 最终，绑定结果如下：
 
-<img src="assets/9bccd772e0142825cd0e2b2196efd22a15654f3a.png" title="" alt="00f2a211-ea7a-4605-873a-bc5c9b7a58c9.png" width="753">
+![9bccd772e0142825cd0e2b2196efd22a15654f3a.png](assets/304a195dd5ccbc316c80cd8a96d563ae80c6ed3a.png)
 
 ### 2.2.4.发送消息
 
@@ -247,7 +249,7 @@ RabbitMQ对应的架构如图：
 
 点击`Admin`选项卡，首先会看到RabbitMQ控制台的用户管理界面：
 
-<img src="assets/a24870ed59ca5bc86c0e27fd55517c96303aa572.png" title="" alt="Snipaste_2024-06-11_21-15-48.png" width="754">
+![a24870ed59ca5bc86c0e27fd55517c96303aa572.png](assets/9431eb84cbc2f3c1d5b90a8442ee920dce8b9f94.png)
 
 这里的用户都是RabbitMQ的管理或运维人员。仔细观察用户表格中的字段，如下：
 
@@ -275,7 +277,7 @@ RabbitMQ对应的架构如图：
 
 我们可以给黑马商城项目创建一个单独的`virtual host`，而不是使用默认的`/`。
 
-<img src="assets/da6b4b356d5676110010d1cb7e591f82895a1800.png" title="" alt="Snipaste_2024-06-11_21-27-02.png" width="851">
+![da6b4b356d5676110010d1cb7e591f82895a1800.png](assets/aa23277be992f0ee963cc993587a01f959b9f77f.png)
 
 由于我们是登录`hmall`账户后创建的`virtual host`，因此回到`users`菜单，你会发现当前用户已经具备了对`/hmall`这个`virtual host`的访问权限了：
 
@@ -283,6 +285,6 @@ RabbitMQ对应的架构如图：
 
 此时，点击页面右上角的`virtual host`下拉菜单，切换`virtual host`为 `/hmall`。然后再次查看queues选项卡，会发现之前的队列已经看不到了。这就是基于`virtual host` 的隔离效果。
 
-<img src="assets/67deaa5836193e3abf0a8502b34ceb66957c2994.png" title="" alt="Snipaste_2024-06-11_21-30-31.png" width="863">
+![67deaa5836193e3abf0a8502b34ceb66957c2994.png](assets/efc29c2ffa704894a37bd33ce22c5fa6370446a8.png)
 
 # 3.SpringAMQP
