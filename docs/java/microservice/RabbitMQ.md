@@ -6,9 +6,7 @@
 
 举个例子，以**余额支付功能**为例来分析，首先看下整个流程：
 
-<img title="" src="assets/cd32d0eb2f04b6f3d516ac598a27115dfeaafc39.png" alt="whiteboard_exported_image.png" width="739">
-
-目前我们采用的是基于OpenFeign的同步调用，也就是说业务执行流程是这样的：
+![Snipaste_2024-08-30_10-17-29.png](assets/ea50068ac0e1b04e2553fc0bb127d980426a14cf.png)目前我们采用的是基于OpenFeign的同步调用，也就是说业务执行流程是这样的：
 
 - 支付服务需要先调用用户服务完成余额扣减
 
@@ -30,13 +28,13 @@
 
 最终你的支付业务会越来越臃肿，也就是说每次有新的需求，现有支付逻辑都要跟着变化，代码经常变动，拓展性不好。
 
-<img title="" src="assets/e31c4642c1863cdace22add5ffc0380394a092d7.png" alt="2566666.png" width="734">
+![b05d505dc38f17dd163edc45b1267fcabed799d4.png](assets/7afa240266e16fd060bca215be31e4e9783b6992.png)
 
 **第二**，**性能下降**
 
 由于我们采用了同步调用，调用者需要等待服务提供者执行完返回结果后，才能继续向下执行，也就是说每次远程调用，调用者都是阻塞等待状态。最终整个业务的响应时长就是每次远程调用的执行时长之和。假如每个微服务的执行时长都是50ms，则最终整个业务的耗时可能高达300ms，性能太差了。
 
-<img src="assets/420fb902ca30c6a01b8948ee94eb6a445722cf54.png" title="" alt="555555555.png" width="736">
+![420fb902ca30c6a01b8948ee94eb6a445722cf54.png](assets/14a4106d91cf0160757619dbff606d28a6fcb798.png)
 
 **第三，级联失败**
 
@@ -191,15 +189,15 @@ RabbitMQ对应的架构如图：
 
 其中包含几个概念：
 
-- **`publisher`**：生产者，也就是发送消息的一方。
+- `publisher`：生产者，也就是发送消息的一方。
 
-- **`consumer`**：消费者，也就是消费消息的一方。
+- `consumer`：消费者，也就是消费消息的一方。
 
-- **`queue`**：队列，存储消息。生产者投递的消息会暂存在消息队列中，等待消费者处理。
+- `queue`：队列，存储消息。生产者投递的消息会暂存在消息队列中，等待消费者处理。
 
-- **`exchange`**：交换机，负责消息路由。生产者发送的消息由交换机决定投递到哪个队列。
+- `exchange`：交换机，负责消息路由。生产者发送的消息由交换机决定投递到哪个队列。
 
-- **`virtual host`**：虚拟主机，起到数据隔离的作用。每个虚拟主机相互独立，有各自的exchange、queue
+- `virtual host`：虚拟主机，起到数据隔离的作用。每个虚拟主机相互独立，有各自的exchange、queue
 
 上述这些东西都可以在RabbitMQ的管理控制台来管理，下一节我们就一起来学习控制台的使用。
 
@@ -209,7 +207,7 @@ RabbitMQ对应的架构如图：
 
 我们打开Exchanges选项卡，可以看到已经存在很多交换机。点击任意交换机，即可进入交换机详情页面。仍然会利用控制台中的publish message 发送一条消息：
 
-<img src="assets/a40977aedafbe1fee07642d002d191dc302dc4b7.png" title="" alt="0a50a7e0-e6b6-47e1-b936-3841c3c4a91f.png" width="541">
+![a40977aedafbe1fee07642d002d191dc302dc4b7.png](assets/ae2eaacde8e650fc283613269d79a574021907dd.png)
 
 这里是由控制台模拟了生产者发送的消息。由于没有消费者存在，最终消息丢失了，这样说明交换机没有存储消息的能力。
 
@@ -217,7 +215,7 @@ RabbitMQ对应的架构如图：
 
 我们打开`Queues`选项卡，新建一个队列，命名为`hello.queue1`。再以相同的方式，创建一个队列，密码为`hello.queue2`，最终队列列表如下：
 
-<img src="assets/f929e206de8f4b929934ac39a11aa921a79d377e.png" title="" alt="ffc22615-802a-4ed5-8f80-0ac705f772d8.png" width="739">
+![f929e206de8f4b929934ac39a11aa921a79d377e.png](assets/ee51c2be63e27399c1de0b76849dcc6bcd3550e8.png)
 
 发送到交换机的消息，只会路由到与其绑定的队列，因此仅仅创建队列是不够的，我们还需要将其与交换机绑定。
 
@@ -225,7 +223,7 @@ RabbitMQ对应的架构如图：
 
 点击`Exchanges`选项卡，点击`amq.fanout`交换机，进入交换机详情页，然后点击`Bindings`菜单，在表单中填写要绑定的队列名称。将hello.queue1、hello.queue2绑定到交换机。
 
-<img src="assets/2d5dc1a432cbcccf8047f1ae7e785a574da991ae.png" title="" alt="e33a7ffa-835d-461e-b85e-197d6ea47195.png" width="709">
+![2d5dc1a432cbcccf8047f1ae7e785a574da991ae.png](assets/48f89e3240b351c8681404c1f729b8d78ba11e18.png)
 
 最终，绑定结果如下：
 
@@ -237,11 +235,11 @@ RabbitMQ对应的架构如图：
 
 回到`Queues`页面，可以发现`hello.queue`中已经有一条消息了：
 
-<img src="assets/cbc1fb4d551eedb237dafbdf83edbba92ea173d5.png" title="" alt="768801c3-5402-49bd-8daf-63f3899de09f.png" width="733">
+![cbc1fb4d551eedb237dafbdf83edbba92ea173d5.png](assets/d54445d43a7ea94555fea8f615c866564bf25e58.png)
 
 这个时候如果有消费者监听了MQ的`hello.queue1`或`hello.queue2`队列，自然就能接收到消息了。
 
-<img src="assets/1f8e63af499837a2b7deb722b140de111cef8777.png" title="" alt="2a15b9c3-c71e-4ac5-9ff9-b1cf51f6fc9c.png" width="667">
+![1f8e63af499837a2b7deb722b140de111cef8777.png](assets/ee116c91d4e2f24deac67e732ed5e0ecd8ae40a1.png)
 
 ## 2.3.数据隔离
 
@@ -267,7 +265,7 @@ RabbitMQ对应的架构如图：
 
 比如，我们给黑马商城创建一个新的用户，命名为`hmall`：
 
-<img src="assets/2d4d9f9717fb5c3c7689cd915cb6a4793b6dc062.png" title="" alt="f101bf47-067b-4f64-81de-7e1aa3197962.png" width="661">
+![2d4d9f9717fb5c3c7689cd915cb6a4793b6dc062.png](assets/8d46bb5e7988e257fa958a57412057b0971aac6f.png)
 
 你会发现此时hmall用户没有任何`virtual host`的访问权限。
 
@@ -281,7 +279,7 @@ RabbitMQ对应的架构如图：
 
 由于我们是登录`hmall`账户后创建的`virtual host`，因此回到`users`菜单，你会发现当前用户已经具备了对`/hmall`这个`virtual host`的访问权限了：
 
-<img src="assets/26c8294c9322521cc3e57c03bd1f0318c07cf912.png" title="" alt="Snipaste_2024-06-11_21-28-14.png" width="803">
+![26c8294c9322521cc3e57c03bd1f0318c07cf912.png](assets/d5f07d49cb1bc9833f9cd3fa0b983f28df4dbb91.png)
 
 此时，点击页面右上角的`virtual host`下拉菜单，切换`virtual host`为 `/hmall`。然后再次查看queues选项卡，会发现之前的队列已经看不到了。这就是基于`virtual host` 的隔离效果。
 
