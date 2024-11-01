@@ -1587,79 +1587,79 @@ var Schema = mongoose.Schema
 mongoose.connect('mongodb://localhost/test')
 //设计表结构，字段名称就是表的属性名称
 var userSchema = new Schema({
-	username: {
-		type: String,
-		required: true
-	},
-	password: {
-		type: String,
-		required: true
-	},
-	email: {
-		type: String
-	}
+    username: {
+        type: String,
+        required: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String
+    }
 })
 // 将Schema发布为模型
 // 第一个参数要用大写名词单数表示数据库名称，mongoose会自动将该字符串转成小写复数的格式
 // 例如这里的User会变成users
 var User = mongoose.model('User', userSchema)
- 
+
 // 增加数据
 var admin = new User({
-	username: 'zs',
-	password: '123456',
-	email: 'admin@admin.com'
+    username: 'zs',
+    password: '123456',
+    email: 'admin@admin.com'
 })
- 
+
 admin.save(function(err, ret) {
-	if (err) {
-		console.log('保存失败')
-	} else {
-		console.log('保存成功')
-	}
+    if (err) {
+        console.log('保存失败')
+    } else {
+        console.log('保存成功')
+    }
 })
- 
+
 // 查询数据
 // 查询所有，返回的是一个数组
 User.find(function(err, ret) {
-	if(err) {
-		console.log('查询失败')
-	} else {
-		console.log(ret)
-	}
+    if(err) {
+        console.log('查询失败')
+    } else {
+        console.log(ret)
+    }
 })
- 
+
 // 按条件查询，返回的是一个对象
 User.findOne({
-	username: 'zs'
+    username: 'zs'
 }, function(err, ret) {
-	if(err) {
-		console.log('查询失败')
-	} else {
-		console.log(ret)
-	}	
+    if(err) {
+        console.log('查询失败')
+    } else {
+        console.log(ret)
+    }    
 })
- 
+
 // 删除数据
 User.remove({
-	username: 'zs'
+    username: 'zs'
 }, function(err, ret) {
-	if(err) {
-		console.log("删除失败")
-	} else {
-		console.log("删除成功")
-	}
+    if(err) {
+        console.log("删除失败")
+    } else {
+        console.log("删除成功")
+    }
 })
- 
+
 // 更新数据
 User.findByIdAndUpdate('', {
-	password: '123'
+    password: '123'
 }, function(err, ret) {
-	if(err) {
-		console.log('更新失败')
-	} else {
-		console.log('更新成功')
-	}
+    if(err) {
+        console.log('更新失败')
+    } else {
+        console.log('更新成功')
+    }
 })
 ```
 
@@ -1679,25 +1679,25 @@ student.js
 const mongoose = require('mongoose')
 mongoose.connect('mongodb://localhost/test')
 var Schema = mongoose.Schema
- 
+
 var studentSchema = new Schema({
-	name: {
-		type: String,
-		required: true
-	},
-	gender: {
-		type: Number,
-		enum: [0, 1],
-		default: 0
-	},
-	age: {
-		type: Number
-	},
-	hobbies: {
-		type: String
-	}
+    name: {
+        type: String,
+        required: true
+    },
+    gender: {
+        type: Number,
+        enum: [0, 1],
+        default: 0
+    },
+    age: {
+        type: Number
+    },
+    hobbies: {
+        type: String
+    }
 })
- 
+
 //直接导出模型构造函数
 module.exports = mongoose.model('Student', studentSchema)
 ```
@@ -1707,68 +1707,68 @@ router.js
 ```
 const express = require('express')
 var Student = require('./student')
- 
+
 // 1. 创建一个路由容器
 const router = express.Router()
- 
+
 // 2. 把路由都挂载到router路由容器中
 router.get('/students', function (req, res) {
-	Student.find(function (err, students) {
-		if (err) {
-			return res.status(500).send("Server Error.")
-		}
-		res.render('index.html', {
-			students: students
-		})
-	})
+    Student.find(function (err, students) {
+        if (err) {
+            return res.status(500).send("Server Error.")
+        }
+        res.render('index.html', {
+            students: students
+        })
+    })
 })
- 
+
 router.get('/students/new', function (req, res) {
-	res.render('new.html')
+    res.render('new.html')
 })
- 
+
 router.post('/students', function (req, res) {
-	new Student(req.body).save(function(err) {
-		if (err) {
-			return res.status(500).send('Server Error.')
-		}
-		res.redirect('/students')
-	})
+    new Student(req.body).save(function(err) {
+        if (err) {
+            return res.status(500).send('Server Error.')
+        }
+        res.redirect('/students')
+    })
 })
- 
+
 router.get('/students/edit', function (req, res) {
-	const id = req.query.id.replace(/"/g, '')
-	Student.findById(id, function(err, student) {
-		if (err) {
-			return res.status(500).send('Server error.')
-		}
-		res.render('edit.html', {
-			student: student
-		})
-	})
+    const id = req.query.id.replace(/"/g, '')
+    Student.findById(id, function(err, student) {
+        if (err) {
+            return res.status(500).send('Server error.')
+        }
+        res.render('edit.html', {
+            student: student
+        })
+    })
 })
- 
+
 router.post('/students/edit', function (req, res) {
-	// 1.获取表单数据 2.更新 3.发送响应
-	const id = req.body.id.replace(/"/g, '')
-	Student.findByIdAndUpdate(id, req.body, function (err) {
-		if (err) {
-			return res.status(500).send('Server error.')
-		}
-		res.redirect('/students')
-	})
+    // 1.获取表单数据 2.更新 3.发送响应
+    const id = req.body.id.replace(/"/g, '')
+    Student.findByIdAndUpdate(id, req.body, function (err) {
+        if (err) {
+            return res.status(500).send('Server error.')
+        }
+        res.redirect('/students')
+    })
 })
- 
+
 router.get('/students/delete', function (req, res) {
-	const id = req.query.id.replace(/"/g, '')
-	Student.findByIdAndRemove(id, function(err) {
-		if(err) {
-			return res.status(500).send('Server error.')
-		}
-		res.redirect('/students')
-	})
+    const id = req.query.id.replace(/"/g, '')
+    Student.findByIdAndRemove(id, function(err) {
+        if(err) {
+            return res.status(500).send('Server error.')
+        }
+        res.redirect('/students')
+    })
 })
- 
+
 //3. 把路由导出
 module.exports = router
 ```
@@ -1791,8 +1791,8 @@ views/index.html
             <table class="table table-striped">
               ...// 原代码不变
               <tbody>
-              	{{ each students }}
-              	<tr>
+                  {{ each students }}
+                  <tr>
                   <td>{{ $index + 1 }}</td>
                   <td>{{ $value.name }}</td>
                   <td>{{ $value.gender }}</td>
@@ -1803,7 +1803,7 @@ views/index.html
                     <a href="/students/delete?id={{ $value._id }}">删除</a>
                   </td>
                 </tr>
-              	{{ /each}} 
+                  {{ /each}} 
               </tbody>
             </table>
           </div>
@@ -1846,26 +1846,26 @@ views/edit.html
 
 ```
 var fs = require('fs')
- 
+
 fs.readFile('./data/a.txt','utf-8',function(err, data) {
-	if(err) {
-		throw err
-	}
-	console.log(data)
+    if(err) {
+        throw err
+    }
+    console.log(data)
 })
- 
+
 fs.readFile('./data/b.txt','utf-8',function(err, data) {
-	if(err) {
-		throw err
-	}
-	console.log(data)
+    if(err) {
+        throw err
+    }
+    console.log(data)
 })
- 
+
 fs.readFile('./data/c.txt','utf-8',function(err, data) {
-	if(err) {
-		throw err
-	}
-	console.log(data)
+    if(err) {
+        throw err
+    }
+    console.log(data)
 })
 ```
 
@@ -1875,24 +1875,24 @@ fs.readFile('./data/c.txt','utf-8',function(err, data) {
 
 ```
 var fs = require('fs')
- 
+
 fs.readFile('./data/a.txt','utf-8',function(err, data) {
-	if(err) {
-		throw err
-	}
-	console.log(data)
-	fs.readFile('./data/b.txt','utf-8',function(err, data) {
-		if(err) {
-			throw err
-		}
-		console.log(data)
-		fs.readFile('./data/c.txt','utf-8',function(err, data) {
-			if(err) {
-				throw err
-			}
-			console.log(data)
-		})
-	})
+    if(err) {
+        throw err
+    }
+    console.log(data)
+    fs.readFile('./data/b.txt','utf-8',function(err, data) {
+        if(err) {
+            throw err
+        }
+        console.log(data)
+        fs.readFile('./data/c.txt','utf-8',function(err, data) {
+            if(err) {
+                throw err
+            }
+            console.log(data)
+        })
+    })
 })
 ```
 
@@ -1908,31 +1908,31 @@ promise有三种状态：Pending、Resolved、Rejected
 
 ```
 const fs = require('fs')
- 
+
 function pReadFile(filePath) {
-	return new Promise(function(resolve, reject) {
-		fs.readFile(filePath, 'utf-8', function(err, data) {
-			if(err) {
-				reject(err)
-			} else {
-				resolve(data)
-			}
-		})
-	})
+    return new Promise(function(resolve, reject) {
+        fs.readFile(filePath, 'utf-8', function(err, data) {
+            if(err) {
+                reject(err)
+            } else {
+                resolve(data)
+            }
+        })
+    })
 }
- 
+
 pReadFile('./data/a.txt')
-	.then(function(data) {
-		console.log(data)
-		return pReadFile('./data/b.txt')
-	})
-	.then(function(data) {
-		console.log(data)
-		return pReadFile('./data/c.txt')
-	})
-	.then(function(data) {
-		console.log(data)
-	})
+    .then(function(data) {
+        console.log(data)
+        return pReadFile('./data/b.txt')
+    })
+    .then(function(data) {
+        console.log(data)
+        return pReadFile('./data/c.txt')
+    })
+    .then(function(data) {
+        console.log(data)
+    })
 ```
 
 ## 22. 基于JWT的身份验证
@@ -2083,11 +2083,11 @@ app.js（**process.env.PORT**表示当前目录下**环境变量**port的值，�
 const express = require('express')
 const app = express()
 const PORT = process.env.PORT || 3000
- 
+
 app.get('/', (req, res) => {
   res.send('Hello world')
 })
- 
+
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`)
 })
@@ -2127,19 +2127,19 @@ app.js
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
- 
+
 const app = express()
- 
+
 app.use(express.json())
 app.use(morgan('dev'))
 app.use(cors())
- 
+
 const PORT = process.env.PORT || 3000
- 
+
 app.get('/', (req, res) => {
   res.send('Hello world')
 })
- 
+
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`)
 })
@@ -2152,21 +2152,21 @@ model/index.js
 ```
 const mongoose = require('mongoose')
 const { dbUrl } = require('../config/config.default')
- 
+
 // 连接MongoDB数据库
 mongoose.connect(dbUrl)
- 
+
 var db = mongoose.connection
 // 当连接失败的时候
 db.on('error', err => {
   console.log('MongoDB 数据库连接失败', err)
 })
- 
+
 // 当连接成功的时候
 db.once('open', function() {
   console.log('MongoDB 数据库连接成功')
 })
- 
+
 // 组织导出模型类
 module.exports = {
   User: mongoose.model('User', require('./user')),
@@ -2195,7 +2195,7 @@ model/user.js
 const mongoose = require('mongoose')
 const baseModel = require('./base-model')
 const md5 = require('../util/md5')
- 
+
 const userSchema = new mongoose.Schema({
   ...baseModel,
   username: {
@@ -2220,7 +2220,7 @@ const userSchema = new mongoose.Schema({
     default: null
   }
 })
- 
+
 module.exports = userSchema
 ```
 
@@ -2229,7 +2229,7 @@ model/article.js
 ```
 const mongoose = require('mongoose')
 const baseModel = require('./base-model')
- 
+
 const articleSchema = new mongoose.Schema({
   ...baseModel,
   username: {
@@ -2253,7 +2253,7 @@ const articleSchema = new mongoose.Schema({
     default: null
   }
 })
- 
+
 module.exports = articleSchema
 ```
 
@@ -2263,7 +2263,7 @@ controller/user.js
 
 ```
 const { User } = require('../model')
- 
+
 // 用户登录
 exports.login = async (req, res, next) => {
   try {
@@ -2276,7 +2276,7 @@ exports.login = async (req, res, next) => {
     next(err)
   }
 }
- 
+
 // 用户注册
 exports.register = async (req, res, next) => {
   try {
@@ -2294,7 +2294,7 @@ exports.register = async (req, res, next) => {
     next(err)
   }
 }
- 
+
 // 获取当前登录用户
 exports.getCurrentUser = async (req, res, next) => {
   try {
@@ -2303,7 +2303,7 @@ exports.getCurrentUser = async (req, res, next) => {
     next(err)
   }
 }
- 
+
 // 更新当前登录用户
 exports.updateCurrentUser = async (req, res, next) => {
   try {
@@ -2325,7 +2325,7 @@ exports.getArticles = async (req, res, next) => {
     next(err)
   }
 }
- 
+
 // 获取用户关注的作者文章列表
 exports.getFeedArticles = async (req, res, next) => {
   try {
@@ -2334,7 +2334,7 @@ exports.getFeedArticles = async (req, res, next) => {
     next(err)
   }
 }
- 
+
 // 获取文章
 exports.getArticle = async (req, res, next) => {
   try {
@@ -2343,7 +2343,7 @@ exports.getArticle = async (req, res, next) => {
     next(err)
   }
 }
- 
+
 // 创建文章
 exports.createArticle = async (req, res, next) => {
   try {
@@ -2352,7 +2352,7 @@ exports.createArticle = async (req, res, next) => {
     next(err)
   }
 }
- 
+
 // 更新文章
 exports.updateArticle = async (req, res, next) => {
   try {
@@ -2361,7 +2361,7 @@ exports.updateArticle = async (req, res, next) => {
     next(err)
   }
 }
- 
+
 // 删除文章
 exports.deleteArticle = async (req, res, next) => {
   try {
@@ -2383,7 +2383,7 @@ exports.getUserProfile = async (req, res, next) => {
     next(err)
   }
 }
- 
+
 // 关注用户
 exports.followUser = async (req, res, next) => {
   try {
@@ -2392,7 +2392,7 @@ exports.followUser = async (req, res, next) => {
     next(err)
   }
 }
- 
+
 // 取消关注用户
 exports.cancelFollowUser = async (req, res, next) => {
   try {
@@ -2409,7 +2409,7 @@ middleware/error-handler.js
 
 ```
 const util = require('util')
- 
+
 module.exports = () => {
   return (err, req, res, next) => {
     res.status(500).json({
@@ -2428,21 +2428,21 @@ const cors = require('cors')
 const router = require('./router/index.js')
 const errorHandler = require('./middleware/error-handler.js')
 require('./model')
- 
+
 const app = express()
- 
+
 app.use(express.json())
 app.use(morgan('dev'))
 app.use(cors())
- 
+
 // 挂载路由
 app.use('/api', router)
- 
+
 // 挂载服务器错误的中间件
 app.use(errorHandler())
- 
+
 const PORT = process.env.PORT || 3000
- 
+
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`)
 })
@@ -2466,19 +2466,19 @@ router/index.js
 ```
 const express = require('express')
 const router = express.Router()
- 
+
 // 用户相关路由
 router.use(require('./user'))
- 
+
 // 用户资料相关路由
 router.use('/profiles', require('./profile'))
- 
+
 // 文章相关路由
 router.use('/articles', require('./article'))
- 
+
 // 标签相关路由
 // router.use('/tags', require('./tag'))
- 
+
 module.exports = router
 ```
 
@@ -2488,21 +2488,21 @@ router/user.js
 const express = require('express')
 const userCtrl = require('../controller/user')
 const userValidator = require('../validator/user')
- 
+
 const router = express.Router()
- 
+
 // 用户登录
 router.post('/users/login', userCtrl.login)
- 
+
 // 用户注册
 router.post('/users', userValidator.register, userCtrl.register)
- 
+
 // 获取当前登录用户
 router.get('/user', userCtrl.getCurrentUser)
- 
+
 // 更新当前登录用户
 router.put('/user', userCtrl.updateCurrentUser)
- 
+
 module.exports = router
 ```
 
@@ -2512,25 +2512,25 @@ router/article.js
 const express = require('express')
 const router = express.Router()
 const articleCtrl = require('../controller/article')
- 
+
 // 获取文章列表
 router.get('/', articleCtrl.getArticles)
- 
+
 // 获取用户关注的作者文章列表
 router.get('/feed', articleCtrl.getFeedArticles)
- 
+
 // 获取文章
 router.get('/:slug', articleCtrl.getArticle)
- 
+
 // 创建文章
 router.post('/', articleCtrl.createArticle)
- 
+
 // 更新文章
 router.put('/:slug', articleCtrl.updateArticle)
- 
+
 // 删除文章
 router.delete('/:slug', articleCtrl.deleteArticle)
- 
+
 module.exports = router
 ```
 
@@ -2540,16 +2540,16 @@ router/profile.js
 const express = require('express')
 const router = express.Router()
 const profileCtrl = require('../controller/profile')
- 
+
 // 获取用户资料
 router.get('/:username', profileCtrl.getUserProfile)
- 
+
 // 关注用户
 router.post('/:username/follow', profileCtrl.followUser)
- 
+
 // 取消关注用户
 router.delete('/:username/follow', profileCtrl.cancelFollowUser)
- 
+
 module.exports = router
 ```
 
@@ -2567,16 +2567,16 @@ middleware/validate.js
 
 ```
 const { validationResult } = require('express-validator')
- 
+
 module.exports = validations => {
   return async (req, res, next) => {
     await Promise.all(validations.map(validation => validation.run(req)))
- 
+
     const errors = validationResult(req)
     if (errors.isEmpty()) {
       return next()
     }
- 
+
     res.status(400).json({ errors: errors.array() })
   }
 }
@@ -2588,7 +2588,7 @@ validator/user.js
 const validate = require('../middleware/validate')
 const { body } = require('express-validator')
 const { User } = require('../model')
- 
+
 exports.register = validate([
   body('user.username')
     .notEmpty().withMessage('用户名不能为空')
@@ -2618,7 +2618,7 @@ util/md5.js
 
 ```
 const crypto = require('crypto')
- 
+
   module.exports = str => {
     return crypto.createHash('md5')
     .update('lagou' + str)
@@ -2630,7 +2630,7 @@ const crypto = require('crypto')
 const mongoose = require('mongoose')
 const baseModel = require('./base-model')
 const md5 = require('../util/md5')
- 
+
 const userSchema = new mongoose.Schema({
   ... //其它代码不变
   password: {
@@ -2641,7 +2641,7 @@ const userSchema = new mongoose.Schema({
   },
   ... //其它代码不变
 })
- 
+
 module.exports = userSchema
 ```
 
@@ -2649,9 +2649,9 @@ module.exports = userSchema
 
 ```
 const { User } = require('../model')
- 
+
 ...    //原代码不变
- 
+
 // 用户注册
 exports.register = async (req, res, next) => {
   try {
@@ -2660,7 +2660,7 @@ exports.register = async (req, res, next) => {
     // 创建完用户数据，不把密码发给客户端
     user = user.toJSON()
     delete user.password
- 
+
     // 4.发送成功响应
     res.status(201).json({
       user
@@ -2703,11 +2703,11 @@ util/jwt.js
 ```
 const jwt = require('jsonwebtoken')
 const { promisify } = require('util')
- 
+
 exports.sign = promisify(jwt.sign)
- 
+
 exports.verify = promisify(jwt.verify)
- 
+
 exports.decode = promisify(jwt.decode)
 ```
 
@@ -2717,7 +2717,7 @@ controller/user.js
 const { User } = require('../model')
 const jwt = require('../util/jwt')
 const { jwtSecret } = require('../config/config.default')
- 
+
 // 用户登录
 exports.login = async (req, res, next) => {
   try {
@@ -2740,7 +2740,7 @@ exports.login = async (req, res, next) => {
     next(err)
   }
 }
- 
+
 ...    //其它代码不变
 ```
 
@@ -2751,9 +2751,9 @@ const validate = require('../middleware/validate')
 const { body } = require('express-validator')
 const { User } = require('../model')
 const md5 = require('../util/md5')
- 
+
 ... //原代码不变
- 
+
 exports.login = [
   validate([
     body('user.email').notEmpty().withMessage('邮箱不能为空'),
@@ -2786,14 +2786,14 @@ router/user.js
 const express = require('express')
 const userCtrl = require('../controller/user')
 const userValidator = require('../validator/user')
- 
+
 const router = express.Router()
- 
+
 // 用户登录
 router.post('/users/login', userValidator.login, userCtrl.login)
- 
+
 ...    //原代码不变
- 
+
 module.exports = router
 ```
 
@@ -2808,16 +2808,16 @@ const express = require('express')
 const userCtrl = require('../controller/user')
 const userValidator = require('../validator/user')
 const auth = require('../middleware/auth')
- 
+
 const router = express.Router()
- 
+
 ...    //原代码不变
- 
+
 // 获取当前登录用户
 router.get('/user', auth, userCtrl.getCurrentUser)
- 
+
 ...    //原代码不变
- 
+
 module.exports = router
 ```
 
@@ -2827,9 +2827,9 @@ controller/user.js
 const { User } = require('../model')
 const jwt = require('../util/jwt')
 const { jwtSecret } = require('../config/config.default')
- 
+
 ...    //原代码不变
- 
+
 // 获取当前登录用户
 exports.getCurrentUser = async (req, res, next) => {
   try {
@@ -2840,7 +2840,7 @@ exports.getCurrentUser = async (req, res, next) => {
     next(err)
   }
 }
- 
+
 ...    //原代码不变
 ```
 
