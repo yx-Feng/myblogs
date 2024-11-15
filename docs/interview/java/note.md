@@ -30,7 +30,7 @@
 
 - List接口
   
-  - ArrayList：基于数组，线程安全
+  - ArrayList：基于数组，线程不安全
   
   - LinkedList：基于双向链表，线程不安全
 
