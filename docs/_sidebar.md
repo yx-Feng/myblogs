@@ -56,6 +56,20 @@
   
   - [实践](docker/practice/note)
 
-- 算法
-
-- 计网
+- 面试
+  
+  - [Java基础](interview/java_base/note)
+  
+  - [Java八股](interview/java/note)
+  
+  - [Spring](interview/spring/note)
+  
+  - [Redis](interview/redis/note)
+  
+  - [数据库](interview/database/note)
+  
+  - [计网](interview/computer_network/note)
+  
+  - [js+css](interview/js_css/note)
+  
+  - [算法](interview/algorithm/note)
