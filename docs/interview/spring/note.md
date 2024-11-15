@@ -58,13 +58,13 @@ Spring 中的 Bean 默认都是单例的。
 
 MVC全名是Model View Controller，是模型(model)－视图(view)－控制器(controller)的缩写，一种软件设计典范，用一种业务逻辑、数据、界面显示分离的方法组织代码。
 
-- **视图(view)**： 为用户提供使用界面，与用户直接进行交互。
+- **视图（view）**： 为用户提供使用界面，与用户直接进行交互。
 
-- **模型(model)**：代表一个存取数据的对象或 JAVA POJO（Plain Old Java Object，简单java对象）。它也可以带有逻辑，主要用于承载数据，并对用户提交请求进行计算的模块。模型分为两类，一类称为数据承载 Bean，一类称为业务处理Bean。所谓数据承载 Bean 是指实体类（如：User类），专门为用户承载业务数据的；而业务处理 Bean 则是指Service 或 Dao 对象， 专门用于处理用户提交请求的。
+- **模型（model）**：代表一个存取数据的对象或 JAVA POJO（Plain Old Java Object，简单java对象）。它也可以带有逻辑，主要用于承载数据，并对用户提交请求进行计算的模块。模型分为两类，一类称为数据承载 Bean，一类称为业务处理Bean。所谓数据承载 Bean 是指实体类（如：User类），专门为用户承载业务数据的；而业务处理 Bean 则是指Service 或 Dao 对象， 专门用于处理用户提交请求的。
 
-- **控制器(controller)**：用于将用户请求转发给相应的 Model 进行处理，并根据 Model 的计算结果向用户提供相应响应。它使视图与模型分离。
+- **控制器（controller）**：用于将用户请求转发给相应的 Model 进行处理，并根据 Model 的计算结果向用户提供相应响应。它使视图与模型分离。
   
-  <img src="assets/8adf9ac99c7014431340c2f196e32526548066a5.png" title="" alt="Snipaste_2024-10-29_10-22-17.png" width="697">
+  ![8adf9ac99c7014431340c2f196e32526548066a5.png](assets/a60907355deaf1542af0f6893ae260aca6b4f38a.png)
 
 ### 7. 为什么使用springboot
 
@@ -83,7 +83,9 @@ Spring Boot通过「自动化配置」和「起步依赖」实现了约定大于
 
 ### 9. SpringBoot的项目结构是怎么样的？
 
-<img title="" src="assets/31cbf3fa2494485a2e32a7893a1bc2b8b28d80c0.png" alt="Snipaste_2024-10-29_10-32-46.png" width="708">
+![31cbf3fa2494485a2e32a7893a1bc2b8b28d80c0.png](assets/013f49ea79570c3fac375f02f24e254de7c10085.png)
+
+
 
 ### 10. Spring AOP的原理
 
