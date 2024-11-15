@@ -66,7 +66,7 @@ http和https使用的**默认端口**也不一样，http是80，https是443。
 (2)服务器收到请求后，如果同意连接，则向客户机发送确认，SYN=1,ACK=1,确认号ack=x+1，选择一个初始序号seq=y
 (3)客户机收到确认报文段后，还要向服务器发送确认，seq=x+1，ack=y+1
 
-<img src="assets/55c436c21f7abb243f6954249065bf82081e49dd.png" title="" alt="Snipaste_2024-10-28_11-26-25.png" width="440">
+![55c436c21f7abb243f6954249065bf82081e49dd.png](assets/8260d30ef5a12a381407364674418520d00989df.png)
 
 **为什么不是两次握手？？**
 
@@ -92,7 +92,7 @@ SYN攻击就是Client在短时间内伪造大量不存在的IP地址，并向Ser
 (3)若服务器已经没有要向客户机发送的数据，就通知TCP释放连接，FIN=1，ACK=1,ack=u+1，seq=w
 (4)客户机收到连接释放报文段后，必须发出确认，ACK=1，ack=w+1,seq=u+1，然后等待一段时间后，客户机才进入连接关闭状态
 
-<img src="assets/ecc9f81766dd5783f1277cbc9733eac6ae6dac81.png" title="" alt="Snipaste_2024-10-28_11-57-26.png" width="477">
+![ecc9f81766dd5783f1277cbc9733eac6ae6dac81.png](assets/3dd31950379687e2b904e0aee9b11fb37ed3568a.png)
 
 ### 9. 如果第二次握手服务端没有接收到信息该怎么处理
 
