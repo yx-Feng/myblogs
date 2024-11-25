@@ -111,3 +111,33 @@ MySQL 数据库的架构是一个层次化的系统结构，通常可以分为�
 MVCC（多版本并发控制）
 
 - 可以通过**保存数据的多个版本**来避免不可重复读和幻读，广泛应用于MySQL InnoDB等数据库引擎。
+
+### 9. MySQL中的事务隔离级别
+
+MySQL 提供了四种事务隔离级别，从低到高分别是：
+
+- 读未提交（Read Uncommitted）：事务可以读取其他事务未提交的数据（脏读）。
+
+- 读已提交（Read Committed）：一个事务只能读取其他事务已提交的数据，避免了脏读，但仍可能出现不可重复读和幻读问题。
+
+- 可重复读（Repeatable Read）（MySQL 默认级别）：保证在一个事务内多次读取同一数据的结果是一样的，即避免了不可重复读问题。
+
+- 可串行化（Serializable）：最高的隔离级别，事务按顺序执行，类似加了全表锁。
+
+### 10. 查询当前数据库的事务隔离级别的命令
+
+查看当前会话（SESSION）事务隔离级别：
+
+```
+SELECT @@SESSION.tx_isolation; -- MySQL 5.7 及更早版本
+SELECT @@SESSION.transaction_isolation; -- MySQL 8.0 版本
+```
+
+查看全局（GLOBAL）事务隔离级别：
+
+```
+SELECT @@GLOBAL.tx_isolation; -- MySQL 5.7 及更早版本
+SELECT @@GLOBAL.transaction_isolation; -- MySQL 8.0 版本
+```
+
+# 

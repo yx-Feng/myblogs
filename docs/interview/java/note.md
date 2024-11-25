@@ -423,7 +423,9 @@ Java 虚拟机（JVM）在运行时将内存划分为多个区域，每个区域
 
 **分代收集算法：** 分代收集算法基于对象生命周期的长短，划分出新生代、老年代等区域，并使用不同的回收策略 。新生代使用复制算法，因为新生代对象大多生命周期短；老年代使用标记-整理或标记-清除，避免内存碎片化。
 
-### 30.
+### 30. 使用hashmap时，如果只重写了equals没有重写hashcode会出现什么问题
+
+`HashMap` 使用键的 `hashCode()` 值来确定存储位置，如果只重写 `equals()`，两个对象可能在逻辑上是相等的（`equals()` 返回 `true`），但如果它们的 `hashCode()` 值不同，则 `HashMap` 会认为它们属于不同的桶，导致**无法正确地定位或替换已有元素**。
 
 ### 31. Hashmap的底层数据结构
 
@@ -515,7 +517,21 @@ ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 **使用 `ExecutorService` 创建线程池**：`ExecutorService` 提供了创建和管理线程池的功能，常见线程池包括 `FixedThreadPool`、`CachedThreadPool` 等。通过线程池执行线程时，使用 `execute()` 或 `submit()` 方法提交任务。
 
-### 39.
+### 39. 线程的状态有哪些？
+
+- 新建（New）：线程被创建但尚未启动，处于新建状态。
+
+- 就绪（Runnable）：线程已经启动并准备好执行。
+
+- 正在运行（Running）：线程正在执行 `run()` 方法中的代码。
+
+- 阻塞（Blocked）：线程因等待某些资源（例如 I/O 操作或锁）而被挂起，无法继续执行。
+
+- 等待（Waiting）：线程进入等待状态，通常是调用 `wait()`、`join()` 或 `sleep()` 等方法时，线程会进入这个状态。
+
+- 超时等待（Timed Waiting）
+
+- 终止（Terminated）
 
 ### 40. Java的设计模式有哪些
 
