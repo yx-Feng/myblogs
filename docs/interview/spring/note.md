@@ -1,5 +1,3 @@
-### 12. 说一下 aop 和 ioc
-
 ### 1. Spring框架核心特性
 
 - **IoC容器**：Spring通过控制反转实现了对象的创建和对象间的依赖关系管理。开发者只需要定义好Bean及其依赖关系，Spring容器负责创建和组装这些对象。
@@ -162,3 +160,13 @@ IoC：是一种程序设计思想，强调控制权的转移。在传统的面�
     @RateLimiter(type = RateLimiterType.IP, count = 1)
     public ResponseResult add(@Valid @RequestBody ClientNavCommentAddDTO addDTO) {}
     ```
+
+### 13. bean的生命周期
+
+- 实例化 -> 当 Spring 容器启动并扫描到需要管理的 Bean 时，首先通过构造函数实例化 Bean 对象。
+- 属性注入 -> Spring 容器为实例化的 Bean 注入它的依赖属性。
+- 初始化前（`postProcessBeforeInitialization`） -> 在 Bean 初始化之前，Spring 允许开发者通过实现 `BeanPostProcessor` 接口的 `postProcessBeforeInitialization()` 方法，定义自定义逻辑。这个阶段可以对 Bean 进行一些修改或操作。
+- 初始化
+- 初始化后（`postProcessAfterInitialization`） -> 在 Bean 初始化完成后，Spring 再次调用 `BeanPostProcessor` 的 `postProcessAfterInitialization()` 方法，允许开发者在 Bean 准备好之后执行自定义逻辑或进一步处理 Bean。
+- 使用 Bean -> Bean 准备完毕后，Spring 容器会将其交给应用程序使用。
+- 销毁 -> 当 Spring 容器关闭时，或 Bean 的生命周期结束时，Spring 会对 Bean 进行销毁操作。
