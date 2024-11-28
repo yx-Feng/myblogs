@@ -72,4 +72,6 @@
   
   - [js+css](interview/js_css/note)
   
+  - [sql](interview/sql/note)
+  
   - [算法](interview/algorithm/note)

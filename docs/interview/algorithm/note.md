@@ -686,3 +686,49 @@ public boolean isValid(String s) {
     return stack.isEmpty();
 }
 ```
+
+## 13. ACM 模式 - 处理输入输出
+
+```
+import java.util.*;
+import java.lang.*;
+
+
+public class Main {
+    public static void main(String[] args) {
+        // 数据输入
+        Scanner in = new Scanner(System.in);
+        // 读数字
+        int numLen = in.nextInt();
+        int[] numArr = new int[numLen];
+        int i = 0;
+        while(in.hasNextInt() && i < numLen) {
+            numArr[i] = in.nextInt();
+            i++;
+        }
+        // 读字符串
+        int strLen = in.nextInt();
+        in.nextLine();
+        String[] strArr = new String[strLen];
+        int j = 0;
+        while(in.hasNextLine() && j < strLen) {
+            strArr[j] = in.nextLine();
+            j++;
+        }
+        // 处理
+        Solution solution = new Solution();
+        String result = solution.process(numArr, strArr);
+    }
+}
+
+
+class Solution {
+    public String process(int[] nums, String[] strs) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(Arrays.toString(nums));
+        sb.append(" && ");
+        sb.append(Arrays.toString(strs));
+        return sb.toString();
+    }
+}
+```
