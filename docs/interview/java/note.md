@@ -471,9 +471,13 @@ Java 虚拟机（JVM）在运行时将内存划分为多个区域，每个区域
 
 单例模式（Singleton Pattern）是一种创建型设计模式，确保在程序运行期间，一个类只能有一个实例，并且提供一个全局访问点。
 
+**1. 懒汉式**
+
+在第一次使用实例时才进行实例化。线程不安全。为了保证线程安全，可以考虑给getInstance()加synchronized关键字。
+
 ```
 public class Singleton {
-    private static volatile Singleton instance;
+    private static Singleton instance;
 
     // 私有化构造函数，防止外部实例化
     private Singleton() {}
@@ -485,6 +489,25 @@ public class Singleton {
         }
         return instance;
     }
+}
+```
+
+**2. 饿汉式**
+
+饿汉式在类加载时就创建实例，线程安全。
+
+```
+public class Singleton {
+    // 类加载时即创建实例
+    private static final Singleton instance = new Singleton();
+
+    // 私有化构造器，防止外部实例化
+    private Singleton() {}
+
+    // 获取实例方法
+    public static Singleton getInstance() {
+        return instance;
+    }
 }
 ```
 
@@ -589,5 +612,8 @@ A/B实验（也叫A/B测试）是一种通过对比不同版本的产品或服�
 
 ### 44. 操作系统内存的设计可借鉴之处
 
-1. 虚拟内存
-- 
+1. 虚拟内存：操作系统通过虚拟内存机制使程序能够使用超出物理内存的空间。在分布式系统中，可以通过类似虚拟内存的抽象，让应用程序认为其拥有大量资源，而实际的物理资源则由系统进行智能调度。这可以提升资源利用率，避免资源不足导致的应用崩溃。
+
+2. 内存缓存：操作系统通常会缓存常用数据或代码，以提高系统的响应速度和性能。在分布式系统中，可以使用类似的缓存机制（如 Redis）来加速数据访问，减少数据库或磁盘的访问压力。
+
+3. 自动内存管理：操作系统采用垃圾回收机制自动管理内存的分配与释放，减少内存泄漏的风险。
