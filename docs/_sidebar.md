@@ -70,6 +70,8 @@
   
   - [计网](interview/computer_network/note)
   
+  - [场景题](interview/scenario/note)
+  
   - [js+css](interview/js_css/note)
   
   - [sql](interview/sql/note)

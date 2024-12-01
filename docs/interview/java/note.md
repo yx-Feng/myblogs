@@ -617,3 +617,70 @@ A/B实验（也叫A/B测试）是一种通过对比不同版本的产品或服�
 2. 内存缓存：操作系统通常会缓存常用数据或代码，以提高系统的响应速度和性能。在分布式系统中，可以使用类似的缓存机制（如 Redis）来加速数据访问，减少数据库或磁盘的访问压力。
 
 3. 自动内存管理：操作系统采用垃圾回收机制自动管理内存的分配与释放，减少内存泄漏的风险。
+
+### 45. Flink的checkpoint机制，存的是什么
+
+**Apache Flink** 是一个开源的流处理框架，主要用于大规模的、分布式的、实时数据处理。link 的核心思想是**流式处理**。它将所有的数据处理任务都看作流处理，无论数据是实时产生的流还是批量导入的数据。
+
+Flink 具有内建的容错机制，利用 **checkpoint** 和 **保存点**（savepoint）来保证数据一致性和作业恢复。当作业发生故障时，Flink 可以从最近的 **checkpoint** 恢复作业状态。
+
+Flink的Checkpoint机制存储了作业的**操作符状态**、**水位线**、**外部系统状态**以及**元数据**。
+
+- 操作符（如map、filter、reduce等），每个操作符都有自己的状态，保存的是处理数据的中间结果。
+
+- 水位线（Watermark）用于跟踪事件时间的进度，Flink通过水位线来处理乱序事件。
+
+- 外部系统的状态：如果Flink作业涉及与外部系统（如Kafka、HDFS、数据库等）的交互，那么这些外部系统的状态也会被保存。
+
+- 保存的元数据：如作业的配置、作业的执行环境等，用于恢复时重建作业。
+
+### 46. 怎么使用的mybatis plus
+
+1. 在 `pom.xml` 文件中添加依赖，在 `application.yml` 或 `application.properties` 文件中进行配置
+
+2. 对实体类和类字段进行标注，例如`@TableName("user")`和`@TableId(value = "id", type = IdType.AUTO)`，自增可以用顺序自增，雪花算法。
+
+3. 通过继承 `BaseMapper` 来快速实现数据的CRUD 操作。
+   
+   ```
+   package com.yourpackage.mapper;
+   
+   import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+   import com.yourpackage.model.User;
+   
+   public interface UserMapper extends BaseMapper<User> {
+       // 你可以在这里添加自定义的方法（如果有需要的话）
+   }
+   ```
+
+### 47. Lombok 有哪些注解
+
+1.`@Getter` 和 `@Setter`
+
+- `@Getter`：为类的所有字段自动生成 getter 方法。
+- `@Setter`：为类的所有字段自动生成 setter 方法。
+
+2.`@NoArgsConstructor`, `@AllArgsConstructor`
+
+- `@NoArgsConstructor`：自动生成一个无参构造函数。
+- `@AllArgsConstructor`：自动生成一个全参构造函数，包含所有字段。
+3. **`@EqualsAndHashCode`**
+- `@EqualsAndHashCode`：自动为类生成 `equals()` 和 `hashCode()` 方法，用于比较对象是否相等和生成哈希值。
+  
+  ```
+  import lombok.EqualsAndHashCode;
+  
+  @EqualsAndHashCode
+  public class User {
+      private Long id;
+      private String name;
+  }
+  ```
+  
+  自动生成的 `equals()` 和 `hashCode()` 方法会基于 `id` 和 `name` 字段进行比较。
+
+4.`@Data`
+
+相当于组合了 `@Getter`, `@Setter`, `@ToString`, `@EqualsAndHashCode`, 和 `@RequiredArgsConstructor` 注解。
+
+### 48.
