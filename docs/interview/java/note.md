@@ -566,13 +566,247 @@ ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 - 工厂方法
 
+工厂方法模式定义了一个用于创建对象的接口，但由子类决定实例化哪个类。工厂方法将对象的创建延迟到子类。
+
+```
+// 产品接口
+interface Product {
+    void doSomething();
+}
+
+// 具体产品类
+class ConcreteProductA implements Product {
+    public void doSomething() {
+        System.out.println("Product A is doing something");
+    }
+}
+class ConcreteProductB implements Product {
+    public void doSomething() {
+        System.out.println("Product B is doing something");
+    }
+}
+
+// 工厂接口
+interface Creator {
+    Product createProduct();
+}
+
+// 具体工厂类
+class ConcreteCreatorA implements Creator {
+    public Product createProduct() {
+        return new ConcreteProductA();
+    }
+}
+class ConcreteCreatorB implements Creator {
+    public Product createProduct() {
+        return new ConcreteProductB();
+    }
+}
+
+// 使用工厂方法创建产品
+public class FactoryMethodExample {
+    public static void main(String[] args) {
+        Creator creatorA = new ConcreteCreatorA();
+        Product productA = creatorA.createProduct();
+        productA.doSomething();  // 输出: Product A is doing something
+    }
+}
+```
+
 - 抽象工厂
+
+抽象工厂模式提供一个接口，用于创建一系列相关或依赖的对象，而无需指定具体类。它提供了多个工厂方法来生成不同类型的产品。
+
+```
+// 抽象产品接口
+interface Button {
+    void render();
+}
+
+interface Checkbox {
+    void paint();
+}
+
+// 具体产品类
+class WinButton implements Button {
+    public void render() {
+        System.out.println("Rendering Windows Button");
+    }
+}
+
+class WinCheckbox implements Checkbox {
+    public void paint() {
+        System.out.println("Painting Windows Checkbox");
+    }
+}
+
+class MacButton implements Button {
+    public void render() {
+        System.out.println("Rendering Mac Button");
+    }
+}
+
+class MacCheckbox implements Checkbox {
+    public void paint() {
+        System.out.println("Painting Mac Checkbox");
+    }
+}
+
+// 抽象工厂接口
+interface GUIFactory {
+    Button createButton();
+    Checkbox createCheckbox();
+}
+
+// 具体工厂类
+class WinFactory implements GUIFactory {
+    public Button createButton() {
+        return new WinButton();
+    }
+    public Checkbox createCheckbox() {
+        return new WinCheckbox();
+    }
+}
+
+class MacFactory implements GUIFactory {
+    public Button createButton() {
+        return new MacButton();
+    }
+    public Checkbox createCheckbox() {
+        return new MacCheckbox();
+    }
+}
+
+// 使用抽象工厂
+public class AbstractFactoryExample {
+    public static void main(String[] args) {
+        GUIFactory factory = new WinFactory();
+        Button button = factory.createButton();
+        Checkbox checkbox = factory.createCheckbox();
+        button.render();
+        checkbox.paint();
+    }
+}
+```
 
 - 单例
 
+单例模式确保一个类只有一个实例，并提供全局访问点。
+
 - 建造者
 
+建造者模式将一个复杂对象的构建过程与其表示分离，使得同样的构建过程可以创建不同的表示。
+
+```
+// 产品类
+class Car {
+    private String engine;
+    private String wheels;
+
+    public void setEngine(String engine) {
+        this.engine = engine;
+    }
+
+    public void setWheels(String wheels) {
+        this.wheels = wheels;
+    }
+
+    public String toString() {
+        return "Car with " + engine + " engine and " + wheels + " wheels";
+    }
+}
+
+// 建造者接口
+interface CarBuilder {
+    void buildEngine();
+    void buildWheels();
+    Car getResult();
+}
+
+// 具体建造者
+class SportsCarBuilder implements CarBuilder {
+    private Car car = new Car();
+
+    public void buildEngine() {
+        car.setEngine("Sports engine");
+    }
+
+    public void buildWheels() {
+        car.setWheels("Sports wheels");
+    }
+
+    public Car getResult() {
+        return car;
+    }
+}
+
+// 导演类
+class Director {
+    private CarBuilder builder;
+
+    public Director(CarBuilder builder) {
+        this.builder = builder;
+    }
+
+    public Car construct() {
+        builder.buildEngine();
+        builder.buildWheels();
+        return builder.getResult();
+    }
+}
+
+// 使用建造者模式
+public class BuilderExample {
+    public static void main(String[] args) {
+        CarBuilder builder = new SportsCarBuilder();
+        Director director = new Director(builder);
+        Car car = director.construct();
+        System.out.println(car);
+    }
+}
+```
+
 - 原型
+
+原型模式通过复制现有的对象来创建新的对象，而不是通过构造函数来创建。它用于避免重复的创建操作，并提高性能。
+
+适用场景：
+
+- 当对象的创建成本较高时，可以通过复制现有对象来提高效率。
+- 当对象之间有较复杂的依赖关系时，使用原型模式更合适。
+
+```
+// 原型接口
+interface Prototype {
+    Prototype clone();
+}
+
+// 具体原型类
+class ConcretePrototype implements Prototype {
+    private String name;
+
+    public ConcretePrototype(String name) {
+        this.name = name;
+    }
+
+    public Prototype clone() {
+        return new ConcretePrototype(this.name);
+    }
+
+    public String toString() {
+        return "Prototype: " + name;
+    }
+}
+
+// 使用原型模式
+public class PrototypeExample {
+    public static void main(String[] args) {
+        ConcretePrototype prototype = new ConcretePrototype("Original");
+        ConcretePrototype clone = (ConcretePrototype) prototype.clone();
+        System.out.println(clone);  // 输出: Prototype: Original
+    }
+}
+```
 
 结构型模式：用于描述对象之间的组合关系，包括代理、享元等模式
 
