@@ -77,3 +77,5 @@
   - [sql](interview/sql/note)
   
   - [算法](interview/algorithm/note)
+  
+  - [其它](interview/others/note)

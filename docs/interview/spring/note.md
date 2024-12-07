@@ -5,23 +5,92 @@
 - **事务管理**：Spring提供了一致的事务管理接口，支持声明式和编程式事务。开发者可以轻松地进行事务管理，而无需关心具体的事务API。
 - **MVC框架**：Spring MVC是一个基于Servlet API构建的Web框架，采用了模型-视图-控制器（MVC）架构。它支持灵活的URL到页面控制器的映射，以及多种视图技术。
 
-### 2. AOP实现有哪些注解？AOP 常见的通知类型及术语解释？
+### 2. spring的事务，spring事务消失如何解决？
 
-切面（Aspect）：横切逻辑的模块化体现，包含一组通知和切点定义。
+Spring事务管理支持：
 
-通知（Advice）是切面中定义的动作，它描述了切面要执行的具体操作。
+- 声明式事务管理
+  
+  通过注解（如 `@Transactional`）或 XML 配置管理事务，减少手动代码。
+  
+  注解方式
+  
+  ```
+  @Service
+  public class UserService {
+      @Transactional
+      public void createUser(User user) {
+          // 数据库操作，事务自动管理
+          userRepository.save(user);
+      }
+  }
+  ```
+  
+  XML方式
+  
+  ```
+  <tx:annotation-driven transaction-manager="transactionManager"/>
+  ```
 
-切点（Pointcut）：定义在哪些连接点上应用通知，通常通过表达式指定。
+- 编程式事务管理
+  
+  对于复杂的事务需求，可以使用 `TransactionTemplate` 进行编程式管理。
+  
+  ```
+  @Transactional
+  public class UserService {
+      @Autowired
+      private TransactionTemplate transactionTemplate;
+  
+      public void createUser(User user) {
+          transactionTemplate.execute(status -> {
+              try {
+                  userRepository.save(user);
+                  // 其他业务操作
+                  return true;
+              } catch (Exception e) {
+                  status.setRollbackOnly(); // 手动回滚
+                  return false;
+              }
+          });
+      }
+  }
+  ```
 
-- @Aspect：用于定义切面，标注在切面类上。
-- @Pointcut：定义切点，标注在方法上，用于指定连接点。
-- @Before：在方法执行之前执行通知。
-- @After：在方法执行之后执行通知。
-- @Around：在方法执行前后都执行通知。
+**事务失效的原因包括**
+
+- 方法调用不通过代理
+  
+  - Spring事务是通过 AOP 代理来处理的，如果直接在同一个类内调用带有事务注解的方法，那么该方法将不会触发代理，也就不会启动事务。
+  
+  ```
+  public class MyService {
+      @Transactional
+      public void method1() {
+          // 执行一些操作
+          method2();  // 直接调用不会触发事务
+      }
+  
+      @Transactional
+      public void method2() {
+          // 执行一些操作
+      }
+  }
+  ```
+  
+  在上面的示例中，`method1()` 和 `method2()` 都有 `@Transactional` 注解，但由于 `method2()` 是由 `method1()` 直接调用的，Spring AOP 代理无法拦截 `method2()`，因此事务不会生效。
+  
+  - **解决方案**：避免直接调用同一类中的事务方法，或使用 **`ApplicationContext`** 来获取代理对象。
+
+- 方法是 `private` 或 `final`
+  
+  - 如果目标方法是 `private` 或 `final`，Spring AOP 不能生成代理，也就无法切入这些方法，因此事务不起作用。
+  
+  - **解决方案**：确保事务方法是 `public`，且不是 `final` 或 `private`。
 
 ### 3. 什么是反射？有哪些使用场景？
 
-反射是 Java 的一种机制，允许程序在运行时加载、探查和使用类的信息。通过反射，您可以动态创建对象、调用方法、访问字段等，而无需在编译时就明确知道类的信息。
+反射是 Java 的一种机制，允许在运行时获取类的结构信息（如类的名称、方法、字段等），并可以动态创建对象、调用方法或访问字段，而无需在编译时就明确知道类的信息。
 
 - **依赖注入（DI）**：
   
@@ -91,16 +160,36 @@ Spring Boot通过「自动化配置」和「起步依赖」实现了约定大于
 
 ### 10. Spring AOP的原理
 
-Spring AOP通过动态代理在运行时生成代理对象，将切面（Aspect）中的通知（Advice）织入目标方法的前后或异常处，实现横切关注点（如日志、事务）的分离。代理对象拦截目标方法的调用，根据切入点（Pointcut）匹配的条件执行对应的通知逻辑，从而在不改变业务代码的前提下，灵活地为其添加通用功能。 
+面向切面编程。在不改变业务代码的前提下，动态地为其添加额外的功能，比如日志记录、事务管理、异常处理等。
+
+Spring AOP 使用**动态代理**来实现 AOP。
+
+Spring AOP 会根据**切点和通知**在运行时动态生成**增强后的代理对象**。目标对象被增强后，实际执行的是代理类。
 
 **动态代理**：
 
-Spring AOP在运行时动态生成目标对象的代理类。根据目标对象是否实现接口，Spring AOP会选择不同的代理方式：
+根据目标对象是否实现接口，Spring AOP会选择不同的代理方式：
 
 - **JDK动态代理**：如果目标对象实现了一个或多个接口，Spring AOP会使用JDK的动态代理生成代理对象。
 - **CGLIB代理**：如果目标对象没有实现接口，Spring AOP会使用CGLIB生成子类代理。CGLIB通过继承目标类并重写方法实现代理功能。
 
-### 11.springmvc 处理请求流程
+### 11. AOP实现有哪些注解？AOP 常见的通知类型及术语解释？
+
+切面（Aspect）：横切逻辑的模块化体现，包含一组通知和切点定义。
+
+连接点（Join Point）：程序执行的某个具体点。
+
+切点（Pointcut）：定义在哪些连接点上应用通知，通常通过表达式指定。
+
+通知（Advice）：定义了切面在连接点上执行的具体动作。
+
+- @Aspect：用于定义切面，标注在切面类上。
+- @Pointcut：定义切点，标注在方法上，用于指定连接点。
+- @Before：在方法执行之前执行通知。
+- @After：在方法执行之后执行通知。
+- @Around：在方法执行前后都执行通知。
+
+### 12.springmvc 处理请求流程
 
 - **请求到达** `DispatcherServlet`。（`DispatcherServlet` 是 `Spring MVC` 的核心组件，负责请求的分发）
 - **`DispatcherServlet` 根据 URL 映射查找对应的控制器**（Controller）。
@@ -108,7 +197,7 @@ Spring AOP在运行时动态生成目标对象的代理类。根据目标对象�
 - **`DispatcherServlet` 调用 `ViewResolver` 查找视图**（如 JSP 页面或 Thymeleaf 模板）。
 - **视图渲染并返回响应**给客户端。
 
-### 12. 说一下 aop 和 ioc，有用过aop吗
+### 13. 说一下 aop 和 ioc，有用过aop吗
 
 AOP：面向切面编程，是一种程序设计思想，旨在通过分离横切关注点（cross-cutting concerns）来提高程序的模块化。横切关注点是那些影响到多个类或模块的功能，比如日志记录、事务管理、性能监控、安全检查等。这些功能通常与业务逻辑代码是分离的，但又需要在多个地方复用。
 
@@ -167,9 +256,9 @@ IoC：是一种程序设计思想，强调控制权的转移。在传统的面�
     public ResponseResult add(@Valid @RequestBody ClientNavCommentAddDTO addDTO) {}
     ```
 
-### 13. bean的生命周期
+### 14. bean的生命周期
 
-- 实例化 -> 当 Spring 容器启动并扫描到需要管理的 Bean 时，首先通过构造函数实例化 Bean 对象。
+- 实例化 -> 当 Spring 容器启动并扫描到需要管理的 Bean 时，通过反射或工厂方法创建 Bean 实例。
 - 属性注入 -> Spring 容器为实例化的 Bean 注入它的依赖属性。
 - 初始化前（`postProcessBeforeInitialization`） -> 在 Bean 初始化之前，Spring 允许开发者通过实现 `BeanPostProcessor` 接口的 `postProcessBeforeInitialization()` 方法，定义自定义逻辑。这个阶段可以对 Bean 进行一些修改或操作。
 - 初始化
@@ -177,7 +266,7 @@ IoC：是一种程序设计思想，强调控制权的转移。在传统的面�
 - 使用 Bean -> Bean 准备完毕后，Spring 容器会将其交给应用程序使用。
 - 销毁 -> 当 Spring 容器关闭时，或 Bean 的生命周期结束时，Spring 会对 Bean 进行销毁操作。
 
-### 14. springcloud异步线程注解
+### 15. springcloud异步线程注解
 
 Spring 提供了 `@Async` 注解来支持异步方法执行。
 
@@ -185,7 +274,7 @@ Spring 提供了 `@Async` 注解来支持异步方法执行。
 
 - 任何被 `@Async` 注解标注的方法都会在一个单独的线程中执行，而不会阻塞调用线程。
 
-### 15. 怎么查看线程信息
+### 16. 怎么查看线程信息
 
 1. 使用 `Thread` 类查看线程信息
 
@@ -218,3 +307,79 @@ jstack <PID>
 `jconsole` 是一个JVM自带的监控工具，它可以用来查看线程信息、内存使用情况、垃圾回收等。
 
 - 在命令行输入 `jconsole`，打开图形化界面。选择要监控的Java进程。
+
+### 17. spring启动类注解
+
+在 Spring 应用中，启动类的注解主要用于标识这是一个 Spring Boot 应用的入口，并引导整个应用的启动流程。
+
+**1. @SpringBootApplication**
+
+它是一个复合注解，包含了多个重要的注解。
+
+- `@SpringBootConfiguration`
+  
+  - 是 `@Configuration` 的扩展，标识当前类是一个配置类。
+  - 表示该类可以定义 `@Bean` 方法，来注册 Bean 到 Spring 容器中。
+
+- `@EnableAutoConfiguration`
+  
+  - 启用 Spring Boot 的自动配置功能，根据类路径下的依赖和配置文件自动配置 Spring 应用环境。
+  - 可以通过 `spring.autoconfigure.exclude` 属性排除特定的自动配置类。
+
+- `@ComponentScan`
+  
+  - 启用组件扫描，默认扫描当前启动类所在包及其子包，发现并注册标注了 `@Component`、`@Service`、`@Repository`、`@Controller` 等注解的类为 Spring 的 Bean。
+
+```
+@SpringBootApplication
+public class Application {
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+}
+```
+
+**2. @SpringBootConfiguration、@EnableAutoConfiguration、@ComponentScan**
+
+独立使用也可以
+
+**3. @Import**
+
+用于导入额外的配置类或组件。可以传入一个或多个类作为参数，Spring 会将这些类作为配置类或组件注册到容器中。
+
+```
+@Import({OtherConfig.class, AnotherConfig.class})
+public class MainConfig {
+}
+```
+
+**4. @PropertySource**
+
+用于加载外部的属性文件到 Spring 环境中。
+
+```
+@PropertySource("classpath:application.properties")
+public class Config {
+}
+```
+
+### 18. springboot底层原理
+
+基于 Spring 框架构建，并通过一系列的增强机制简化传统 Spring 开发的复杂流程。
+
+比如：自动配置、条件装配、内嵌服务器
+
+- @EnableAutoConfiguration注解：注解被定义在启动类上，通过 `@SpringBootApplication` 自动包含。其作用是扫描类路径下的 `META-INF/spring.factories` 文件，加载 `EnableAutoConfiguration` 指定的所有自动配置类。
+
+- Spring Boot 通过条件注解实现按需加载配置的能力。
+  
+  常见条件注解：
+  
+  - `@ConditionalOnClass`：仅当类路径中存在指定类时加载 Bean。
+  - `@ConditionalOnMissingBean`：仅当 Spring 容器中不存在指定 Bean 时加载。
+  - `@ConditionalOnProperty`：根据配置属性值加载 Bean。
+  - `@ConditionalOnWebApplication`：仅当当前应用为 Web 应用时加载。
+
+- Spring Boot 提供内嵌的 Web 服务器（如 Tomcat、Jetty 或 Undertow），开发者无需自行安装或配置。
+
+### 19.
