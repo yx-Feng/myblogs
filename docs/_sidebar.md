@@ -30,6 +30,8 @@
   
   - [MyBatis](java/mybatis/note)
   
+  - [JPA](java/jpa/note)
+  
   - [微服务](java/microservice/note01)
   
   - [微服务2](java/microservice/note02)
