@@ -265,21 +265,21 @@ public interface PetDao extends JpaRepository<Pet, Integer> {
 
 ```
     @Test
-	public void test2() {
-		List<Pet> pets = petDao.loadPetsList();
-		System.out.println(pets);
+    public void test2() {
+        List<Pet> pets = petDao.loadPetsList();
+        System.out.println(pets);
 
-		List<Object[]> pets2 = petDao.loadPetsList2();
-		for (Object[] pet : pets2) {
-			System.out.println(Arrays.toString(pet));
-		}
+        List<Object[]> pets2 = petDao.loadPetsList2();
+        for (Object[] pet : pets2) {
+            System.out.println(Arrays.toString(pet));
+        }
 
-		List<Pet> pets3 = petDao.loadPetsLis3();
-		System.out.println(pets3);
-	}
+        List<Pet> pets3 = petDao.loadPetsLis3();
+        System.out.println(pets3);
+    }
 ```
 
-### 5. 实战 - 对象关联映射
+### 5. 实战 - 对象关联映射 - 一对多
 
 数据库表的自动生成
 
@@ -325,9 +325,9 @@ public class Clazz {
 
 ```
     @Test
-	void contextLoads() {
-		System.out.println("表成功生成...");
-	}
+    void contextLoads() {
+        System.out.println("表成功生成...");
+    }
 ```
 
 **一对多：增删改查**
@@ -350,61 +350,274 @@ public interface StudentDao extends JpaRepository<Student, Integer> {
 
 ```
     @Test
-	public void addClazz() {
-		// 添加班级信息
-		Clazz clz = new Clazz();
-		clz.setCname("三年一班");
-		clazzDao.save(clz);
-	}
+    public void addClazz() {
+        // 添加班级信息
+        Clazz clz = new Clazz();
+        clz.setCname("三年一班");
+        clazzDao.save(clz);
+    }
 
-	@Test
-	public void addStu() {
-		// 添加学生信息
-		Student student = new Student();
-		student.setSname("张三");
-		studentDao.save(student);
+    @Test
+    public void addStu() {
+        // 添加学生信息
+        Student student = new Student();
+        student.setSname("张三");
+        studentDao.save(student);
 
-		Student student1 = new Student();
-		student1.setSname("李四");
-		studentDao.save(student);
-		Clazz clz1 = new Clazz();
-		clz1.setCid(1);
-		student1.setClz(clz1);
-		studentDao.save(student1);
+        Student student1 = new Student();
+        student1.setSname("李四");
+        studentDao.save(student);
+        Clazz clz1 = new Clazz();
+        clz1.setCid(1);
+        student1.setClz(clz1);
+        studentDao.save(student1);
 
-		studentDao.save(student);
-	}
+        studentDao.save(student);
+    }
 ```
 
 ```
     // 更新班级信息
+    @Test
+    public void updateClz() {
+        Clazz clz = new Clazz();
+        clz.setCid(2);
+        clz.setCname("三年三班");
+        clazzDao.save(clz);
+    }
+
+    // 更新学生信息
+    @Test
+    public void updateStu() {
+        Student stu = new Student();
+        stu.setId(3);
+        stu.setSname("王七");
+        Clazz clazz = new Clazz();
+        clazz.setCid(2);
+        stu.setClz(clazz);
+        studentDao.save(stu);
+    }
+```
+
+**查询，OneToMany是懒加载，ManyToOne是立即加载**
+
+Clazz.java
+
+```
+@Entity(name = "t_clazz")
+@Data
+public class Clazz {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int cid;
+
+    @OneToMany(mappedBy = "clz", fetch = FetchType.EAGER)
+    private List<Student> list;
+
+    @Column
+    private String cname;
+}
+```
+
+```
+    // 查询班级信息
 	@Test
-	public void updateClz() {
-		Clazz clz = new Clazz();
-		clz.setCid(2);
-		clz.setCname("三年三班");
-		clazzDao.save(clz);
+	public void testFindClz() {
+		// 查询班级信息，并没有查询班级当中的学生信息（默认是懒加载），只有使用到学生信息的时候，才会发送select语句查询学生信息
+		// 当班级信息查询完毕，dao层结束后，session就会关闭。再次查询学生信息，会出现no session异常
+		// 解决：（1）设置立即加载 （2）延长session的生命周期
+		List<Clazz> clazzes = clazzDao.findAll();
+		for(Clazz clazz : clazzes) {
+			System.out.println(clazz.getCid() + " " + clazz.getCname());
+			List<Student> students = clazz.getList();
+			for (Student student:students) {
+				System.out.println(student.getId()+" "+student.getSname());
+			}
+		}
 	}
 
-	// 更新学生信息
+	// 查询学生信息
 	@Test
-	public void updateStu() {
-		Student stu = new Student();
-		stu.setId(3);
-		stu.setSname("王七");
-		Clazz clazz = new Clazz();
-		clazz.setCid(2);
-		stu.setClz(clazz);
-		studentDao.save(stu);
+	public void testFindStudents() {
+		List<Student> students = studentDao.findAll();
+		for (Student student : students) {
+			System.out.println(student.getId() + " " + student.getSname() + " " + student.getClz().getCid());
+		}
 	}
 ```
 
-```
+**删除**
+
+班级表中的班级被学生表引用，不能直接删  
+
+解决：（1）级联删除 （2）先断开主外键连接（外键字段设置为null），再删除
+
+Clazz.java
 
 ```
+@OneToMany(mappedBy = "clz", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+private List<Student> list;
+```
+
+### 6. 多对多
+
+项目和员工关系：
+
+- 一个员工可以参与多个项目
+
+- 一个项目可以关联多个员工
+
+**实体和表的创建**
+
+Emp.java
+
+```
+@Entity(name = "t_emp")
+@Data
+public class Emp {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    @Column
+    private String name;
+
+    // 使得Emp对象放弃外键的维护权利, 即当前的Emp类不负责维护与另一个实体类的多对多关系的外键约束。
+    @ManyToMany(mappedBy = "emps")
+    private List<Project> projects = new ArrayList<>();
+}
+```
+
+Project.java
+
+```
+@Entity(name = "t_project")
+@Data
+public class Project {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    @Column
+    private String name;
+
+    // 多对多，通过JoinTable生成第三方表，指定各自主键的存放列名
+    // joinColumns：将本表id，存储到第三方表，列名为p_id
+    // inverseJoinColumns：将对方表id，存储到第三方表，列名为e_id
+    @ManyToMany
+    @JoinTable(name = "emps_pros", uniqueConstraints = {@UniqueConstraint(columnNames = {"e_id", "p_id"})},
+            joinColumns = {@JoinColumn(name = "p_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "e_id", referencedColumnName = "id")})
+    private List<Emp> emps = new ArrayList<>();
+}
+```
+
+**增加**
+
+```
+    // 创建员工和项目
+	@Test
+	public void testAddEmp() {
+		Emp emp = new Emp();
+		emp.setName("张三");
+
+		Emp emp2 = new Emp();
+		emp2.setName("李四");
+
+		Project project = new Project();
+		project.setName("项目1");
+		project.getEmps().add(emp);
+		project.getEmps().add(emp2);
+
+		empDao.save(emp);
+		empDao.save(emp2);
+
+		projectDao.save(project);
+	}
+```
+
+**修改**
+
+**查找**
+
+- 同样需要处理懒加载的问题
+
+**删除**
+
+- 删除项目信息，可以关联删除员工信息
+
+- 删除员工信息，不能关联删除参与的项目信息（没有被任何项目引用就能删除失败）
+
+### 7. 一对一
+
+- 用户与用户详情
+
+- 员工与身份证信息
+
+Boy.java
+
+```
+@Entiy(name="t_boy")
+@Date
+public class Boy {
+    ...
+    @OneToOne
+    @JoinColumn(name="gid", unique=true)
+    private Gril gril
+}
+```
+
+Gril.java
+
+```
+@Entiy(name="t_girl")
+@Date
+public class Girl {
+    ...
+    @OneToOne(mappedBy = "girl")
+    private Boy boy
+}
+```
+
+Boy表会新增一个外键列gid
+
+### 8. 延长session生命周期
+
+**延长session的生命周期到service层**
+
+除了立即加载，来解决no session问题。
+
+还可以在service层的方法上添加@Transactional，让方法内部所有的操作都在同一个session当中完成。
+
+```
+@Transactional
+public void deleteClzWithStu() {
+    List<Clazz> clazzes = clazzDao.findAll();
+    for(Clazz clazz : clazzes) {
+        List<Student> students = clazz.getList();
+        for(Student student : students) {
+            studentDao.delete(student);
+        }
+        // 断开主外键连接
+        clazz.setList(null);
+        clazzDao.deleteById(clazz.getCid();
+    }
+}
+```
+
+**延长session的生命周期到view层**
+
+Clazz 班级类 和 student学生类是一对多的关联关系：
+jsp 页面上展示数据：
+
+- \$\{clazz.cname\} 能够获得班级的名称
+
+- \$\{clazz.students\} 由于一对多是懒加载。查询的班级信息并没有立刻查询关联的学生信息。要想使用学生信息，此时需要查询数据库。但是 service 层的方法已经关闭了。此时就no session。
+  解决：将 session 的生命周期延长到视图层。当EL表达式渲染完毕之后，再去关闭session。
+  
+
+- 使用过滤器：OpenSessionInViewFilter。springboot已经提供好了，并且已经给我们配置成功了，不需要自己额外配置。
 
 
-
-多对多
-
-一对一
