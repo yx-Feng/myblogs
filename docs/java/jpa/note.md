@@ -421,29 +421,29 @@ public class Clazz {
 
 ```
     // 查询班级信息
-	@Test
-	public void testFindClz() {
-		// 查询班级信息，并没有查询班级当中的学生信息（默认是懒加载），只有使用到学生信息的时候，才会发送select语句查询学生信息
-		// 当班级信息查询完毕，dao层结束后，session就会关闭。再次查询学生信息，会出现no session异常
-		// 解决：（1）设置立即加载 （2）延长session的生命周期
-		List<Clazz> clazzes = clazzDao.findAll();
-		for(Clazz clazz : clazzes) {
-			System.out.println(clazz.getCid() + " " + clazz.getCname());
-			List<Student> students = clazz.getList();
-			for (Student student:students) {
-				System.out.println(student.getId()+" "+student.getSname());
-			}
-		}
-	}
+    @Test
+    public void testFindClz() {
+        // 查询班级信息，并没有查询班级当中的学生信息（默认是懒加载），只有使用到学生信息的时候，才会发送select语句查询学生信息
+        // 当班级信息查询完毕，dao层结束后，session就会关闭。再次查询学生信息，会出现no session异常
+        // 解决：（1）设置立即加载 （2）延长session的生命周期
+        List<Clazz> clazzes = clazzDao.findAll();
+        for(Clazz clazz : clazzes) {
+            System.out.println(clazz.getCid() + " " + clazz.getCname());
+            List<Student> students = clazz.getList();
+            for (Student student:students) {
+                System.out.println(student.getId()+" "+student.getSname());
+            }
+        }
+    }
 
-	// 查询学生信息
-	@Test
-	public void testFindStudents() {
-		List<Student> students = studentDao.findAll();
-		for (Student student : students) {
-			System.out.println(student.getId() + " " + student.getSname() + " " + student.getClz().getCid());
-		}
-	}
+    // 查询学生信息
+    @Test
+    public void testFindStudents() {
+        List<Student> students = studentDao.findAll();
+        for (Student student : students) {
+            System.out.println(student.getId() + " " + student.getSname() + " " + student.getClz().getCid());
+        }
+    }
 ```
 
 **删除**
@@ -518,24 +518,24 @@ public class Project {
 
 ```
     // 创建员工和项目
-	@Test
-	public void testAddEmp() {
-		Emp emp = new Emp();
-		emp.setName("张三");
+    @Test
+    public void testAddEmp() {
+        Emp emp = new Emp();
+        emp.setName("张三");
 
-		Emp emp2 = new Emp();
-		emp2.setName("李四");
+        Emp emp2 = new Emp();
+        emp2.setName("李四");
 
-		Project project = new Project();
-		project.setName("项目1");
-		project.getEmps().add(emp);
-		project.getEmps().add(emp2);
+        Project project = new Project();
+        project.setName("项目1");
+        project.getEmps().add(emp);
+        project.getEmps().add(emp2);
 
-		empDao.save(emp);
-		empDao.save(emp2);
+        empDao.save(emp);
+        empDao.save(emp2);
 
-		projectDao.save(project);
-	}
+        projectDao.save(project);
+    }
 ```
 
 **修改**
@@ -548,7 +548,7 @@ public class Project {
 
 - 删除项目信息，可以关联删除员工信息
 
-- 删除员工信息，不能关联删除参与的项目信息（没有被任何项目引用就能删除失败）
+- 删除员工信息，不能关联删除参与的项目信息（没有被任何项目引用就能删除）
 
 ### 7. 一对一
 
@@ -616,8 +616,5 @@ jsp 页面上展示数据：
 
 - \$\{clazz.students\} 由于一对多是懒加载。查询的班级信息并没有立刻查询关联的学生信息。要想使用学生信息，此时需要查询数据库。但是 service 层的方法已经关闭了。此时就no session。
   解决：将 session 的生命周期延长到视图层。当EL表达式渲染完毕之后，再去关闭session。
-  
 
 - 使用过滤器：OpenSessionInViewFilter。springboot已经提供好了，并且已经给我们配置成功了，不需要自己额外配置。
-
-

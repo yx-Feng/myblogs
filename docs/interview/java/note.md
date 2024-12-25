@@ -109,9 +109,9 @@ Java 中的 **集合迭代器** 是一种遍历集合元素的机制。
 
 `Iterator` 是一个接口，定义了遍历集合元素的方法，主要方法有：
 
-- **`hasNext()`**：检查集合中是否还有下一个元素。如果有下一个元素，返回 `true`，否则返回 `false`。
-- **`next()`**：返回集合中的下一个元素。如果没有元素，抛出 `NoSuchElementException`。
-- **`remove()`**：删除当前返回的元素。调用 `next()` 方法后，才可以调用 `remove()`，否则会抛出 `IllegalStateException`。
+- **hasNext()**：检查集合中是否还有下一个元素。如果有下一个元素，返回 `true`，否则返回 `false`。
+- **next()**：返回集合中的下一个元素。如果没有元素，抛出 `NoSuchElementException`。
+- **remove()**：删除当前返回的元素。调用 `next()` 方法后，才可以调用 `remove()`，否则会抛出 `IllegalStateException`。
 
 ```
 import java.util.ArrayList;
@@ -389,6 +389,12 @@ Java 中的锁主要用于控制多个线程对共享资源的访问，确保线
 
 - 显示锁（ReentrantLock、ReentrantReadWriteLock、StampedLock）：由 `java.util.concurrent.locks.Lock`接口及其诸多实现类提供的同步机制。相较于隐式锁，显式锁提供了更为多样化的锁操作选项，包括：支持线程在等待锁时可被中断、根据先后顺序分配锁资源的公平锁与非公平锁机制。
 
+- synchronized 和 lock 的区别
+  
+  - synchronized：关键字、隐式锁、方法或代码块执行完毕后自动释放、不可中断
+  
+  - lock：类、显式锁、需要手动加锁和解锁、可中断
+
 **基于对资源的访问权限**
 
 - 独占锁：是一种同步机制，它确保在任一时刻，最多只有一个线程可以获得锁并对受保护的资源进行访问或修改。
@@ -415,7 +421,7 @@ volatile关键字的作用就是保证共享变量的**可见性**，也就是�
 
 其他情况下volatile并不能保证线程安全问题，因为volatile并不能保证变量操作的原子性。
 
-### 23. synchorized和volatile的区别
+### 23. synchronized和volatile的区别
 
 `synchronized`和`volatile`都是用来实现线程安全的关键字，但它们的功能和使用场景有所不同。
 
@@ -1349,11 +1355,79 @@ public class CountDownLatchExample {
 
 - 流量削峰：在秒杀活动中，用户请求通过队列暂存，后端系统按能力逐步处理。
 
-**常见的消息队列中间件**
+**常见的消息队列中间件**：RabbitMQ、Kafka、RocketMQ
 
-RabbitMQ、Kafka、RocketMQ
+- **RabbitMQ** 适用于中小规模的系统，提供复杂的路由和高可靠性的消息队列。
 
-### 64.
+- **Kafka** 适用于大规模的分布式系统，特别适合日志收集、流数据处理和事件驱动架构。
+
+- **RocketMQ** 适用于高吞吐量、低延迟和顺序消息处理场景，特别适合金融、订单处理等需要事务消息的业务。
+
+**RabbitMQ 的几种消息传递方式**
+
+- 简单模式：一个生产者，一个队列，一个消费者，不需要设置交换机。
+
+- 工作队列模式：一个生产者，多个消费者（竞争关系），不需要设置交换机。
+
+- 发布/订阅模式：交换机和队列进行绑定，当发送消息到交换机后，交换机会将消息发送到绑定的队列。
+
+- 路由模式：交换机和队列进行绑定，并且指定routing key，当发送消息到交换机后，交换机会根据routing key将消息发送到对应的队列。
+
+- 通配符模式：交换机和队列进行绑定，并且指定通配符方式的routing key，当发送消息到交换机后，交换机会根据routing key将消息发送到对应的队列。
+
+### 64. 在单台机器部署的情况下，如何对同一个用户加锁以确保接口的线程安全？
+
+如果一个用户通过多个线程同时发起操作（如通过多个设备或重复请求），可能导致数据状态的冲突或不一致。对同一个用户加锁的主要目的是确保在多线程并发情况下，涉及同一个用户的关键操作能够保持**线程安全**，避免出现数据不一致、资源竞争或逻辑错误的情况。
+
+- 获取用户 ID 对应的常量值以保证其唯一性。`userId.intern()` 是 Java 中 `String` 类的一个方法，用于返回字符串的常量池中的唯一引用。当多个线程针对同一个用户 ID 加锁时，通过 `userId.intern()` 可以**确保加锁对象的唯一性**。
+  
+  ```
+  public class UserLockService {
+      public void handleRequest(String userId) {
+          String lock = userId.intern(); // 使用字符串常量池
+  
+          synchronized (lock) {
+              try {
+                  // 执行业务逻辑
+                  System.out.println("Processing request for user: " + userId);
+                  Thread.sleep(1000); // 模拟业务操作
+              } catch (InterruptedException e) {
+                  Thread.currentThread().interrupt();
+              }
+          }
+      }
+  }
+  ```
+
+- 使用 `ConcurrentHashMap` 映射锁对象。与传统的 `HashMap` 不同，`ConcurrentHashMap` 通过分段锁（Segment Locking）机制来优化并发性能，从而避免了全表加锁的瓶颈。
+  
+  通过 `ConcurrentHashMap` 存储锁对象，使用资源的标识（如 `userId`）作为键，锁对象作为值。当多个线程需要对同一个资源进行加锁时，它们会访问该资源对应的锁对象，从而实现对资源的同步。
+  
+  ```
+  import java.util.concurrent.locks.ReentrantLock;
+  import java.util.concurrent.ConcurrentHashMap;
+  
+  public class LockMapExample {
+      private static final ConcurrentHashMap<String, ReentrantLock> lockMap = new ConcurrentHashMap<>();
+  
+      public static void main(String[] args) {
+          String userId = "user123";
+  
+          // 获取锁对象
+          ReentrantLock lock = lockMap.computeIfAbsent(userId, k -> new ReentrantLock());
+  
+          // 加锁
+          lock.lock();
+          try {
+              // 执行对 userId 的相关操作
+              System.out.println("Processing for " + userId);
+          } finally {
+              // 解锁
+              lock.unlock();
+          }
+      }
+  }
+  ```
 
 ### 65.
 
