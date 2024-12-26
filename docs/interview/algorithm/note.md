@@ -108,9 +108,9 @@ public static void quickSort(int[] arr, int low, int high) {
         while(arr[j] >= pivot && i < j) j--;
         while(arr[i] <= pivot && i < j) i++;
         if(i < j) {
-            int tmp = arr[j];
-            arr[j] = arr[i];
-            arr[i] = tmp;
+            int tmp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = tmp;
         }
     }
     // 基准和i==j对应位置的元素交换
@@ -352,7 +352,7 @@ class Solution {
 
 ```
 public int[] twoSum(int[] num, int target) {
-    Map<Integer, Integer> hashtable = new HashMap<>(Integer, Integer);
+    Map<Integer, Integer> hashtable = new HashMap<Integer, Integer>();
     for(int i = 0; i < nums.length; i++) {
         if(hashtable.containsKey(target-num[i])) {
             return new int[]{hashtable.get(target-num[i]), i};

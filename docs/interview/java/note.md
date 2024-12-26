@@ -731,7 +731,9 @@ ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 **使用 `ExecutorService` 创建线程池**：`ExecutorService` 提供了创建和管理线程池的功能，常见线程池包括 `FixedThreadPool`、`CachedThreadPool` 等。通过线程池执行线程时，使用 `execute()` 或 `submit()` 方法提交任务。
 
-### 46. 线程的状态有哪些？
+### 46. 线程的状态有哪些？线程池的核心概念? 线程池的核心参数？
+
+**线程的状态**
 
 - 新建（New）：线程被创建但尚未启动，处于新建状态。
 
@@ -746,6 +748,26 @@ ExecutorService executorService = Executors.newSingleThreadExecutor();
 - 超时等待（Timed Waiting）
 
 - 终止（Terminated）
+
+**线程池的基本组件**
+
+- 核心线程数：线程池中保持活动的线程的最小数量。即使没有任务需要执行，核心线程也会一直存在。
+
+- 最大线程数：线程池中允许存在的最大线程数。
+
+- 工作队列：用于保存提交到线程池的任务的队列。
+
+**线程池的核心参数**
+
+- corePoolSize（核心线程数）：线程池保持的最小线程数。
+
+- maximumPoolSize（最大线程数）：线程池允许创建的最大线程数。
+
+- keepAliveTime（线程空闲时间）：当线程池中的线程数超过核心线程数时，多余的空闲线程在 `keepAliveTime` 时间内会被终止。
+
+- workQueue（工作队列）：用来保存待执行任务的阻塞队列。
+
+- handler（拒绝策略）。
 
 ### 47. 线程池的拒绝策略
 
