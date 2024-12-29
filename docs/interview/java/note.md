@@ -1451,6 +1451,31 @@ public class CountDownLatchExample {
   }
   ```
 
-### 65.
+### 65. Mybaits缓存机制
+
+通过缓存机制，可以避免重复查询同样的数据，从而提高应用程序的响应速度和系统的整体性能。MyBatis 提供了 **一级缓存** 和 **二级缓存** 两种缓存机制。
+
+- 一级缓存是 **会话级别** 的缓存，缓存的数据只在当前 `SqlSession` 内有效，关闭 `SqlSession` 后缓存将失效。每个 `SqlSession` 对象都有自己的缓存，当查询操作在同一个 `SqlSession` 内执行时，如果查询条件相同，MyBatis 会直接从缓存中获取结果，而不是重新查询数据库。
+
+- 二级缓存是 基于 **Mapper 映射器** 级别的缓存，可以在不同的 `SqlSession` 之间共享缓存。
+
+- 一级缓存是默认启用的，不需要特别配置。要启用二级缓存，必须在 MyBatis 配置文件和 Mapper 文件中进行相应的配置。
+  
+  在 `mybatis-config.xml` 中开启二级缓存
+  
+  ```
+  <update id="updateUser" flushCache="true">
+    UPDATE user SET name = #{name} WHERE id = #{id}
+  </update>
+  ```
+  
+  在每个 Mapper 文件中启用缓存
+  
+  ```
+  <mapper namespace="com.example.mapper.UserMapper">
+    <cache/> <!-- 启用二级缓存 -->
+    <!-- 映射 SQL 语句 -->
+  </mapper>
+  ```
 
 ### 66.

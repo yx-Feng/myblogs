@@ -88,7 +88,23 @@ Spring事务管理支持：
   
   - **解决方案**：确保事务方法是 `public`，且不是 `final` 或 `private`。
 
-### 3. 什么是反射？有哪些使用场景？
+### 3. Spring事务传播机制
+
+Spring 提供了多种事务传播行为，用来定义当一个方法调用另一个事务方法时，事务的行为方式。通过注解 `@Transactional` 的 `propagation` 属性指定传播行为。
+
+Spring 支持以下 7 种传播行为：
+
+| 传播行为          | 调用方无事务 | 调用方有事务 | 特点           |
+| ------------- | ------ | ------ | ------------ |
+| REQUIRED      | 新建事务   | 加入当前事务 | 默认选项，适合大多数场景 |
+| REQUIRES_NEW  | 新建事务   | 挂起当前事务 | 独立事务，互不影响    |
+| SUPPORTS      | 非事务运行  | 加入当前事务 | 对事务不强依赖      |
+| NOT_SUPPORTED | 非事务运行  | 挂起当前事务 | 忽略事务         |
+| MANDATORY     | 抛出异常   | 加入当前事务 | 必须在事务中运行     |
+| NEVER         | 非事务运行  | 抛出异常   | 禁止事务         |
+| NESTED        | 新建事务   | 嵌套事务   | 支持嵌套事务，部分回滚  |
+
+### 4. 什么是反射？有哪些使用场景？
 
 反射是 Java 的一种机制，允许在运行时获取类的结构信息（如类的名称、方法、字段等），并可以动态创建对象、调用方法或访问字段，而无需在编译时就明确知道类的信息。
 
@@ -101,7 +117,7 @@ Spring事务管理支持：
   
   - 在实现 AOP 时，Spring 使用反射来代理目标对象，并在执行目标方法之前或之后执行切面逻辑。反射允许 Spring 在运行时动态地拦截方法调用并处理切面。
 
-### 4. spring 常用注解有什么？
+### 5. spring 常用注解有什么？
 
 - @Autowired：主要用于自动装配bean。当Spring容器中存在与要注入的属性类型匹配的bean时，它会自动将bean注入到属性中。就跟我们new 对象一样。
 
@@ -117,7 +133,7 @@ Spring事务管理支持：
 
 - @Controller：用于标记一个类作为控制层的组件。它也是@Component注解的特例，用于标记控制层的bean。
 
-### 5. Bean是否单例？
+### 6. Bean是否单例？
 
 Spring 中的 Bean 默认都是单例的。
 
@@ -127,7 +143,19 @@ Spring 中的 Bean 默认都是单例的。
 
 需要注意的是，虽然Spring的默认行为是将Bean设置为单例模式，但在一些情况下，使用多例模式是更为合适的，例如在创建状态不可变的Bean或有状态Bean时。此外，需要注意的是，如果Bean单例是有状态的，那么在使用时需要考虑线程安全性问题。
 
-### 6. MVC分层
+### 7. SpringBoot和SpringMVC的区别？
+
+- **SpringMVC** 主要是一个用于构建 Web 应用的框架，它处理 HTTP 请求，使用控制器（Controller）来处理请求并返回视图，但是需要开发者手动配置很多内容，如 Spring 配置文件、组件扫描。
+
+- **SpringBoot** 是 Spring 框架的一个扩展，提供自动配置和快速启动，简化了 Spring 应用的开发和部署。
+
+### 8. SpringMVC的底层原理
+
+SpringMVC 是 Spring 框架中用于处理 Web 请求的模块。
+
+SpringMVC 的工作由一个核心组件 `DispatcherServlet` 完成。**DispatcherServlet** 是一个前端控制器（Front Controller），负责接收所有的 HTTP 请求，根据请求 URL 和配置的映射规则找到对应的处理器（Controller）。
+
+### 9. MVC分层
 
 MVC全名是Model View Controller，是模型(model)－视图(view)－控制器(controller)的缩写，一种软件设计典范，用一种业务逻辑、数据、界面显示分离的方法组织代码。
 
@@ -139,13 +167,13 @@ MVC全名是Model View Controller，是模型(model)－视图(view)－控制器(
   
   ![8adf9ac99c7014431340c2f196e32526548066a5.png](assets/a60907355deaf1542af0f6893ae260aca6b4f38a.png)
 
-### 7. 为什么使用springboot
+### 10. 为什么使用springboot
 
 - 简化开发：Spring Boot通过提供一系列的开箱即用的组件和自动配置，简化了项目的配置和开发过程，开发人员可以更专注于业务逻辑的实现，而不需要花费过多时间在繁琐的配置上。
 - 快速启动：Spring Boot提供了快速的应用程序启动方式，可通过内嵌的Tomcat、Jetty或Undertow等容器快速启动应用程序，无需额外的部署步骤，方便快捷。
 - 自动化配置：Spring Boot通过自动配置功能，根据项目中的依赖关系和约定俗成的规则来配置应用程序，减少了配置的复杂性，使开发者更容易实现应用的最佳实践。
 
-### 8. 怎么理解SpringBoot中的约定大于配置
+### 11. 怎么理解SpringBoot中的约定大于配置
 
 Spring Boot 的“约定大于配置”原则是一种设计理念，通过减少配置和提供合理的默认值，使得开发者可以更快速地构建和部署应用程序。
 
@@ -154,11 +182,11 @@ Spring Boot通过「自动化配置」和「起步依赖」实现了约定大于
 - 自动化配置：Spring Boot根据项目的依赖和环境自动配置应用程序，无需手动配置大量的XML或Java配置文件。例如，如果项目引入了Spring Web MVC依赖，Spring Boot会自动配置一个基本的Web应用程序上下文。
 - 起步依赖：Spring Boot提供了一系列起步依赖，这些依赖包含了常用的框架和功能，可以帮助开发者快速搭建项目。
 
-### 9. SpringBoot的项目结构是怎么样的？
+### 12. SpringBoot的项目结构是怎么样的？
 
 ![31cbf3fa2494485a2e32a7893a1bc2b8b28d80c0.png](assets/013f49ea79570c3fac375f02f24e254de7c10085.png)
 
-### 10. Spring AOP的原理
+### 13. Spring AOP的原理 ?  怎么使用AOP ?
 
 面向切面编程。在不改变业务代码的前提下，动态地为其添加额外的功能，比如日志记录、事务管理、异常处理等。
 
@@ -166,14 +194,37 @@ Spring AOP 使用**动态代理**来实现 AOP。
 
 Spring AOP 会根据**切点和通知**在运行时动态生成**增强后的代理对象**。目标对象被增强后，实际执行的是代理类。
 
-**动态代理**：
+**动态代理底层实现**：
 
 根据目标对象是否实现接口，Spring AOP会选择不同的代理方式：
 
 - **JDK动态代理**：如果目标对象实现了一个或多个接口，Spring AOP会使用JDK的动态代理生成代理对象。
-- **CGLIB代理**：如果目标对象没有实现接口，Spring AOP会使用CGLIB生成子类代理。CGLIB通过继承目标类并重写方法实现代理功能。
+- **CGLIB动态代理**：如果目标对象没有实现接口，Spring AOP会使用CGLIB生成子类代理。CGLIB通过继承目标类并重写方法实现代理功能。
 
-### 11. AOP实现有哪些注解？AOP 常见的通知类型及术语解释？
+**使用**
+
+- 引入依赖spring-boot-starter-aop
+
+- 定义切面类，使用 `@Aspect` 注解标记为切面类。定义切点（指程序中可以插入切面的具体位置）和通知（在切点处执行的具体逻辑）。
+  
+  ```
+  @Aspect
+  @Component
+  public class LoggingAspect {
+  
+      @Pointcut("execution(* com.example.service.*.*(..))")
+      public void serviceMethods() {}
+  
+      @Before("serviceMethods()")
+      public void logBefore(JoinPoint joinPoint) {
+          System.out.println("Before method: " + joinPoint.getSignature().getName());
+      }
+  }
+  ```
+
+- 在主类或配置类中使用@EnableAspectJAutoProxy注解启用AOP
+
+### 14. AOP实现有哪些注解？AOP 常见的通知类型及术语解释？
 
 切面（Aspect）：横切逻辑的模块化体现，包含一组通知和切点定义。
 
@@ -189,7 +240,7 @@ Spring AOP 会根据**切点和通知**在运行时动态生成**增强后的代
 - @After：在方法执行之后执行通知。
 - @Around：在方法执行前后都执行通知。
 
-### 12.springmvc 处理请求流程
+### 15. springmvc 处理请求流程
 
 - **请求到达** `DispatcherServlet`。（`DispatcherServlet` 是 `Spring MVC` 的核心组件，负责请求的分发）
 - **`DispatcherServlet` 根据 URL 映射查找对应的控制器**（Controller）。
@@ -197,7 +248,7 @@ Spring AOP 会根据**切点和通知**在运行时动态生成**增强后的代
 - **`DispatcherServlet` 调用 `ViewResolver` 查找视图**（如 JSP 页面或 Thymeleaf 模板）。
 - **视图渲染并返回响应**给客户端。
 
-### 13. 说一下 aop 和 ioc，有用过aop吗
+### 16. 说一下 aop 和 ioc，有用过aop吗
 
 AOP：面向切面编程，是一种程序设计思想，旨在通过分离横切关注点（cross-cutting concerns）来提高程序的模块化。横切关注点是那些影响到多个类或模块的功能，比如日志记录、事务管理、性能监控、安全检查等。这些功能通常与业务逻辑代码是分离的，但又需要在多个地方复用。
 
@@ -256,7 +307,7 @@ IoC：是一种程序设计思想，强调控制权的转移。在传统的面�
     public ResponseResult add(@Valid @RequestBody ClientNavCommentAddDTO addDTO) {}
     ```
 
-### 14. bean的生命周期
+### 17. bean的生命周期
 
 - 实例化 -> 当 Spring 容器启动并扫描到需要管理的 Bean 时，通过反射或工厂方法创建 Bean 实例。
 - 属性注入 -> Spring 容器为实例化的 Bean 注入它的依赖属性。
@@ -266,7 +317,7 @@ IoC：是一种程序设计思想，强调控制权的转移。在传统的面�
 - 使用 Bean -> Bean 准备完毕后，Spring 容器会将其交给应用程序使用。
 - 销毁 -> 当 Spring 容器关闭时，或 Bean 的生命周期结束时，Spring 会对 Bean 进行销毁操作。
 
-### 15. springcloud异步线程注解
+### 18. springcloud异步线程注解
 
 Spring 提供了 `@Async` 注解来支持异步方法执行。
 
@@ -274,7 +325,7 @@ Spring 提供了 `@Async` 注解来支持异步方法执行。
 
 - 任何被 `@Async` 注解标注的方法都会在一个单独的线程中执行，而不会阻塞调用线程。
 
-### 16. 怎么查看线程信息
+### 19. 怎么查看线程信息
 
 1. 使用 `Thread` 类查看线程信息
 
@@ -308,7 +359,7 @@ jstack <PID>
 
 - 在命令行输入 `jconsole`，打开图形化界面。选择要监控的Java进程。
 
-### 17. spring启动类注解
+### 20. spring启动类注解
 
 在 Spring 应用中，启动类的注解主要用于标识这是一个 Spring Boot 应用的入口，并引导整个应用的启动流程。
 
@@ -363,7 +414,7 @@ public class Config {
 }
 ```
 
-### 18. springboot底层原理
+### 21. springboot底层原理
 
 基于 Spring 框架构建，并通过一系列的增强机制简化传统 Spring 开发的复杂流程。
 
@@ -382,4 +433,4 @@ public class Config {
 
 - Spring Boot 提供内嵌的 Web 服务器（如 Tomcat、Jetty 或 Undertow），开发者无需自行安装或配置。
 
-### 19.
+### 22.
