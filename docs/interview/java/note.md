@@ -109,9 +109,9 @@ Java 中的 **集合迭代器** 是一种遍历集合元素的机制。
 
 `Iterator` 是一个接口，定义了遍历集合元素的方法，主要方法有：
 
-- **hasNext()**：检查集合中是否还有下一个元素。如果有下一个元素，返回 `true`，否则返回 `false`。
-- **next()**：返回集合中的下一个元素。如果没有元素，抛出 `NoSuchElementException`。
-- **remove()**：删除当前返回的元素。调用 `next()` 方法后，才可以调用 `remove()`，否则会抛出 `IllegalStateException`。
+- hasNext()：检查集合中是否还有下一个元素。如果有下一个元素，返回 `true`，否则返回 `false`。
+- next()：返回集合中的下一个元素。如果没有元素，抛出 `NoSuchElementException`。
+- remove()：删除当前返回的元素。调用 `next()` 方法后，才可以调用 `remove()`，否则会抛出 `IllegalStateException`。
 
 ```
 import java.util.ArrayList;

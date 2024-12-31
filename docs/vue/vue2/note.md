@@ -2273,7 +2273,7 @@ export default {
 
 ### 17.5 plugin插件
 
-webpack]中的插件，就是对webpack现有功能的各种扩展，比如打包优化，文件压缩等等。
+webpack中的插件，就是对webpack现有功能的各种扩展，比如打包优化，文件压缩等等。
 
 **loader和plugin的区别**  
 
@@ -3773,7 +3773,7 @@ axios.all([axios({
 ```
 axios.defaults.baseURL = 'http://httpbin.org'
 axios.defaults.timeout = 5000
- 
+
 axios.all([axios({
   url: '/get'
 }), axios({
@@ -3822,7 +3822,7 @@ main.js
 
 ```
 import {request} from "../network/request";
- 
+
 request({
   url: '/get'
 }).then(res => {
@@ -3868,7 +3868,7 @@ export function request(config) {
     }, err => {
       console.log(err)
     })
- 
+
     return instance(config)
 }
 ```

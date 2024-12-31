@@ -1565,7 +1565,7 @@ npm i axios
 
 获取bootstrap.css(找到链接ctrl+s保存网页即可)：[bootstrap](https://www.bootcdn.cn/twitter-bootstrap/)
 
-存放路径：**/public/css/bootstrap.css**
+存放路径：/public/css/bootstrap.css
 
 `/public/index.html `加一行
 
@@ -2184,9 +2184,13 @@ redux 是一个专门用于状态管理的JS库，可用在React、Vue、Angular
 ![c14b84d9dccb8595bb37b2b8eb42e2d1.png](assets/946df0956feedeee3e36908a9287db4be56bf385.png)
 
 **Action**：是一个普通[JS对象](https://so.csdn.net/so/search?q=JS%E5%AF%B9%E8%B1%A1&spm=1001.2101.3001.7020)，type字段用于描述发生事件的类型，payload字段用于描述发生的具体事情。 
+
 **Action Creator**：是一个创建并返回一个 action 对象的函数。 
+
 **Reducer**：是一个函数，接收当前的state和action对象，必要时决定如何更新状态，并返回新状态，可以将 reducer 视为一个事件监听器。 
+
 **Store**：当前 Redux 应用的 state 存在于一个名为 **store** 的对象中。store 是通过传入一个 reducer 来创建的，并且有一个名为getState的方法，它返回当前状态值。 
+
 **dispatch**：store有一个方法叫dispatch。更新 state 的唯一方法是调用store.dispatch()并传入一个action对象。store 将执行所有 reducer 函数并计算出更新后的 state，调用getState()可以获取新 state。dispatch一个action可以形象的理解为 "触发一个事件"。
 
 **React-Redux 是 React 的官方 Redux UI 绑定库**。如果想要同时使用 Redux 和 React，你也应该使用 React-Redux 来绑定这两个库。
