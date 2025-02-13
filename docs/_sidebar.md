@@ -72,6 +72,8 @@
   
   - [计网](interview/computer_network/note)
   
+  - [操作系统](interview/os/note)
+  
   - [场景题](interview/scenario/note)
   
   - [js+css](interview/js_css/note)
