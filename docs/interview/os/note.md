@@ -1,3 +1,5 @@
+### 2.2 chmod指令
+
 ## 1. 进程管理
 
 ### 1.1 进程 vs 线程
@@ -53,26 +55,26 @@ item buffer[n]
 
 ```
 void producer(){
-	while(1){
-		produce an item in nextp;
-		...
-		while(counter==n)
-		;
-		buffer[in]=nextp;
-		in=(in+1)%n;
-		counter++;
-	}
+    while(1){
+        produce an item in nextp;
+        ...
+        while(counter==n)
+        ;
+        buffer[in]=nextp;
+        in=(in+1)%n;
+        counter++;
+    }
 };
 void consumer(){
-	while(1){
-		while(counter==0)
-		;
-		nextc=buffer[out];
-		out=(out+1)%n;
-		counter--;
-		consume the item in nextc;
-		...
-	}
+    while(1){
+        while(counter==0)
+        ;
+        nextc=buffer[out];
+        out=(out+1)%n;
+        counter--;
+        consume the item in nextc;
+        ...
+    }
 };
 ```
 
@@ -97,78 +99,78 @@ package thread_test;
 
 //消费者
 class Consumer extends Thread {
-	private ShareArea sharedObject;
-	
-	public Consumer(ShareArea shared) {
-		sharedObject = shared;
-	}
-	
-	public void run() {
-		int value;
-		do {
-			try {
-				Thread.sleep((int)(Math.random()*3000));
-			}catch(InterruptedException exception){}
-			value = sharedObject.getSharedInt();	//获取共享整数的值
-			System.out.println("消费："+ value);
-		}while(value != 10);
-	}
+    private ShareArea sharedObject;
+
+    public Consumer(ShareArea shared) {
+        sharedObject = shared;
+    }
+
+    public void run() {
+        int value;
+        do {
+            try {
+                Thread.sleep((int)(Math.random()*3000));
+            }catch(InterruptedException exception){}
+            value = sharedObject.getSharedInt();    //获取共享整数的值
+            System.out.println("消费："+ value);
+        }while(value != 10);
+    }
 }
 
 //生产者
 class Producer extends Thread {
-	private ShareArea sharedObject;
-	
-	public Producer(ShareArea shared) {
-		sharedObject = shared;
-	}
-	
-	public void run() {
-		for(int cnt = 1;cnt <=10 ;cnt++) {
-			try {
-				Thread.sleep((int)(Math.random()*2000));
-			}catch(InterruptedException exception){}
-			sharedObject.setSharedInt(cnt);//更改共享数据
-			System.out.println("生产:" + cnt);
-		}
-	}
+    private ShareArea sharedObject;
+
+    public Producer(ShareArea shared) {
+        sharedObject = shared;
+    }
+
+    public void run() {
+        for(int cnt = 1;cnt <=10 ;cnt++) {
+            try {
+                Thread.sleep((int)(Math.random()*2000));
+            }catch(InterruptedException exception){}
+            sharedObject.setSharedInt(cnt);//更改共享数据
+            System.out.println("生产:" + cnt);
+        }
+    }
 }
 
 //共享数据访问程序
 class ShareArea {
-	private int sharedInt = -1;		//共享整数
-	private boolean writable = true;//条件变量
-	
-	public synchronized void setSharedInt(int value) {
-		while(! writable) {
-			try {
-				wait();				//轮不到生产者写就等待
-			}catch(InterruptedException exception) {}
-		}
-		sharedInt = value;			//生产者写入一个值
-		writable = false;           //消费者操作前，生产者不能写入另一个值
-		notify();					//唤醒等待资源的线程
-	}
-	
-	public synchronized int getSharedInt() {
-		while(writable) {
-			try {
-				wait();				//没轮到消费者就等待
-			}catch(InterruptedException exception) {}
-		}
-		writable = true;			//生产者要等生产者再生产才能消费另一个值
-		notify();					//唤醒等待资源的线程
-		return sharedInt;			//消费者得到数据
-	}
+    private int sharedInt = -1;        //共享整数
+    private boolean writable = true;//条件变量
+
+    public synchronized void setSharedInt(int value) {
+        while(! writable) {
+            try {
+                wait();                //轮不到生产者写就等待
+            }catch(InterruptedException exception) {}
+        }
+        sharedInt = value;            //生产者写入一个值
+        writable = false;           //消费者操作前，生产者不能写入另一个值
+        notify();                    //唤醒等待资源的线程
+    }
+
+    public synchronized int getSharedInt() {
+        while(writable) {
+            try {
+                wait();                //没轮到消费者就等待
+            }catch(InterruptedException exception) {}
+        }
+        writable = true;            //生产者要等生产者再生产才能消费另一个值
+        notify();                    //唤醒等待资源的线程
+        return sharedInt;            //消费者得到数据
+    }
 }
 
 public class SharedTest {
-	public static void main(String args[]) {
-		ShareArea shareObject = new ShareArea();
-		Producer p =new Producer(shareObject);
-		Consumer c =new Consumer(shareObject);
-		p.start();c.start();
-	}	
+    public static void main(String args[]) {
+        ShareArea shareObject = new ShareArea();
+        Producer p =new Producer(shareObject);
+        Consumer c =new Consumer(shareObject);
+        p.start();c.start();
+    }    
 }
 ```
 
@@ -187,4 +189,72 @@ public class SharedTest {
 - 不可剥夺条件：当线程已经持有了资源 ，在自己使用完之前不能被其他线程获取。
 - 环路等待条件：在死锁发生的时候，两个或多个线程获取资源的顺序构成了环形链。
 
+## 2. linux操作系统
 
+### 2.1 linux操作系统和window操作系统
+
+**1. 内核架构**：
+
+- Linux：是monolithic（单体）内核，也就是说，Linux 内核将操作系统的所有核心功能（如文件管理、内存管理、硬件抽象等）都集中在一个大的内核空间中运行。
+
+- Windows：混合内核（Hybrid Kernel），Windows 的内核将一些操作系统的功能分散在内核态和用户态之间，以确保系统的稳定性和效率。（内核态：也叫特权模式，在这个模式下，程序可以执行任何 CPU 指令，并直接访问系统的硬件资源。）（用户态：也叫非特权模式，程序运行时不具有访问硬件的权限，需要通过系统调用system call与内核进行交互）
+
+**2. 文件系统**
+
+- Linux：使用统一的层次化目录结构，所有的磁盘分区、外部设备和文件都挂载到这个根目录/下的某个目录中。
+
+- Windows：使用盘符管理，不同的磁盘和分区之间没有统一的目录结构，文件结构更加直观，但不适合复杂的多设备管理。（假设你有 C:、D: 和 E: 这三个磁盘。后来添加了一个新的磁盘，系统会自动为它分配一个盘符，比如 F:。如果你拔掉某个盘并重新连接，Windows 可能会重新分配盘符，当程序依赖于固定的盘符时，这可能会导致程序路径错误）
+
+**3. 命令行界面（CLI）**
+
+- Linux：Linux 的命令行界面非常强大，几乎所有的操作都可以通过命令行完成。常用的 shell 包括 Bash、Zsh、Fish 等。
+
+- Windows ：也提供命令行界面（CMD 和 PowerShell），但是这些工具功能和灵活性远不及 Linux 的命令行。Windows 主要依赖于图形界面进行操作。
+
+### 2.2 chmod指令
+
+```
+chmod [选项] 模式 文件名
+```
+
+用于改变文件或目录的访问权限。
+
+常见选项-R，表示递归地修改指定目录下的所有文件和子目录的权限。
+
+**数字模式**：三个数字，分别对应 文件所有者（user）、所属组（group）和其他用户（others）的权限。每个数字看成三位二进制，分别对应读权限、写权限和执行权限。
+
+```
+chmod -R 755 mydir
+```
+
+**符号模式**：用字母和符号来表示权限。
+
+- 用户类别：u（文件所有者）、g（所属组）、o（其它用户）、a（所有用户）。
+
+- 操作符：+（添加权限）、-（移除权限）、=（设置权限）。
+
+- 权限字符：r（读权限）、w（写权限）、x（执行权限）。
+
+```
+chmod u+w test.txt
+```
+
+### 2.3 硬链接 和 软链接
+
+**①硬链接**（Hard Link）是一个文件的多个引用，指向同一个inode（索引节点），inode用于存储文件元信息（如文件大小、创建时间、权限等）。多个硬链接实际上共享同一个物理文件数据，只是文件名不同。
+
+```
+ln 源文件 硬链接文件
+```
+
+使用场景：数据备份、版本控制
+
+**②软链接**（Soft Link，也称为符号链接，Symbolic Link）包含的是另一个文件或目录的路径名，当访问软链接时，系统会自动将其解析为指向的源文件或目录。
+
+```
+ln -s 源文件或目录 软链接文件
+```
+
+软链接是一个独立的文件，有自己的 inode，它只存储源文件或目录的路径信息，不存储实际的数据。
+
+使用场景：方便访问（当源文件或目录的路径较长或复杂时，可以创建软链接，使用较短的名称来访问）、软件升级（在软件升级时，可以通过修改软链接指向新的软件版本，而不需要修改其他依赖该软件的配置文件）。
