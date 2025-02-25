@@ -700,9 +700,11 @@ public class Singleton {
 }
 ```
 
-### 43.线程池怎么创建，线程池可以用来干嘛，你用过的是哪种线程池
+### 43.线程池
 
-在 Java 中，线程池是通过 `Executor` 框架来管理的。要创建线程池，通常使用 `Executors` 工厂类中的静态方法。
+（1）在 Java 中，线程池怎么创建？
+
+通常使用 `Executors` 工厂类中的静态方法。
 
 ```
 // 创建一个固定大小的线程池
@@ -713,43 +715,31 @@ ExecutorService executorService = Executors.newFixedThreadPool(5);
 ExecutorService executorService = Executors.newSingleThreadExecutor();
 ```
 
-**线程池的作用**
+（2）线程池的作用
+
+管理和复用线程，从而有效地减少线程创建和销毁的开销，提高程序性能。
 
 在线程池中，多个任务可以被并发执行，因为线程池能够管理多个线程并行处理任务。
 
-线程池可以重复利用现有线程，避免频繁创建和销毁线程带来的系统开销，尤其适用于短生命周期的任务。
+（3）为什么要用动态性线程池
 
-### 44. 为什么要用动态性线程池
+主要是为了**在任务量变化时灵活调整线程数量**，优化资源利用，通过复用线程，避免频繁创建和销毁线程，提高系统的效率和吞吐量。在高负载时，它能增加线程处理任务，低负载时则减少线程，节省资源。
 
-使用动态性线程池是为了**在任务量变化时灵活调整线程数量**，优化资源利用，通过复用线程，避免频繁创建和销毁线程，提高系统的效率和吞吐量。在高负载时，它能增加线程处理任务，低负载时则减少线程，节省资源。
+（4）提交任务流程
 
-### 45. java中的多线程，如何实现的
+①提交任务：调用`execute()`方法（无返回值）或者`submit()`方法（有返回值）来提交任务。
 
-**继承 `Thread` 类**：重写 `run()` 方法，定义线程的行为。启动线程时，通过 `start()` 方法来启动。
+②选择合适的线程：线程池内部有一个任务队列（`BlockingQueue`），线程池通过不同的线程选择策略将任务分配到线程中。如果线程池中有空闲线程，任务会直接分配给空闲线程。如果线程池中的线程都在工作，那么任务会被放入队列中等待执行。
 
-**实现 `Runnable` 接口**：创建一个实现 `Runnable` 接口的类，重写 `run()` 方法。将 `Runnable` 实例传递给 `Thread` 对象，再调用 `start()` 方法启动。
+③线程执行任务：一旦线程空闲出来，或者任务从队列中取出，线程池会选择合适的线程来执行任务。任务执行完成后，线程会被回收或复用。
 
-**使用 `ExecutorService` 创建线程池**：`ExecutorService` 提供了创建和管理线程池的功能，常见线程池包括 `FixedThreadPool`、`CachedThreadPool` 等。通过线程池执行线程时，使用 `execute()` 或 `submit()` 方法提交任务。
+④任务执行完成：如果任务是通过`submit()`提交的，返回的`Future`对象可以用来获取任务执行结果、检查是否完成或取消任务。
 
-### 46. 线程的状态有哪些？线程池的核心概念? 线程池的核心参数？
+（5）线程的状态
 
-**线程的状态**
+新建（New）、就绪（Runnable）、正在运行（Running）、阻塞（Blocked）、等待（Waiting）、超时等待（Timed Waiting）、终止（Terminated）
 
-- 新建（New）：线程被创建但尚未启动，处于新建状态。
-
-- 就绪（Runnable）：线程已经启动并准备好执行。
-
-- 正在运行（Running）：线程正在执行 `run()` 方法中的代码。
-
-- 阻塞（Blocked）：线程因等待某些资源（例如 I/O 操作或锁）而被挂起，无法继续执行。
-
-- 等待（Waiting）：线程进入等待状态，通常是调用 `wait()`、`join()` 或 `sleep()` 等方法时，线程会进入这个状态。
-
-- 超时等待（Timed Waiting）
-
-- 终止（Terminated）
-
-**线程池的基本组件**
+（6）线程池的基本组件
 
 - 核心线程数：线程池中保持活动的线程的最小数量。即使没有任务需要执行，核心线程也会一直存在。
 
@@ -757,7 +747,7 @@ ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 - 工作队列：用于保存提交到线程池的任务的队列。
 
-**线程池的核心参数**
+（7）线程池的核心参数
 
 - corePoolSize（核心线程数）：线程池保持的最小线程数。
 
@@ -769,29 +759,7 @@ ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 - handler（拒绝策略）。
 
-### 47. 线程池的拒绝策略
-
-线程池的拒绝策略（Rejection Policy）是指当线程池中的任务数量达到最大值且所有工作线程都在忙碌时，如何处理新提交的任务。
-
-- **AbortPolicy（默认策略）**
-  
-  - 直接抛出 `RejectedExecutionException` 异常。
-  
-  - 当任务过多，且无法容忍任务丢失时，程序会直接报错，提示任务无法执行。
-
-- **CallerRunsPolicy**
-  
-  - 由提交任务的线程自己执行被拒绝的任务，即当前线程直接执行任务，而不是将其提交到线程池。
-  
-  - 适用于任务提交者愿意承受一定的性能下降或延迟的场景。此策略能减少任务的丢失，但会增加提交任务的线程的负担。
-
-- **DiscardPolicy**
-  
-  - 丢弃当前任务，不抛出异常。
-  
-  - 适用于一些不重要的任务，丢弃它们不会对系统产生影响。
-
-### 48. 线程池如何设置核心线程数
+（8）线程池如何设置核心线程数
 
 1. 通过 `ThreadPoolExecutor` 类的构造函数来设置。
    
@@ -820,7 +788,39 @@ int poolSize = 5; // 设置固定线程池大小（核心线程数即为 poolSiz
 ExecutorService executor = Executors.newFixedThreadPool(poolSize);
 ```
 
-### 49. 讲讲ThreadLocal
+（9）线程池的拒绝策略
+
+线程池的拒绝策略（Rejection Policy）是指当线程池中的任务数量达到最大值且所有工作线程都在忙碌时，如何处理新提交的任务。
+
+- **AbortPolicy（默认策略）**
+  
+  - 直接抛出 `RejectedExecutionException` 异常。
+  
+  - 当任务过多，且无法容忍任务丢失时，程序会直接报错，提示任务无法执行。
+
+- **CallerRunsPolicy**
+  
+  - 由提交任务的线程自己执行被拒绝的任务，即当前线程直接执行任务，而不是将其提交到线程池。
+  
+  - 适用于任务提交者愿意承受一定的性能下降或延迟的场景。此策略能减少任务的丢失，但会增加提交任务的线程的负担。
+
+- **DiscardPolicy**
+  
+  - 丢弃当前任务，不抛出异常。
+  
+  - 适用于一些不重要的任务，丢弃它们不会对系统产生影响。
+
+### 44. 线程
+
+（1）java中的多线程，如何实现的 
+
+**继承 `Thread` 类**：重写 `run()` 方法，定义线程的行为。启动线程时，通过 `start()` 方法来启动。
+
+**实现 `Runnable` 接口**：创建一个实现 `Runnable` 接口的类，重写 `run()` 方法。将 `Runnable` 实例传递给 `Thread` 对象，再调用 `start()` 方法启动。
+
+**使用 `ExecutorService` 创建线程池**：`ExecutorService` 提供了创建和管理线程池的功能，常见线程池包括 `FixedThreadPool`、`CachedThreadPool` 等。通过线程池执行线程时，使用 `execute()` 或 `submit()` 方法提交任务。
+
+（2）讲讲ThreadLocal
 
 `ThreadLocal` 是一种线程隔离机制，它提供了一种方式来确保每个线程都有一个独立的变量副本。
 
@@ -858,7 +858,127 @@ public class ThreadLocalExample {
 }
 ```
 
-### 50. Java的设计模式有哪些
+（3）Java多线程怎么等待其他线程的结果
+
+1. 使用 `Thread.join()`
+
+`join()` 方法使当前线程等待另一个线程完成后再继续运行。
+
+```
+public class JoinExample {
+    public static void main(String[] args) throws InterruptedException {
+        Thread thread = new Thread(() -> {
+            System.out.println("Thread is running...");
+            try {
+                Thread.sleep(2000); // 模拟工作耗时
+                System.out.println("Thread completed.");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+
+        thread.start();
+        System.out.println("Waiting for thread to complete...");
+        thread.join(); // 等待 thread 完成
+        System.out.println("Main thread continues...");
+    }
+}
+```
+
+2. 使用 `CountDownLatch`
+
+`CountDownLatch` 是一个并发工具类，用来实现线程之间的协调，确保一定数量的线程完成后再继续。
+
+```
+import java.util.concurrent.CountDownLatch;
+
+public class CountDownLatchExample {
+    public static void main(String[] args) throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(2);
+
+        Runnable task = () -> {
+            try {
+                System.out.println(Thread.currentThread().getName() + " is working...");
+                Thread.sleep(2000); // 模拟任务耗时
+                System.out.println(Thread.currentThread().getName() + " completed.");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                latch.countDown(); // 减少计数
+            }
+        };
+
+        new Thread(task).start();
+        new Thread(task).start();
+
+        System.out.println("Waiting for tasks to complete...");
+        latch.await(); // 阻塞，直到计数为 0
+        System.out.println("All tasks completed. Main thread continues.");
+    }
+}
+```
+
+（4）线程为什么需要本地内存，不直接读主内存
+
+线程需要本地内存是为了**提高性能**，因为主内存（RAM）访问速度慢，而本地内存（通常对应CPU缓存）访问快，可以减少线程频繁访问主内存的开销。
+
+（5）怎么解决i++的线程安全问题
+
+在多线程环境中，`i++` 操作存在线程安全问题，因为 `i++` 不是原子的，它实际上包含了三个步骤：
+
+1. 读取变量 `i` 的当前值。
+2. 将值增加 1。
+3. 将增加后的值写回到 `i`。
+
+可能会发生以下问题：
+
+- **竞争条件**：两个线程读取到相同的 `i` 值，然后分别增加 1 并写回，最终 `i` 的值增加了 1，但实际上应该增加 2。
+
+**解决**
+
+- 使用 `synchronized` 关键字。可以确保同一时刻只有一个线程执行 `i++` 操作，从而避免线程安全问题。
+
+```
+private int i = 0;
+
+public synchronized void increment() {
+    i++;
+}
+```
+
+- 使用 `AtomicInteger` 类（原子操作）
+
+Java 提供了 `AtomicInteger` 类，它提供了原子性的加法操作。`AtomicInteger` 使用底层硬件的原子指令来保证线程安全，避免了锁的使用，通常比 `synchronized` 更高效。
+
+```
+import java.util.concurrent.atomic.AtomicInteger;
+
+private AtomicInteger i = new AtomicInteger(0);
+
+public void increment() {
+    i.incrementAndGet(); // 等同于 i++
+}
+```
+
+（6）死锁
+
+死锁（Deadlock）是指在多线程或多进程的程序中，两个或多个进程（或线程）相互等待对方释放资源，从而导致所有进程或线程都无法继续执行的情况。锁通常发生在以下四个条件同时满足时：
+
+- **互斥条件（Mutual Exclusion）**：某些资源是不可共享的，必须由一个进程或线程独占。例如，打印机、文件等设备在同一时刻只能被一个线程占用。
+
+- **持有并等待条件（Hold and Wait）**：一个进程已经持有了一些资源，并且还在等待获取其他被其他进程占用的资源。
+
+- **非抢占条件（No Preemption）**：已分配给进程的资源，不能强行抢占，必须等到进程自己释放资源。
+
+- **循环等待条件（Circular Wait）**：存在一种进程的循环等待关系。例如，进程A等待进程B释放资源，而进程B等待进程C释放资源，进程C又等待进程A释放资源。
+
+死锁的预防和解决方法：
+
+- **资源分配策略**：为了避免死锁，可以设计合理的资源分配策略，比如按顺序请求资源，避免出现循环等待。
+
+- **死锁避免**：采用死锁避免算法，如银行家算法，通过动态检查进程资源请求的安全性，避免进入不安全的状态。
+
+### 45. Java的设计模式有哪些
 
 设计模式是指：面对同类软件工程设计问题，总结出来的设计经验，一种通用的解决方案
 
@@ -1116,7 +1236,7 @@ public class PrototypeExample {
 
 - 策略、模板方法、观察者、迭代子模式、责任链模式、命令模式、备忘录模式、状态模式、访问者模式、中介者模式、解释器模式
 
-### 51. A/B实验（也叫A/B测试）
+### 46. A/B实验（也叫A/B测试）
 
 A/B实验（也叫A/B测试）是一种通过对比不同版本的产品或服务，来评估哪种版本更有效的实验方法。在A/B测试中，"A"和"B"代表两个不同的版本或变体，通常是产品、网页、应用等的不同设计、功能或内容。
 
@@ -1127,7 +1247,7 @@ A/B实验（也叫A/B测试）是一种通过对比不同版本的产品或服�
 
 通过A/B测试，分别向两组用户展示不同的按钮，收集点击率数据，分析哪个版本的点击率更高，从而做出相应的改进决策。
 
-### 52. 进程、线程和协程区别，进程与线程的上下文切换区别
+### 47. 进程、线程和协程区别，进程与线程的上下文切换区别
 
 - **进程（Process）**：是操作系统分配资源的基本单位，是正在运行的程序的实例。每个进程拥有独立的内存空间、文件描述符、堆栈等资源。
 - **线程**：是进程的执行单位，也叫做轻量级进程。一个进程可以有多个线程，它们共享同一进程的资源（如内存空间、文件描述符等），但每个线程有自己的堆栈和寄存器等上下文信息。线程之间的切换由操作系统负责。栈空间大，切换成本高。
@@ -1138,7 +1258,7 @@ A/B实验（也叫A/B测试）是一种通过对比不同版本的产品或服�
 - 进程是操作系统分配资源的基本单位，拥有独立的内存空间和资源，进程间相互独立，上下文切换需要保存和恢复更多的信息，如内存管理和文件描述符，因而开销较大。
 - 而线程是进程的执行单位，多个线程共享同一进程的内存空间和资源，而线程上下文切换只涉及少量的CPU寄存器和堆栈指针等，开销较小。
 
-### 53. I/O多路复用
+### 48. I/O多路复用
 
 在传统阻塞I/O中，每个I/O操作都需要独占一个线程等待数据的到来。而**I/O多路复用**通过内核提供的机制，让一个线程能够同时监听多个I/O事件，当其中的某一个或多个通道就绪时，线程会被唤醒来处理这些事件。
 
@@ -1150,7 +1270,7 @@ A/B实验（也叫A/B测试）是一种通过对比不同版本的产品或服�
 
 - 非阻塞：通过异步事件通知，避免线程在等待I/O时被阻塞。
 
-### 54. 操作系统内存的设计可借鉴之处
+### 49. 操作系统内存的设计可借鉴之处
 
 1. 虚拟内存：操作系统通过虚拟内存机制使程序能够使用超出物理内存的空间。在分布式系统中，可以通过类似虚拟内存的抽象，让应用程序认为其拥有大量资源，而实际的物理资源则由系统进行智能调度。这可以提升资源利用率，避免资源不足导致的应用崩溃。
 
@@ -1158,7 +1278,7 @@ A/B实验（也叫A/B测试）是一种通过对比不同版本的产品或服�
 
 3. 自动内存管理：操作系统采用垃圾回收机制自动管理内存的分配与释放，减少内存泄漏的风险。
 
-### 55. Flink的checkpoint机制，存的是什么
+### 50. Flink的checkpoint机制，存的是什么
 
 **Apache Flink** 是一个开源的流处理框架，主要用于大规模的、分布式的、实时数据处理。link 的核心思想是**流式处理**。它将所有的数据处理任务都看作流处理，无论数据是实时产生的流还是批量导入的数据。
 
@@ -1174,7 +1294,7 @@ Flink的Checkpoint机制存储了作业的**操作符状态**、**水位线**、
 
 - 保存的元数据：如作业的配置、作业的执行环境等，用于恢复时重建作业。
 
-### 56. 怎么使用的mybatis plus
+### 51. 怎么使用的mybatis plus
 
 1. 在 `pom.xml` 文件中添加依赖，在 `application.yml` 或 `application.properties` 文件中进行配置
 
@@ -1193,7 +1313,7 @@ Flink的Checkpoint机制存储了作业的**操作符状态**、**水位线**、
    }
    ```
 
-### 57. Lombok 有哪些注解
+### 52. Lombok 有哪些注解
 
 1.`@Getter` 和 `@Setter`
 
@@ -1223,7 +1343,7 @@ Flink的Checkpoint机制存储了作业的**操作符状态**、**水位线**、
 
 相当于组合了 `@Getter`, `@Setter`, `@ToString`, `@EqualsAndHashCode`, 和 `@RequiredArgsConstructor` 注解。
 
-### 58. Linux内核的功能有哪些
+### 53. Linux内核的功能有哪些
 
 **进程管理**：负责进程的创建（如`fork`）和终止（如`exit`），并管理进程的生命周期。Linux内核通过调度算法（如完全公平调度器CFS）决定哪些进程获得CPU时间。还支持进程间通信（IPC）如管道、消息队列、共享内存等。
 
@@ -1235,127 +1355,7 @@ Flink的Checkpoint机制存储了作业的**操作符状态**、**水位线**、
 
 **网络管理**：Linux内核实现了TCP/IP协议栈，支持多种网络协议（如TCP、UDP、IP、ICMP等），提供数据传输、路由、连接管理等功能。防火墙。
 
-### 59. 死锁
-
-死锁（Deadlock）是指在多线程或多进程的程序中，两个或多个进程（或线程）相互等待对方释放资源，从而导致所有进程或线程都无法继续执行的情况。锁通常发生在以下四个条件同时满足时：
-
-- **互斥条件（Mutual Exclusion）**：某些资源是不可共享的，必须由一个进程或线程独占。例如，打印机、文件等设备在同一时刻只能被一个线程占用。
-
-- **持有并等待条件（Hold and Wait）**：一个进程已经持有了一些资源，并且还在等待获取其他被其他进程占用的资源。
-
-- **非抢占条件（No Preemption）**：已分配给进程的资源，不能强行抢占，必须等到进程自己释放资源。
-
-- **循环等待条件（Circular Wait）**：存在一种进程的循环等待关系。例如，进程A等待进程B释放资源，而进程B等待进程C释放资源，进程C又等待进程A释放资源。
-
-死锁的预防和解决方法：
-
-- **资源分配策略**：为了避免死锁，可以设计合理的资源分配策略，比如按顺序请求资源，避免出现循环等待。
-
-- **死锁避免**：采用死锁避免算法，如银行家算法，通过动态检查进程资源请求的安全性，避免进入不安全的状态。
-
-### 60. 怎么解决i++的线程安全问题
-
-在多线程环境中，`i++` 操作存在线程安全问题，因为 `i++` 不是原子的，它实际上包含了三个步骤：
-
-1. 读取变量 `i` 的当前值。
-2. 将值增加 1。
-3. 将增加后的值写回到 `i`。
-
-可能会发生以下问题：
-
-- **竞争条件**：两个线程读取到相同的 `i` 值，然后分别增加 1 并写回，最终 `i` 的值增加了 1，但实际上应该增加 2。
-
-**解决**
-
-- 使用 `synchronized` 关键字。可以确保同一时刻只有一个线程执行 `i++` 操作，从而避免线程安全问题。
-
-```
-private int i = 0;
-
-public synchronized void increment() {
-    i++;
-}
-```
-
-- 使用 `AtomicInteger` 类（原子操作）
-
-Java 提供了 `AtomicInteger` 类，它提供了原子性的加法操作。`AtomicInteger` 使用底层硬件的原子指令来保证线程安全，避免了锁的使用，通常比 `synchronized` 更高效。
-
-```
-import java.util.concurrent.atomic.AtomicInteger;
-
-private AtomicInteger i = new AtomicInteger(0);
-
-public void increment() {
-    i.incrementAndGet(); // 等同于 i++
-}
-```
-
-### 61. Java多线程怎么等待其他线程的结果
-
-1. 使用 `Thread.join()`
-
-`join()` 方法使当前线程等待另一个线程完成后再继续运行。
-
-```
-public class JoinExample {
-    public static void main(String[] args) throws InterruptedException {
-        Thread thread = new Thread(() -> {
-            System.out.println("Thread is running...");
-            try {
-                Thread.sleep(2000); // 模拟工作耗时
-                System.out.println("Thread completed.");
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
-
-        thread.start();
-        System.out.println("Waiting for thread to complete...");
-        thread.join(); // 等待 thread 完成
-        System.out.println("Main thread continues...");
-    }
-}
-```
-
-2. 使用 `CountDownLatch`
-
-`CountDownLatch` 是一个并发工具类，用来实现线程之间的协调，确保一定数量的线程完成后再继续。
-
-```
-import java.util.concurrent.CountDownLatch;
-
-public class CountDownLatchExample {
-    public static void main(String[] args) throws InterruptedException {
-        CountDownLatch latch = new CountDownLatch(2);
-
-        Runnable task = () -> {
-            try {
-                System.out.println(Thread.currentThread().getName() + " is working...");
-                Thread.sleep(2000); // 模拟任务耗时
-                System.out.println(Thread.currentThread().getName() + " completed.");
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } finally {
-                latch.countDown(); // 减少计数
-            }
-        };
-
-        new Thread(task).start();
-        new Thread(task).start();
-
-        System.out.println("Waiting for tasks to complete...");
-        latch.await(); // 阻塞，直到计数为 0
-        System.out.println("All tasks completed. Main thread continues.");
-    }
-}
-```
-
-### 62. 线程为什么需要本地内存，不直接读主内存
-
-线程需要本地内存是为了**提高性能**，因为主内存（RAM）访问速度慢，而本地内存（通常对应CPU缓存）访问快，可以减少线程频繁访问主内存的开销。
-
-### 63. 消息队列了解吗？生产者，消费者，主题之间的关系，如何避免 消费者重复消费？是否允许多个生产者和消费者？
+### 54. 消息队列了解吗？生产者，消费者，主题之间的关系，如何避免 消费者重复消费？是否允许多个生产者和消费者？
 
 **核心概念**
 
@@ -1397,7 +1397,7 @@ public class CountDownLatchExample {
 
 - 通配符模式：交换机和队列进行绑定，并且指定通配符方式的routing key，当发送消息到交换机后，交换机会根据routing key将消息发送到对应的队列。
 
-### 64. 在单台机器部署的情况下，如何对同一个用户加锁以确保接口的线程安全？
+### 55. 在单台机器部署的情况下，如何对同一个用户加锁以确保接口的线程安全？
 
 如果一个用户通过多个线程同时发起操作（如通过多个设备或重复请求），可能导致数据状态的冲突或不一致。对同一个用户加锁的主要目的是确保在多线程并发情况下，涉及同一个用户的关键操作能够保持**线程安全**，避免出现数据不一致、资源竞争或逻辑错误的情况。
 
@@ -1451,7 +1451,7 @@ public class CountDownLatchExample {
   }
   ```
 
-### 65. Mybaits缓存机制
+### 56. Mybaits缓存机制
 
 通过缓存机制，可以避免重复查询同样的数据，从而提高应用程序的响应速度和系统的整体性能。MyBatis 提供了 **一级缓存** 和 **二级缓存** 两种缓存机制。
 
@@ -1478,4 +1478,4 @@ public class CountDownLatchExample {
   </mapper>
   ```
 
-### 66.
+### 57.
