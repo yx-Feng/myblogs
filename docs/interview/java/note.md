@@ -278,7 +278,17 @@ public class IteratorExample {
 
 **（8）了解过 ConcurrentHashMap 吗**
 
-与普通的 `HashMap` 不同，通过细粒度的锁（分段锁）来避免整个 map 被锁住，从而减少了锁竞争，提高了并发性能。在 `ConcurrentHashMap` 中，内部结构被分为多个段，每个段都有独立的锁。当线程需要访问不同段的数据时，它们可以并发进行，而互不干扰。
+JDK 1.7 的 ConcurrentHashMap 采用 Segment 分段锁，多个线程可以并发访问不同的 Segment，提高并发能力。
+
+- `ConcurrentHashMap` 由多个 Segment（段） 组成，类似于一个小型的 `HashMap`。
+
+- 每个 `Segment` 维护一部分数据，并使用 `ReentrantLock` 进行加锁，保证线程安全。
+
+- 每个 `Segment` 内部使用 **数组 + 链表** 存储数据。
+
+JDK 1.8 的 ConcurrentHashMap 移除了 Segment，采用 CAS + Synchronized 机制，在高并发情况下进一步优化，减少了锁的粒度，提高了吞吐量。
+
+
 
 **（9）ConcurrentHashMap和HashMap吞吐量比较**
 
@@ -462,7 +472,22 @@ volatile关键字的作用就是保证共享变量的**可见性**，也就是�
 
 其他情况下volatile并不能保证线程安全问题，因为volatile并不能保证变量操作的原子性。
 
-**（3）synchronized和volatile的区别**
+**（3）synchronized是独占锁吗？可以修饰静态方法？**
+
+`synchronized` 是独占锁。独占锁也称为互斥锁，它在同一时刻只允许一个线程持有该锁并访问共享资源。
+
+`synchronized` 可以修饰静态方法。`synchronized` 修饰静态方法时，使用的锁是该类的 `Class` 对象，所有该类的实例共享这个锁。
+
+```
+public class SynchronizedStaticMethodExample {
+    // 使用 synchronized 修饰静态方法
+    public static synchronized void staticMethod() {
+        // 方法体
+    }
+}
+```
+
+**（4）synchronized和volatile的区别**
 
 `synchronized`和`volatile`都是用来实现线程安全的关键字，但它们的功能和使用场景有所不同。
 
@@ -486,7 +511,7 @@ volatile关键字的作用就是保证共享变量的**可见性**，也就是�
 
 - 适合用于简单的状态标志，例如状态开关、标志变量等，不需要多步操作的共享数据。
 
-**（4）volatile和synchronized的底层原理**
+**（5）volatile和synchronized的底层原理**
 
 **volatile 的底层原理**
 
@@ -500,7 +525,69 @@ volatile关键字的作用就是保证共享变量的**可见性**，也就是�
 
 - 由于 `synchronized` 是排他锁，只有一个线程可以访问临界区代码，确保了操作的原子性。
 
-**（5）synchronized锁升级过程**
+**（6）volatile会不会造成线程阻塞**
+
+不会。
+
+在 Java 中，`volatile` 是一个轻量级的同步机制，主要有两个作用：
+
+- 保证变量的可见性：在多线程环境下，每个线程都有自己的工作内存，变量的值会先从主内存拷贝到工作内存中进行操作，操作完成后再写回主内存。使用 `volatile` 修饰的变量，当一个线程修改了该变量的值，会立即将修改后的值刷新到主内存中，并且会使其他线程工作内存中该变量的副本失效，从而保证其他线程能够立即看到最新的值。
+- 禁止指令重排序：在 Java 编译器和处理器为了提高性能，可能会对指令进行重排序。使用 `volatile` 修饰的变量，会在编译和运行时禁止特定类型的指令重排序，保证代码的执行顺序符合程序员的预期。
+
+线程阻塞通常是指线程在执行过程中由于某种原因（如等待锁、等待 I/O 操作完成等）而暂停执行，进入阻塞状态，直到满足特定条件后才会继续执行。`olatile` 关键字只是保证了变量的可见性和禁止指令重排序，它并不涉及线程的阻塞和唤醒机制。
+
+**（7）volatile和synchronized是否能被编译器优化**
+
+编译器通常不会对 `volatile` 变量进行优化，编译器和 JVM 会对 `synchronized` 代码块或方法进行一些优化，以提高性能。例如：
+
+**锁粗化**：如果一系列的连续操作都对同一个对象加锁和解锁，编译器会将这些锁操作合并成一个更大范围的锁，减少加锁和解锁的次数。
+
+```
+public class LockCoarseningExample {
+    private Object lock = new Object();
+
+    public void method() {
+        synchronized (lock) {
+            // 操作 1
+        }
+        synchronized (lock) {
+            // 操作 2
+        }
+    }
+}
+```
+
+编译器可能会将上述代码优化为：
+
+```
+public class LockCoarseningExample {
+    private Object lock = new Object();
+
+    public void method() {
+        synchronized (lock) {
+            // 操作 1
+            // 操作 2
+        }
+    }
+}
+```
+
+**锁消除**：如果编译器通过逃逸分析发现某个锁对象只能被一个线程访问，不存在多线程竞争的情况，就会将锁操作消除。
+
+```
+public class LockEliminationExample {
+    public void method() {
+        Object lock = new Object();
+        synchronized (lock) {
+            // 操作
+        }
+    }
+}
+```
+
+由于 `lock` 对象只在 `method` 方法内部使用，不会被其他线程访问，编译器可能会将 `synchronized` 块消除。
+
+**（8）synchronized锁升级过程**
 
 - **偏向锁（Biased Locking）**
   
@@ -520,7 +607,7 @@ volatile关键字的作用就是保证共享变量的**可见性**，也就是�
   
   - 重量级锁会导致线程进入阻塞状态，性能开销较大。
 
-**（6）原子性和可见性是什么**
+**（9）原子性和可见性是什么**
 
 **原子性**：是指一个操作是不可分割的，要么完整地执行完毕，要么不执行（在多线程环境下）。原子操作意味着在操作的过程中，任何其他线程都不能看到操作处于中间状态。
 
@@ -530,9 +617,21 @@ volatile关键字的作用就是保证共享变量的**可见性**，也就是�
 
 为了确保一个线程对共享变量的修改能够被其他线程及时看到，避免因线程之间对共享数据的视图不一致而导致程序出现错误或不正确的行为。 
 
+**（10）ReentrantLock底层实现**
+
+`ReentrantLock` 是 Java 并发包（`java.util.concurrent.locks`）中一个可重入的互斥锁，它的底层主要基于 `AbstractQueuedSynchronizer`（AQS）实现。
+
+`ReentrantLock` 内部使用一个继承自 AQS 的静态内部类 `Sync` 来实现锁的同步机制。
+
+`Sync` 有两个子类 `FairSync`（公平锁）和 `NonfairSync`（非公平锁），分别用于实现公平锁和非公平锁的逻辑。
+
+AQS 是一个用于构建锁和同步器的框架，它使用一个整型的状态变量 `state` 来表示锁的状态，通过一个双向链表来管理等待线程。
+
+
+
 ### 5.线程池
 
-（1）在 Java 中，线程池怎么创建？
+**（1）在 Java 中，线程池怎么创建？**
 
 通常使用 `Executors` 工厂类中的静态方法。
 
@@ -545,17 +644,17 @@ ExecutorService executorService = Executors.newFixedThreadPool(5);
 ExecutorService executorService = Executors.newSingleThreadExecutor();
 ```
 
-（2）线程池的作用
+**（2）线程池的作用**
 
 管理和复用线程，从而有效地减少线程创建和销毁的开销，提高程序性能。
 
 在线程池中，多个任务可以被并发执行，因为线程池能够管理多个线程并行处理任务。
 
-（3）为什么要用动态性线程池
+**（3）为什么要用动态性线程池**
 
 主要是为了**在任务量变化时灵活调整线程数量**，优化资源利用，通过复用线程，避免频繁创建和销毁线程，提高系统的效率和吞吐量。在高负载时，它能增加线程处理任务，低负载时则减少线程，节省资源。
 
-（4）提交任务流程
+**（4）提交任务流程**
 
 ①提交任务：调用`execute()`方法（无返回值）或者`submit()`方法（有返回值）来提交任务。
 
@@ -565,11 +664,11 @@ ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 ④任务执行完成：如果任务是通过`submit()`提交的，返回的`Future`对象可以用来获取任务执行结果、检查是否完成或取消任务。
 
-（5）线程的状态
+**（5）线程的状态**
 
 新建（New）、就绪（Runnable）、正在运行（Running）、阻塞（Blocked）、等待（Waiting）、超时等待（Timed Waiting）、终止（Terminated）
 
-（6）线程池的基本组件
+**（6）线程池的基本组件**
 
 - 核心线程数：线程池中保持活动的线程的最小数量。即使没有任务需要执行，核心线程也会一直存在。
 
@@ -577,7 +676,7 @@ ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 - 工作队列：用于保存提交到线程池的任务的队列。
 
-（7）线程池的核心参数
+**（7）线程池的核心参数**
 
 - corePoolSize（核心线程数）：线程池保持的最小线程数。
 
@@ -589,7 +688,7 @@ ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 - handler（拒绝策略）。
 
-（8）线程池如何设置核心线程数
+**（8）线程池如何设置核心线程数**
 
 1. 通过 `ThreadPoolExecutor` 类的构造函数来设置。
    
@@ -618,31 +717,138 @@ int poolSize = 5; // 设置固定线程池大小（核心线程数即为 poolSiz
 ExecutorService executor = Executors.newFixedThreadPool(poolSize);
 ```
 
-（9）线程池的拒绝策略
+**（9）线程池的拒绝策略**
 
 线程池的拒绝策略（Rejection Policy）是指当线程池中的任务数量达到最大值且所有工作线程都在忙碌时，如何处理新提交的任务。
 
-- **AbortPolicy（默认策略）**
-  
-  - 直接抛出 `RejectedExecutionException` 异常。
-  
-  - 当任务过多，且无法容忍任务丢失时，程序会直接报错，提示任务无法执行。
+- **AbortPolicy（默认策略）**：当任务被拒绝时，直接抛出 `RejectedExecutionException` 异常，阻止系统正常工作。
 
-- **CallerRunsPolicy**
-  
-  - 由提交任务的线程自己执行被拒绝的任务，即当前线程直接执行任务，而不是将其提交到线程池。
-  
-  - 适用于任务提交者愿意承受一定的性能下降或延迟的场景。此策略能减少任务的丢失，但会增加提交任务的线程的负担。
+- **CallerRunsPolicy**：当任务被拒绝时，由提交任务的线程（调用 `execute` 方法的线程）来执行该任务。
 
-- **DiscardPolicy**
-  
-  - 丢弃当前任务，不抛出异常。
-  
-  - 适用于一些不重要的任务，丢弃它们不会对系统产生影响。
+- **DiscardPolicy**：当任务被拒绝时，直接丢弃该任务，不会抛出任何异常，也不会有任何提示。
+
+- **DiscardOldestPolicy**：当任务被拒绝时，丢弃任务队列中最老的任务（即队列头部的任务），然后尝试重新提交当前任务。
+
+- 除了这四种内置的拒绝策略，你还可以通过实现 `RejectedExecutionHandler` 接口来自定义拒绝策略。
+
+**（10）线程池线程出异常，主线程怎么感知**
+
+①使用 `Future` 对象获取异常信息
+
+当使用 `ExecutorService.submit()` 方法提交任务时，会返回一个 `Future` 对象。可以通过调用 `Future.get()` 方法来获取任务的执行结果，若任务执行过程中抛出异常，`get()` 方法会将该异常重新抛出，主线程可以捕获该异常。
+
+```
+import java.util.concurrent.*;
+
+public class FutureExceptionHandling {
+    public static void main(String[] args) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<?> future = executor.submit(() -> {
+            // 模拟抛出异常
+            throw new RuntimeException("线程执行过程中出现异常");
+        });
+
+        try {
+            // 获取任务结果
+            future.get();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.out.println("线程被中断: " + e.getMessage());
+        } catch (ExecutionException e) {
+            // 获取任务抛出的异常
+            Throwable cause = e.getCause();
+            System.out.println("任务执行出现异常: " + cause.getMessage());
+        }
+
+        executor.shutdown();
+    }
+}
+```
+
+②可以继承 `ThreadPoolExecutor` 类，重写 `afterExecute` 方法，在任务执行完成后检查是否抛出异常。
+
+```
+import java.util.concurrent.*;
+
+public class AfterExecuteExceptionHandling extends ThreadPoolExecutor {
+    public AfterExecuteExceptionHandling(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {
+        super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
+    }
+
+    @Override
+    protected void afterExecute(Runnable r, Throwable t) {
+        super.afterExecute(r, t);
+        if (t == null && r instanceof Future<?>) {
+            try {
+                Future<?> future = (Future<?>) r;
+                if (future.isDone()) {
+                    future.get();
+                }
+            } catch (CancellationException ce) {
+                t = ce;
+            } catch (ExecutionException ee) {
+                t = ee.getCause();
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        if (t != null) {
+            System.out.println("任务执行出现异常: " + t.getMessage());
+        }
+    }
+
+    public static void main(String[] args) {
+        AfterExecuteExceptionHandling executor = new AfterExecuteExceptionHandling(
+                1, 1, 0L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<>()
+        );
+
+        executor.submit(() -> {
+            // 模拟抛出异常
+            throw new RuntimeException("线程执行过程中出现异常");
+        });
+
+        executor.shutdown();
+    }
+}
+```
+
+③自定义 `ThreadFactory` 捕获异常
+
+可以自定义 `ThreadFactory`，在创建线程时为线程设置 `UncaughtExceptionHandler`，当线程抛出未捕获的异常时，会调用该处理器进行处理。
+
+```
+import java.util.concurrent.*;
+
+public class CustomThreadFactoryExceptionHandling {
+    public static void main(String[] args) {
+        ThreadFactory customThreadFactory = r -> {
+            Thread thread = new Thread(r);
+            thread.setUncaughtExceptionHandler((t, e) -> {
+                System.out.println("线程 " + t.getName() + " 出现异常: " + e.getMessage());
+            });
+            return thread;
+        };
+
+        ExecutorService executor = new ThreadPoolExecutor(
+                1, 1, 0L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<>(),
+                customThreadFactory
+        );
+
+        executor.submit(() -> {
+            // 模拟抛出异常
+            throw new RuntimeException("线程执行过程中出现异常");
+        });
+
+        executor.shutdown();
+    }
+}
+```
 
 ### 6. 线程
 
-（1）java中的多线程，如何实现的 
+**（1）java中的多线程，如何实现的**
 
 **继承 `Thread` 类**：重写 `run()` 方法，定义线程的行为。启动线程时，通过 `start()` 方法来启动。
 
@@ -650,7 +856,7 @@ ExecutorService executor = Executors.newFixedThreadPool(poolSize);
 
 **使用 `ExecutorService` 创建线程池**：`ExecutorService` 提供了创建和管理线程池的功能，常见线程池包括 `FixedThreadPool`、`CachedThreadPool` 等。通过线程池执行线程时，使用 `execute()` 或 `submit()` 方法提交任务。
 
-（2）讲讲ThreadLocal
+**（2）讲讲ThreadLocal**
 
 `ThreadLocal` 是一种线程隔离机制，它提供了一种方式来确保每个线程都有一个独立的变量副本。
 
@@ -688,7 +894,7 @@ public class ThreadLocalExample {
 }
 ```
 
-（3）Java多线程怎么等待其他线程的结果
+**（3）Java多线程怎么等待其他线程的结果**
 
 1. 使用 `Thread.join()`
 
@@ -748,11 +954,11 @@ public class CountDownLatchExample {
 }
 ```
 
-（4）线程为什么需要本地内存，不直接读主内存
+**（4）线程为什么需要本地内存，不直接读主内存**
 
 线程需要本地内存是为了**提高性能**，因为主内存（RAM）访问速度慢，而本地内存（通常对应CPU缓存）访问快，可以减少线程频繁访问主内存的开销。
 
-（5）怎么解决i++的线程安全问题
+**（5）怎么解决i++的线程安全问题**
 
 在多线程环境中，`i++` 操作存在线程安全问题，因为 `i++` 不是原子的，它实际上包含了三个步骤：
 
@@ -790,7 +996,7 @@ public void increment() {
 }
 ```
 
-（6）死锁
+**（6）死锁**
 
 死锁（Deadlock）是指在多线程或多进程的程序中，两个或多个进程（或线程）相互等待对方释放资源，从而导致所有进程或线程都无法继续执行的情况。锁通常发生在以下四个条件同时满足时：
 
