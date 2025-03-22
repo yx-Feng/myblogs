@@ -242,7 +242,7 @@ Collection接口有三个主要的子接口：List接口、Set接口、Queue接�
 
 - List接口：有序、可重复的集合，常见实现类：ArrayList、LinkedList、Vector。
 
-- Set接口：无序、不可重复的接口，常见实现类：HashSet、TreeSet、LinkedHashSet。
+- Set接口：无序、不可重复的集合，常见实现类：HashSet、TreeSet、LinkedHashSet。
 
 - Queue接口：用于模拟队列这种先进先出（FIFO）的数据结构，常见的实现类有： LinkedList、PriorityQueue。
 
