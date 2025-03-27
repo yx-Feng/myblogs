@@ -368,7 +368,7 @@ jstack <PID>
 
 - 在命令行输入 `jconsole`，打开图形化界面。选择要监控的Java进程。
 
-### 19. spring启动类注解
+### 19. springBoot启动类注解
 
 在 Spring 应用中，启动类的注解主要用于标识这是一个 Spring Boot 应用的入口，并引导整个应用的启动流程。
 
@@ -376,34 +376,13 @@ jstack <PID>
 
 它是一个复合注解，包含了多个重要的注解。
 
-- `@SpringBootConfiguration`
-  
-  - 是 `@Configuration` 的扩展，标识当前类是一个配置类。
-  - 表示该类可以定义 `@Bean` 方法，来注册 Bean 到 Spring 容器中。
+- `@SpringBootConfiguration`：继承自`@Configuration`，用于标识当前类是一个 Spring Boot 配置类。
 
-- `@EnableAutoConfiguration`
-  
-  - 启用 Spring Boot 的自动配置功能，根据类路径下的依赖和配置文件自动配置 Spring 应用环境。
-  - 可以通过 `spring.autoconfigure.exclude` 属性排除特定的自动配置类。
+- `@EnableAutoConfiguration`：启用 Spring Boot 的自动配置功能，根据类路径下的依赖和配置文件自动配置 Spring 组件（如 Web、JPA、Security）。
 
-- `@ComponentScan`
-  
-  - 启用组件扫描，默认扫描当前启动类所在包及其子包，发现并注册标注了 `@Component`、`@Service`、`@Repository`、`@Controller` 等注解的类为 Spring 的 Bean。
+- `@ComponentScan`：自动扫描 @Component、@Service、@Repository、@Controller 等 Spring 组件，并注册到 Spring 容器。
 
-```
-@SpringBootApplication
-public class Application {
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
-    }
-}
-```
-
-**2. @SpringBootConfiguration、@EnableAutoConfiguration、@ComponentScan**
-
-独立使用也可以
-
-**3. @Import**
+**2. @Import**
 
 用于导入额外的配置类或组件。可以传入一个或多个类作为参数，Spring 会将这些类作为配置类或组件注册到容器中。
 
@@ -413,7 +392,7 @@ public class MainConfig {
 }
 ```
 
-**4. @PropertySource**
+**3. @PropertySource**
 
 用于加载外部的属性文件到 Spring 环境中。
 

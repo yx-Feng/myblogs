@@ -279,6 +279,59 @@ List<String> filteredNames = names.stream()
     .collect(Collectors.toList());
 ```
 
+**（18）lambda表达式为什么使用作用域内局部变量时，提示必须为有效final？**
+
+Lambda 表达式的本质是 匿名内部类，而 匿名内部类只能访问 final 变量。
+
+Lambda 表达式可以捕获其所在作用域中的局部变量。捕获的本质是，Lambda 表达式内部会保存这些局部变量的副本。
+
+如果在 Lambda 表达式执行期间，变量的值发生改变，而 Lambda 表达式内部保存的是旧值，这就会造成数据不一致的问题。
+
+```
+public class LambdaTest {
+  public static void main(String[] args) {
+    int num = 10;
+    Runnable r = () -> System.out.println(num); // 假设允许使用 num
+    num = 20; // 如果修改 num，Lambda 可能访问到错误的值
+    r.run(); // 这个时候 num 是 10 还是 20？
+  }
+}
+```
+
+**（19）编译完的class字节码是二进制存储的吗？**
+
+.class 文件存储的内容是 二进制数据，按照特定的结构组织，包括：
+
+- 魔数（Magic Number）：0xCAFEBABE（用于标识文件类型）。
+
+- 版本号（Minor Version、Major Version）。
+
+- 常量池（Constant Pool）：存储字符串、类名、方法名等。
+
+- 访问标志（Access Flags）：类的修饰符（如 public、abstract）。
+
+- 类、父类信息。
+
+- 字段（Fields）信息。
+
+- 方法（Methods）信息。
+
+- 字节码指令（方法的具体实现）。
+
+- 异常表（Exception Table）。
+
+- 属性表（Attributes）：包括行号表、局部变量表等。
+
+**（20）Java是解释型还是编译型语言？**
+
+属于 "半编译半解释" 的语言。
+
+Java 代码的执行涉及两个关键步骤：
+
+1.编译（Compile）：Java 源代码（.java）首先被 Javac 编译器编译成 字节码（.class 文件），这不是直接的机器码，而是一种中间代码。
+
+2.解释/即时编译（Interpret/JIT Compile）：最初，JVM 采用解释器（Interpreter），逐行将字节码转换为对应的机器指令并执行，速度较慢。为了提升性能，JVM 的即时编译器（JIT Compiler） 会将热点代码（经常执行的部分）直接编译为本地机器码，从而加速执行。
+
 ### 2. Java集合
 
 **（1）谈谈对java集合的理解**
