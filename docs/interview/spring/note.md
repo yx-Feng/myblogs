@@ -167,6 +167,18 @@ MVC全名是Model View Controller，是模型(model)－视图(view)－控制器(
   
   ![8adf9ac99c7014431340c2f196e32526548066a5.png](assets/a60907355deaf1542af0f6893ae260aca6b4f38a.png)
 
+典型的 SpringMVC 分层结构主要包括以下几个层次： 
+
+- 表现层（Controller 层）：处理前端请求，调用业务逻辑层，返回视图或数据（如 JSON）。
+
+- 业务逻辑层（Service 层）：封装核心业务逻辑，处理事务，协调各个 DAO 的调用。
+
+- 数据访问层（DAO / Repository 层）：封装对数据库的访问操作，如增删改查。
+
+- 实体层（Entity / Model / Domain）：用于表示数据库中的表结构或业务对象。
+
+- 
+
 ### 10. 为什么使用springboot
 
 - 简化开发：Spring Boot通过提供一系列的开箱即用的组件和自动配置，简化了项目的配置和开发过程，开发人员可以更专注于业务逻辑的实现，而不需要花费过多时间在繁琐的配置上。

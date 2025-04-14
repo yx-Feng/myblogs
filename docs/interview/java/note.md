@@ -18,6 +18,17 @@
 
 异常（Exception）是指程序在执行过程中遇到的错误或不可预见的情况，通常会导致程序的正常执行中断。
 
+`Throwable` 是所有错误和异常的根类。它有两个直接子类：Error和Exception。
+
+```
+java.lang.Object
+  └── java.lang.Throwable
+        ├── java.lang.Error        ⟶ 一般表示严重错误，程序无法处理
+        └── java.lang.Exception    ⟶ 一般表示程序可以处理的异常
+              ├── java.lang.RuntimeException   ⟶ 运行时异常（非受检异常）
+              └── 非 RuntimeException 的异常   ⟶ 受检异常（Checked Exception）
+```
+
 Java中的异常大体上分为两类：
 
 - 受检异常（Checked Exception）：程序在编译时必须处理的异常。
@@ -332,6 +343,32 @@ Java 代码的执行涉及两个关键步骤：
 
 2.解释/即时编译（Interpret/JIT Compile）：最初，JVM 采用解释器（Interpreter），逐行将字节码转换为对应的机器指令并执行，速度较慢。为了提升性能，JVM 的即时编译器（JIT Compiler） 会将热点代码（经常执行的部分）直接编译为本地机器码，从而加速执行。
 
+**（21）类加载过程**
+
+Java 中的类加载过程是指 Java 虚拟机（JVM）将 `.class` 文件加载到内存中，并将其转化为 `Class` 对象的过程。整个类加载过程主要包括以下五个阶段：
+
+- 加载：JVM 通过类的全限定名（包名 + 类名）查找并加载 `.class` 字节码文件。将字节码读入内存，构造 `Class` 对象。
+
+- 连接：
+  
+  - 验证：验证字节码的正确性，确保不会破坏JVM的安全性。
+  
+  - 准备：为类的静态变量分配内存并赋默认值（不是初始值）。
+  
+  - 解析：将类中的**符号引用**（如方法名、字段名）替换为**直接引用**（内存地址）。
+
+- 初始化：执行类构造器 `<clinit>()` 方法，初始化静态变量。若父类未初始化，会先初始化父类。静态代码块也在这个阶段执行。
+  
+  ```
+  static {
+      // 静态初始化代码
+  }
+  ```
+
+- 使用：类被正常使用，如创建对象、调用静态方法等。
+
+- 卸载：当 `ClassLoader` 和该类不再被引用时，GC 会回收该 `Class` 对象。
+
 ### 2. Java集合
 
 **（1）谈谈对java集合的理解**
@@ -471,7 +508,15 @@ JDK 1.8 的 ConcurrentHashMap 摒弃了 `Segment` 分段锁的设计，采用�
 
 `CAS` 是一种无锁算法，它包含三个操作数：内存位置（V）、预期原值（A）和新值（B）。如果内存位置的值与预期原值相匹配，那么处理器会自动将该位置值更新为新值。否则，处理器不做任何操作。整个比较并交换的操作是原子性的。
 
-应用场景：在 `ConcurrentHashMap` 中，`CAS` 主要用于初始化数组、扩容时的节点迁移等操作。例如，在初始化数组时，多个线程可能会同时尝试初始化，使用 `CAS` 可以确保只有一个线程能够成功初始化，其他线程会重试。
+CAS 是一种 **乐观锁** 思想的实现 —— 我假设在我操作的过程中，数据不会被别的线程改掉；如果被改了，那我就重试。**核心思想**：只有当当前值 == 预期值时，才更新为新值。否则，不做任何操作。
+
+应用场景：通过 CAS 操作，`ConcurrentHashMap` 实现了 无锁并发操作，允许多个线程高效地同时修改不同的桶（bucket）中的数据，而不会导致阻塞。在 `ConcurrentHashMap` 中，CAS 主要用于以下几个操作：
+
+1. 插入或更新元素：在桶中插入或更新值时，`ConcurrentHashMap` 会使用 CAS 来保证操作的原子性。
+
+2. 删除元素：删除桶中的元素时，也会使用 CAS 来确保删除的操作是线程安全的。
+
+3. 扩容：在容量不足时，`ConcurrentHashMap` 会使用 CAS 来扩展和重新分配数据结构。
 
 **Synchronized**
 
@@ -812,9 +857,9 @@ ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 - maximumPoolSize（最大线程数）：线程池允许创建的最大线程数。
 
-- keepAliveTime（线程空闲时间）：当线程池中的线程数超过核心线程数时，多余的空闲线程在 `keepAliveTime` 时间内会被终止。
+- keepAliveTime（空闲线程存活时间）：当线程池中的线程数超过核心线程数时，多余的空闲线程在 `keepAliveTime` 时间内会被终止。
 
-- workQueue（工作队列）：用来保存待执行任务的阻塞队列。
+- workQueue（任务队列）：用来保存待执行任务的阻塞队列。
 
 - handler（拒绝策略）。
 
@@ -1154,6 +1199,55 @@ public void increment() {
 
 - 进程是操作系统分配资源的基本单位，拥有独立的内存空间和资源，进程间相互独立，上下文切换需要保存和恢复更多的信息，如内存管理和文件描述符，因而开销较大。
 - 而线程是进程的执行单位，多个线程共享同一进程的内存空间和资源，而线程上下文切换只涉及少量的CPU寄存器和堆栈指针等，开销较小。
+
+**（8）手写一个两个线程交替输出字符**
+
+```
+public class AlternatePrint {
+
+    private static final Object lock = new Object();
+    private static boolean printA = true; // 控制打印顺序
+
+    public static void main(String[] args) {
+        Thread threadA = new Thread(() -> {
+            for (int i = 0; i < 10; i++) {
+                synchronized (lock) {
+                    while (!printA) {
+                        try {
+                            lock.wait(); // 等待B打印完
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+                    System.out.print("A ");
+                    printA = false; // 下一轮该B打印了
+                    lock.notify();
+                }
+            }
+        });
+
+        Thread threadB = new Thread(() -> {
+            for (int i = 0; i < 10; i++) {
+                synchronized (lock) {
+                    while (printA) {
+                        try {
+                            lock.wait(); // 等待A打印完
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+                    System.out.print("B ");
+                    printA = true; // 下一轮该A打印了
+                    lock.notify();
+                }
+            }
+        });
+
+        threadA.start();
+        threadB.start();
+    }
+}
+```
 
 ### 7. Java的设计模式有哪些
 
