@@ -480,7 +480,15 @@ public class IteratorExample {
 
 - 使用 `ConcurrentHashMap`：`ConcurrentHashMap`是一个线程安全的哈希表，是`HashMap`的一个改进版本，专门为多线程环境设计。`ConcurrentHashMap`采用分段锁机制，将数据分为多个段，每个段可以独立加锁，减少了锁竞争，从而提高了并发性能。
 
-**（7）hashmap和hashtable区别**
+**（7）什么时候会触发 hashmap 的扩容**
+
+`HashMap` 会在元素数量超过阈值（threshold）时触发扩容。
+
+当前元素个数 > 负载因子（load factor） × 当前数组容量（capacity）
+
+扩容机制：新容量 = 原容量 × 2（即翻倍）、将原数组中的元素 重新哈希，分配到新数组的位置。
+
+**（8）hashmap和hashtable区别**
 
 `HashMap` 适合单线程或不需要线程安全的场景，性能较高；`Hashtable` 是线程安全的，但性能较低。
 
@@ -490,7 +498,7 @@ public class IteratorExample {
 
 （通过**同步机制**，可以确保在同一时间只有一个线程访问某一段代码或资源，其他线程必须等待该资源被释放后才能访问）
 
-**（8）了解过 ConcurrentHashMap 吗**
+**（9）了解过 ConcurrentHashMap 吗**
 
 JDK 1.7 的 ConcurrentHashMap 采用 Segment 分段锁，多个线程可以并发访问不同的 Segment（一个 `Segment` 可以包含多个桶（数组元素）），提高并发能力。
 
@@ -518,21 +526,65 @@ CAS 是一种 **乐观锁** 思想的实现 —— 我假设在我操作的过�
 
 3. 扩容：在容量不足时，`ConcurrentHashMap` 会使用 CAS 来扩展和重新分配数据结构。
 
+**CAS 在实际应用中的常见问题**
+
+**①ABA 问题**
+
+CAS 的比较逻辑是：
+
+```
+if (内存中的值 == 预期值) {
+    更新值
+}
+```
+
+但如果，内存值从 **A → B → A**，你还是会认为它没变（但其实已经变了两次）
+
+解决：使用 **带版本号** 的变量，比如 `AtomicStampedReference`、`AtomicMarkableReference`。
+
+**②自旋消耗 CPU**
+
+CAS 是通过不断地重试实现的（叫做“自旋”）：
+
+```
+while (!compareAndSwap(...)) {
+    // retry
+}
+```
+
+在高并发或者冲突频繁时，大量线程竞争同一资源，可能导致 CPU 占用升高、线程一直在空转。
+
 **Synchronized**
 
 `Synchronized` 是 Java 中的关键字，用于实现同步机制，确保同一时刻只有一个线程能够访问被 `Synchronized` 修饰的代码块或方法。
 
 应用场景：在 `ConcurrentHashMap` 中，`Synchronized` 主要用于对桶（`bin`）进行加锁，当多个线程同时访问同一个桶时，会使用 `Synchronized` 对该桶进行加锁，从而保证线程安全。
 
-**（9）ConcurrentHashMap和HashMap吞吐量比较**
+**（10）ConcurrentHashMap和HashMap吞吐量比较**
 
 单线程环境：`HashMap` 性能更优，因为它没有额外的加锁开销。`ConcurrentHashMap` 由于涉及锁的操作，性能稍低。
 
 多线程环境：`HashMap` 在多线程环境下可能会发生数据竞争，如果多个线程同时修改 `HashMap`，可能会导致 死循环、数据丢失 等问题。`ConcurrentHashMap` 采用 细粒度锁，吞吐量更高。
 
-**（10）使用hashmap时，如果只重写了equals没有重写hashcode会出现什么问题**
+**（11）使用hashmap时，如果只重写了equals没有重写hashcode会出现什么问题**
 
 `HashMap` 使用键的 `hashCode()` 值来确定存储位置，如果只重写 `equals()`，两个对象可能在逻辑上是相等的（`equals()` 返回 `true`），但如果它们的 `hashCode()` 值不同，则 `HashMap` 会认为它们属于不同的桶，导致**无法正确地定位或替换已有元素**。
+
+**（12）如何解决 hash 冲突**
+
+**拉链法（Chaining）** – HashMap 的默认策略
+
+每个桶存放一个链表，如果发生哈希冲突，将新元素添加到该桶的链表中。链表长度超过 8 且桶数量超过 64 → 转为 红黑树，提高查询效率（JDK 1.8 起）。
+
+**再哈希（Rehashing）**
+
+当冲突太多时，进行扩容并重新分布数据。这也是Java HashMap扩容时的主要操作。
+
+**（13）如果有两个线程同时往 hashmap 去 put 同一个 key 不同的 value 会有什么风险**
+
+HashMap 在多线程环境下不是线程安全的，不能同时进行写操作，否则会出现覆盖（一个线程的 `put` 会覆盖另一个线程的操作）、不可预知的结果（因为操作非原子，最终的值可能是两个线程中任意一个的 value）等问题。
+
+
 
 ### 3. JVM
 
@@ -1529,6 +1581,10 @@ AQS 即 AbstractQueuedSynchronizer，是 Java 并发包（`java.util.concurrent`
 **布隆过滤器**（Bloom Filter）是一种高效的**空间复杂度**的数据结构，用于判断一个元素是否存在于一个集合中。
 
 一个位数组，以及多个独立的哈希函数，如果想添加一个元素，首先会通过所有哈希函数计算该元素的哈希值，这些值对应的位置置为1。查询元素，同样使用哈希函数计算哈希值，所有位置的值为1，则表明该元素可能在集合中，有任何一个位置的值为0，则元素不在集合中。
+
+插入元素和查询元素的时间复杂度均为O(k)，k是哈希函数的个数。
+
+“可能存在”是因为：多个不同的元素，可能会哈希到相同的bit位（哈希冲突）
 
 **缺点**：①可能会误判某个元素存在 ②一但元素被添加到布隆过滤器中，无法删除（因为多个元素可能映射到同一位，删除操作会导致其他元素的状态被改变）。
 

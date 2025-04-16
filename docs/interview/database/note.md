@@ -98,6 +98,14 @@ MySQL中的索引是一种用于快速定位数据的技术。索引可以显著
 - **精确查询**：时间复杂度为 **O(log n)**，与树的高度成正比。
 - **范围查询**：B + 树的叶子节点通过双向链表连接，可直接遍历链表获取连续数据，时间复杂度为 **O(k)**（k 为结果集大小）。
 
+**为什么 B+ 树比 B树 更适合 MySQL 索引？b+树在 I/O 方面和 b 树有什么区别？**
+
+更低的树高：B+ 树非叶子节点只存 key，能容纳更多 key ⇒ 更“扁平”
+
+高度低 ⇒ 磁盘随机 I/O 次数少
+
+适合范围查询和顺序扫描：所有数据都在叶子节点，按 key 排序且链表连接，扫描只需遍历叶子链表，比 B 树高效很多。
+
 **（3）mysql怎么看索引**
 
 要查看某个表的索引，可以使用 `SHOW INDEX` 命令。此命令会返回关于指定表 `table_name` 的所有索引的详细信息，包括索引名称、索引字段、索引类型、唯一性、索引的顺序（列顺序）、索引的唯一性等。
@@ -171,6 +179,33 @@ SELECT * FROM table_name WHERE date_column >= '2023-01-01' AND date_column < '20
 
 ```
 SELECT * FROM table_name WHERE name LIKE '%abc';
+```
+
+**5. 隐式转换导致索引失效**
+
+字段是字符串，查询时写成数字
+
+或者
+
+字段是 int，查询时写成字符串
+
+```
+-- 字段 phone 是 varchar 类型，建了索引
+SELECT * FROM users WHERE phone = 13800138000;
+
+
+-- 字段 user_id 是 int 类型，建了索引
+SELECT * FROM orders WHERE user_id = '12345';
+```
+
+日期比较发生类型转换，MySQL 会把字段 `create_time` 转换为字符串，再去比较
+
+```
+SELECT * FROM orders WHERE create_time = '2024-01-01';
+正确的是
+-- 加具体时间，且让常量转换为 datetime 类型（不转字段）
+SELECT * FROM orders WHERE create_time >= '2024-01-01 00:00:00'
+                      AND create_time <  '2024-01-02 00:00:00';
 ```
 
 **（6）有一个用户表，其中属性有用户唯一Id，用户性别，查询条件这两个属性都需要用到，联合索引应该怎么设置。**
