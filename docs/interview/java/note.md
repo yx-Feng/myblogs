@@ -369,6 +369,51 @@ Java 中的类加载过程是指 Java 虚拟机（JVM）将 `.class` 文件加�
 
 - 卸载：当 `ClassLoader` 和该类不再被引用时，GC 会回收该 `Class` 对象。
 
+**（22）字符串相加底层发生了什么**
+
+如果 `a` 和 `b` 是 **常量字符串**，编译器会直接在编译期把它们拼接好，例如：
+
+```
+String c = "hello" + "world";
+```
+
+编译器会直接优化为：
+
+```
+String c = "helloworld";
+```
+
+这不会在运行时产生开销，拼接结果也会进入字符串常量池。
+
+如果 `a` 和 `b` 是**变量**，Java 会在运行时使用 `StringBuilder` 来拼接，实际上编译器会把代码转换成：
+
+```
+String c = new StringBuilder().append(a).append(b).toString();
+```
+
+这样做是为了避免创建多个中间字符串对象，提高效率。
+
+举例：
+
+假如变量直接拼接，每次 `result + i`，都会创建一个新的字符串对象。
+
+```
+String result = "";
+for (int i = 0; i < 1000; i++) {
+    result = result + i;
+}
+```
+
+每次 `append` 都是往同一个对象里面追加，不用每次都创建新对象；`StringBuilder` 是可变的，内存可以扩容。
+
+```
+StringBuilder sb = new StringBuilder();
+for (int i = 0; i < 1000; i++) {
+    sb.append(i);
+}
+String result = sb.toString();
+```
+
 ### 2. Java集合
 
 **（1）谈谈对java集合的理解**
@@ -583,8 +628,6 @@ while (!compareAndSwap(...)) {
 **（13）如果有两个线程同时往 hashmap 去 put 同一个 key 不同的 value 会有什么风险**
 
 HashMap 在多线程环境下不是线程安全的，不能同时进行写操作，否则会出现覆盖（一个线程的 `put` 会覆盖另一个线程的操作）、不可预知的结果（因为操作非原子，最终的值可能是两个线程中任意一个的 value）等问题。
-
-
 
 ### 3. JVM
 
@@ -1072,6 +1115,14 @@ public class CustomThreadFactoryExceptionHandling {
     }
 }
 ```
+
+**（11）往线程池提交一个任务但是这个任务里有一个子操作也是往相同的线程池提交一个任务，会有什么问题**
+
+如果线程池线程数较小（尤其是 =1），假设线程池大小为 N，且你恰好提交了 N 个类似任务 A。
+
+每个任务 A 在执行时都卡在等待它的子任务 B 的结果。而线程池里没有剩余线程去执行这些子任务 B（因为全被任务 A 占用了）。于是：子任务无法执行 => 任务 A 永远在等子任务 => 所有线程都被阻塞 => 线程池陷入死锁
+
+解决：使用**更大的线程池**，保证有空闲线程处理子任务。考虑将子任务改为**异步非阻塞**调用，不调用 `get()` 等待。
 
 ### 6. 线程
 
@@ -1621,6 +1672,8 @@ Java 中的类加载器有不同的层次结构，主要包括启动类加载器
 
 在第一次使用实例时才进行实例化。线程不安全。为了保证线程安全，可以考虑给getInstance()加synchronized关键字。
 
+线程不安全：在多线程环境中，线程 A 和线程 B 可能同时执行到 `if (instance == null)` 这一判断语句。都会执行 `instance = new Singleton();` 这行代码，从而创建出两个不同的 `Singleton` 实例。
+
 ```
 public class Singleton {
     private static Singleton instance;
@@ -1636,11 +1689,18 @@ public class Singleton {
         return instance;
     }
 }
+
+public class Main {
+    public static void main(String[] args) {
+        Singleton singleton = Singleton.getInstance();
+        ...
+    }
+}
 ```
 
 **2. 饿汉式**
 
-饿汉式在类加载时就创建实例，线程安全。
+饿汉式在类加载时就创建实例，线程安全（Java 的类加载机制确保了类在整个生命周期中只会被加载一次）。
 
 ```
 public class Singleton {
@@ -1932,4 +1992,89 @@ Flink的Checkpoint机制存储了作业的**操作符状态**、**水位线**、
   
   - **稳定性**：即使请求到达的速率很快，系统也会以固定的速率处理请求，避免了瞬时的流量过大。
 
-### 25.
+### 25.CAP了解吗？怎么取舍？哪个必须有？
+
+CAP 是分布式系统中的一个核心理论，全称是：
+
+- **C**（Consistency，一致性）：所有节点访问到的数据是一样的，像单机一样，更新后立刻对所有人可见。
+
+- **A**（Availability，可用性）：每个请求都能在有限时间内得到响应（不一定是最新的）。
+
+- **P**（Partition tolerance，分区容忍性）：系统能在部分节点之间网络断开的情况下继续运行。
+
+在一个**分布式系统**中，**网络分区（P）一旦发生，C 和 A 只能二选一**。因为网络断了以后，节点之间不能同步数据，系统必须选择：
+
+- 要不要**立即响应请求**（A），
+
+- 还是**等待网络恢复，保证一致性**（C）。
+
+**P（分区容忍性）是必须有的**，因为网络问题不可避免，任何分布式系统都必须应对节点之间的通信中断。
+
+所以，CAP 实际是 **在 P 存在的前提下，在 C 和 A 之间权衡取舍**。
+
+**那如果现在只有两个节点，还必须继续提供服务，怎么办？**
+
+网络一旦断了，这两个节点就不能互相通信了（P发生）。
+
+你必须继续提供服务（要求A）。
+
+那只能选择 **放弃强一致性（放弃C）**，也就是走 **AP 路线**。
+
+### 26. 怎么取消一个正在执行的任务？future和complatablefuture区别？
+
+`Future` 和 `CompletableFuture` 都是 Java 中用于处理异步任务的接口，它们都能够代表一个异步操作的结果。
+
+`Future` 是 Java 提供的一个接口，用于表示异步计算的结果。它允许你检查任务是否完成，并获取结果。
+
+**特点：**
+
+- 阻塞性：`Future.get()` 是一个阻塞调用，如果任务尚未完成，调用线程会被阻塞直到结果可用。
+
+- 取消任务：`Future.cancel()` 可以尝试取消任务，取消成功的前提是任务尚未开始执行，或正在执行中并且可以中断。
+
+- 只能获取结果：`Future` 只能获取任务的返回值或抛出异常，无法在任务完成时处理其他逻辑。
+
+```
+ExecutorService executor = Executors.newSingleThreadExecutor();
+Future<Integer> future = executor.submit(() -> {
+    Thread.sleep(2000);
+    return 42;
+});
+
+try {
+    Integer result = future.get(); // 阻塞，直到任务完成
+    System.out.println("Result: " + result);
+} catch (InterruptedException | ExecutionException e) {
+    e.printStackTrace();
+}
+
+executor.shutdown();
+```
+
+`CompletableFuture` 是 Java 8 引入的一个增强版的 `Future`。它不仅支持 `Future` 的基本功能，还提供了丰富的 API 来处理异步计算的控制和组合。
+
+**特点：**
+
+- 非阻塞：`CompletableFuture` 提供了许多方法来非阻塞地处理异步操作，例如 `thenApply()`、`thenAccept()`、`thenCombine()` 等，允许你在任务完成后执行其他逻辑。
+
+- 链式调用：你可以通过链式调用（fluent API）将多个异步任务串联起来。
+
+- 回调机制：可以在异步任务完成时触发回调来处理结果，支持更多灵活的控制。
+
+```
+CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> {
+    try {
+        Thread.sleep(2000);
+    } catch (InterruptedException e) {
+        e.printStackTrace();
+    }
+    return 42;
+});
+
+future.thenApply(result -> {
+    System.out.println("Processing result: " + result);
+    return result * 2;
+}).thenAccept(finalResult -> {
+    System.out.println("Final result: " + finalResult);
+});
+```
