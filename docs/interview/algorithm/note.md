@@ -374,7 +374,7 @@ class LRUCache {
         tail.prev = head;
         this.size = 0;
     }
-    
+
     public int get(int key) {
         DLinkedNode node = cache.get(key);
         if(node == null) {
@@ -384,7 +384,7 @@ class LRUCache {
         moveToHead(node);
         return node.value;
     }
-    
+
     public void put(int key, int value) {
         DLinkedNode node = cache.get(key);
         if(node == null) {
