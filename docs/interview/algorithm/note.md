@@ -127,9 +127,352 @@ public static void quickSort(int[] arr, int low, int high) {
 }
 ```
 
-## 2. 动态规划
+## 2. 哈希表
 
-### 2.1 爬楼梯
+### 2.1 两数之和
+
+给定一个整数数组 `nums` 和一个整数目标值 `target`，请你在该数组中找出 **和为目标值** *`target`*  的那 **两个** 整数，并返回它们的数组下标。
+
+你可以假设每种输入只会对应一个答案，并且你不能使用两次相同的元素。
+
+你可以按任意顺序返回答案。
+
+```
+public int[] twoSum(int[] num, int target) {
+    Map<Integer, Integer> hashmap = new HashMap<Integer, Integer>();
+    for(int i = 0; i < nums.length; i++) {
+        if(hashmap.containsKey(target - num[i])){
+            return new int[]{hashmap.get(target-num[i]), i};
+        }
+        hashmap.put(num[i], i);
+    }
+    return new int[0];
+}
+```
+
+### 2.2 最长连续序列
+
+给定一个未排序的整数数组 `nums` ，找出数字连续的最长序列（**不要求**序列元素在原数组中**连续**）的长度。
+
+请你设计并实现时间复杂度为 `O(n)` 的算法解决此问题。
+
+```
+public int longestConsecutive(int[] nums) {
+    Set<Integer> num_set = new HashSet<Integer>();
+    for(int num : nums) {
+        num_set.add(num);
+    }
+    int longestSubStr = 0;
+    for(int num : num_set) {
+        if(!num_set.conatins(num-1) {
+            int cur = num;
+            int curLen = 1;
+            while(num_set.contains(cur+1)) {
+                cur += 1;
+                curLen += 1;
+            }
+            longestSubStr = Math.max(longestSubStr, curLen);
+        }
+    }
+    return longestSubStr;
+}
+```
+
+## 3. 二叉树
+
+### 3.1 二叉树的中序遍历
+
+给定一个二叉树的根节点 `root` ，返回 它的 **中序** 遍历。
+
+```
+public List<Integer> inorderTraversal(TreeNode root) {
+        List<Integer> res = new ArrayList<Integer>();
+        inorder(root, res);
+        return res;
+}
+
+public void inorder(TreeNode root, List<Integer> res) {
+        if(root == null) {
+            return;
+        }
+        inorder(root.left, res);
+        res.add(root.val);
+        inorder(root.right, res);
+}
+```
+
+**迭代**
+
+```
+class Solution {
+    public List<Integer> inorderTraversal(TreeNode root) {
+        List<Integer> res = new ArrayList<Integer>();
+        Deque<TreeNode> stk = new LinkedList<TreeNode>();
+        while (root != null || !stk.isEmpty()) {
+            while (root != null) {
+                stk.push(root);
+                root = root.left;
+            }
+            root = stk.pop();
+            res.add(root.val);
+            root = root.right;
+        }
+        return res;
+    }
+}
+```
+
+### 3.2 二叉树的最大深度
+
+二叉树的 **最大深度** 是指从根节点到最远叶子节点的最长路径上的节点数。
+
+```
+public int maxDepth(TreeNode root) {
+    if(root == null) {
+        return 0;
+    } else {
+        int letfHeight = maxDepth(root.left);
+        int rightHeight = maxDepth(root.right);
+        return Math.max(letfHeight, rightHeight)+1;
+    }
+}
+```
+
+### 3.3 二叉树的层序遍历
+
+给你二叉树的根节点 `root` ，返回其节点值的 **层序遍历** 。 （即逐层地，从左到右访问所有节点）。
+
+```
+public class TreeNode {
+    int val;
+    TreeNode left;
+    TreeNode right;
+    TreeNode() {}
+    TreeNode(int val) {this.val = val; }
+    TreeNode(int val, TreeNode left, TreeNode right) {
+        this.val = val;
+        this.left = left;
+        this.right = right;
+    }
+}
+public List<List<Integer>> levelOrder(TreeNode root) {
+    List<List<Integer>> ret = new ArrayList<List<Integer>>();
+    if(root == null) {
+        return ret;
+    }
+    Queue<TreeNode> queue = new LinkedList<TreeNode>();
+    queue.offer(root);
+    while(!queue.isEmpty()){
+        List<Integer> level = new ArrayList<Integer>();
+        int curLevelSize = queue.size();
+        for(int i = 1; i <= curLevelSize; i++) {
+            TreeNode node = queue.poll();    
+            level.add(node.val);
+            if(node.left != null) {
+                queue.offer(node.left);
+            }
+            if(node.right != null) {
+                queue.offer(node.right);
+            }
+        }
+        ret.add(level);
+    }
+    return ret;
+}
+```
+
+## 4. 链表
+
+### 4.1 反转链表
+
+给你单链表的头节点 `head` ，请你反转链表，并返回反转后的链表。
+
+```
+public ListNode reverseList(ListNode head) {
+    ListNode curr = head;
+    ListNode prev = null;
+    while(curr != null) {
+        ListNode next = curr.next;
+        curr.next = prev; 
+        prev = curr;
+        curr = next;       
+    }
+    return prev;
+}
+```
+
+### 4.2 环形链表
+
+给你一个链表的头节点 `head` ，判断链表中是否有环。
+
+```
+public boolean hasCycle(ListNode head) {
+        Set<ListNode> seen = new HashSet<ListNode>();
+        while (head != null) {
+            if (!seen.add(head)) {
+                return true;
+            }
+            head = head.next;
+        }
+        return false;
+}
+```
+
+### 4.3 合并两个有序链表
+
+将两个升序链表合并为一个新的 **升序** 链表并返回。新链表是通过拼接给定的两个链表的所有节点组成的。
+
+```
+public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        if (l1 == null) {
+            return l2;
+        } else if (l2 == null) {
+            return l1;
+        } else if (l1.val < l2.val) {
+            l1.next = mergeTwoLists(l1.next, l2);
+            return l1;
+        } else {
+            l2.next = mergeTwoLists(l1, l2.next);
+            return l2;
+        }
+}
+```
+
+### 4.4 LRU 缓存
+
+请你设计并实现一个满足  **LRU (最近最少使用)** 缓存约束的数据结构。
+
+实现 `LRUCache` 类：
+
+- `LRUCache(int capacity)` 以 **正整数** 作为容量 `capacity` 初始化 LRU 缓存
+- `int get(int key)` 如果关键字 `key` 存在于缓存中，则返回关键字的值，否则返回 `-1` 。
+- `void put(int key, int value)` 如果关键字 `key` 已经存在，则变更其数据值 `value` ；如果不存在，则向缓存中插入该组 `key-value` 。如果插入操作导致关键字数量超过 `capacity` ，则应该 **逐出** 最久未使用的关键字。
+
+函数 `get` 和 `put` 必须以 `O(1)` 的平均时间复杂度运行。
+
+```
+class LRUCache {
+    class DLinkedNode {
+        int key;
+        int value;
+        DLinkedNode prev;
+        DLinkedNode next;
+        public DLinkedNode() {}
+        public DLinkedNode(int _key, int _value) {key = _key; value = _value;}
+    }
+
+    private int capacity;
+    private int size;
+    private Map<Integer, DLinkedNode> cache = new HashMap<Integer, DLinkedNode>();
+    private DLinkedNode head, tail;
+
+    public LRUCache(int capacity) {
+        this.capacity = capacity;
+        head = new DLinkedNode();
+        tail = new DLinkedNode();
+        head.next = tail;
+        tail.prev = head;
+        this.size = 0;
+    }
+    
+    public int get(int key) {
+        DLinkedNode node = cache.get(key);
+        if(node == null) {
+            return -1;
+        }
+        // 如果key存在，哈希表定位，再移动到头部
+        moveToHead(node);
+        return node.value;
+    }
+    
+    public void put(int key, int value) {
+        DLinkedNode node = cache.get(key);
+        if(node == null) {
+            DLinkedNode newNode = new DLinkedNode(key, value);
+            cache.put(key, newNode);
+            addToHead(newNode);
+            size++;
+            if(size > capacity) {
+                // 如果超出容量
+                DLinkedNode tail = removeTail();
+                cache.remove(tail.key);
+                size--;
+            }
+        } else {
+            node.value = value;
+            moveToHead(node);
+        }
+    }
+
+    private void removeNode(DLinkedNode node) {
+        node.prev.next = node.next;
+        node.next.prev = node.prev;
+    }
+
+    private void addToHead(DLinkedNode node) {
+        node.prev = head;
+        node.next = head.next;
+        head.next.prev= node;
+        head.next = node;
+    }
+
+    private void moveToHead(DLinkedNode node) {
+        removeNode(node);
+        addToHead(node);
+    }
+
+    private DLinkedNode removeTail() {
+        DLinkedNode res = tail.prev;
+        removeNode(res);
+        return res;
+    }
+}
+```
+
+### 4.5  K 个一组翻转链表
+
+给你链表的头节点 `head` ，每 `k` 个节点一组进行翻转，请你返回修改后的链表。
+
+`k` 是一个正整数，它的值小于或等于链表的长度。如果节点总数不是 `k` 的整数倍，那么请将最后剩余的节点保持原有顺序。
+
+你不能只是单纯的改变节点内部的值，而是需要实际进行节点交换。
+
+```
+
+```
+
+## 5. 贪心
+
+### 5.1 买卖股票的最佳时机
+
+给定一个数组 `prices` ，它的第 `i` 个元素 `prices[i]` 表示一支给定股票第 `i` 天的价格。
+
+你只能选择 **某一天** 买入这只股票，并选择在 **未来的某一个不同的日子** 卖出该股票。设计一个算法来计算你所能获取的最大利润。
+
+返回你可以从这笔交易中获取的最大利润。如果你不能获取任何利润，返回 `0` 。
+
+**解**：假设自己总是从股票最低价时买入的，计算当天卖出股票的利润，然后选出可能获取的最大利润
+
+```
+class Solution {
+    public int maxProfit(int[] prices) {
+        int min_p = Integer.MAX_VALUE;
+        int max_p = 0;
+        for(int i = 0; i < prices.length; i++) {
+            if(prices[i] < min_p) {
+                min_p = prices[i];
+            } else if(prices[i]-min_p > max_p) {
+                max_p = prices[i] - min_p;
+            }
+        }
+        return max_p;
+    }
+}
+```
+
+## 6. 动态规划
+
+### 6.1 爬楼梯
 
 假设你正在爬楼梯。需要 `n` 阶你才能到达楼顶。
 
@@ -155,7 +498,7 @@ class Solution {
 }
 ```
 
-### 2.2 接雨水
+### 6.2 接雨水
 
 给定 `n` 个非负整数表示每个宽度为 `1` 的柱子的高度图，计算按此排列的柱子，下雨之后能接多少雨水。
 
@@ -191,448 +534,15 @@ class Solution {
 }
 ```
 
-## 3. 分治
+### 6.3 最长递增子序列
 
-### 3.1
+### 6.4 最长回文子串
 
-## 4. 贪心
+### 6.5 最长公共子序列
 
-### 4.1 买卖股票的最佳时机
+## 7. 二分查找
 
-给定一个数组 `prices` ，它的第 `i` 个元素 `prices[i]` 表示一支给定股票第 `i` 天的价格。
-
-你只能选择 **某一天** 买入这只股票，并选择在 **未来的某一个不同的日子** 卖出该股票。设计一个算法来计算你所能获取的最大利润。
-
-返回你可以从这笔交易中获取的最大利润。如果你不能获取任何利润，返回 `0` 。
-
-**解**：假设自己总是从股票最低价时买入的，计算当天卖出股票的利润，然后选出可能获取的最大利润
-
-```
-class Solution {
-    public int maxProfit(int[] prices) {
-        int min_p = Integer.MAX_VALUE;
-        int max_p = 0;
-        for(int i = 0; i < prices.length; i++) {
-            if(prices[i] < min_p) {
-                min_p = prices[i];
-            } else if(prices[i]-min_p > max_p) {
-                max_p = prices[i] - min_p;
-            }
-        }
-        return max_p;
-    }
-}
-```
-
-## 5. 深搜
-
-### 5.1 二叉树的中序遍历
-
-给定一个二叉树的根节点 `root` ，返回 它的 **中序** 遍历 。
-
-**递归**
-
-```
-/**
- * Definition for a binary tree node.
- * public class TreeNode {
- *     int val;
- *     TreeNode left;
- *     TreeNode right;
- *     TreeNode() {}
- *     TreeNode(int val) { this.val = val; }
- *     TreeNode(int val, TreeNode left, TreeNode right) {
- *         this.val = val;
- *         this.left = left;
- *         this.right = right;
- *     }
- * }
- */
-class Solution {
-    public List<Integer> inorderTraversal(TreeNode root) {
-        List<Integer> res = new ArrayList<Integer>();
-        inorder(root, res);
-        return res;
-    }
-
-    public void inorder(TreeNode root, List<Integer> res) {
-        if(root == null) {
-            return;
-        }
-        inorder(root.left, res);
-        res.add(root.val);
-        inorder(root.right, res);
-    }
-}
-```
-
-**迭代**
-
-```
-class Solution {
-    public List<Integer> inorderTraversal(TreeNode root) {
-        List<Integer> res = new ArrayList<Integer>();
-        Deque<TreeNode> stk = new LinkedList<TreeNode>();
-        while (root != null || !stk.isEmpty()) {
-            while (root != null) {
-                stk.push(root);
-                root = root.left;
-            }
-            root = stk.pop();
-            res.add(root.val);
-            root = root.right;
-        }
-        return res;
-    }
-}
-```
-
-### 5.2 相同的树
-
-给你两棵二叉树的根节点 `p` 和 `q` ，编写一个函数来检验这两棵树是否相同。
-
-如果两个树在结构上相同，并且节点具有相同的值，则认为它们是相同的。
-
-```
-class Solution {
-    public boolean isSameTree(TreeNode p, TreeNode q) {
-        if(p == null && q == null) {
-            return true;
-        } else if ( p == null || q == null){
-            return false;
-        } else if (p.val != q.val) {
-            return false;
-        } else {
-            return isSameTree(p.left, q.left) && isSameTree(p.right, q.right);
-        }
-    }
-}
-```
-
-## 6. 广搜
-
-### 6.1
-
-## 7. 哈希表
-
-### 7.1 最长回文串
-
-给定一个包含大写字母和小写字母的字符串 `s` ，返回 通过这些字母构造成的 **最长的回文串**的长度。
-
-在构造过程中，请注意 **区分大小写** 。比如 `"Aa"` 不能当做一个回文字符串。
-
-**解**：字符串能被构造成回文串的**充要条件**为：除了一种字符出现**奇数**次外，其余所有字符出现**偶数**次。
-
-①借助一个 HashMap ，统计字符串 s 中各字符的出现次数；
-②遍历 HashMap ，统计构造回文串的最大长度：
-    将当前字符的出现次数向下取偶数（即若为偶数则不变，若为奇数则减 1 ），出现偶数次则都可组成回文串，因此计入 res ；
-    若此字符出现次数为奇数，则可将此字符放到回文串中心，因此将 odd 置 1 ；
-
-返回 `res + odd` 即可。
-
-```
-class Solution {
-    public int longestPalindrome(String s) {
-        HashMap<Character, Integer> counter = new HashMap<>();
-        for(int i = 0; i < s.length(); i++) {
-            counter.merge(s.charAt(i), 1, (oldValue, newValue) -> oldValue + newValue);
-        }
-        int res = 0, odd = 0;
-        for(Map.Entry<Character, Integer> kv:counter.entrySet()) {
-            int count = kv.getValue();
-            if(count % 2 == 1) odd = 1;
-            res += count - count%2;
-        }
-        return res+odd;
-    }
-}
-```
-
-### 7.2 两数之和
-
-给定一个整数数组 `nums` 和一个整数目标值 `target`，请你在该数组中找出 **和为目标值** *`target`*  的那 **两个** 整数，并返回它们的数组下标。
-
-你可以假设每种输入只会对应一个答案，并且你不能使用两次相同的元素。
-
-你可以按任意顺序返回答案。
-
-```
-public int[] twoSum(int[] num, int target) {
-    Map<Integer, Integer> hashtable = new HashMap<Integer, Integer>();
-    for(int i = 0; i < nums.length; i++) {
-        if(hashtable.containsKey(target-num[i])) {
-            return new int[]{hashtable.get(target-num[i]), i};
-        }
-        hashtable.put(num[i], i);
-    }
-    return new int[0];
-}
-```
-
-## 8. 双指针
-
-### 8.1 移动零
-
-给定一个数组 `nums`，编写一个函数将所有 `0` 移动到数组的末尾，同时保持非零元素的相对顺序。
-
-**请注意** ，必须在不复制数组的情况下原地对数组进行操作。
-
-```
-public void moveZero(int[] nums) {
-    if(num == null) {
-        return;
-    }
-    // 第一次遍历
-    int j = 0;
-    for(int i = 0; i < nums.length; i++) {
-        if(num[i]!=0) {
-            nums[j++] = nums[i];
-        }
-    }
-    // 把末尾元素都赋0
-    for(int i = j; i < nums.lengthl i++) {
-        nums[i] = 0;
-    }
-}
-```
-
-## 9. 链表
-
-### 9.1 相交链表
-
-给你两个单链表的头节点 `headA` 和 `headB` ，请你找出并返回两个单链表相交的起始节点。如果两个链表不存在相交节点，返回 `null` 。
-
-```
-public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
-    Set<ListNode> visited = new HashSet<ListNode>();
-    ListNode temp = headA;
-    while(temp != null) {
-        visited.add(temp);
-        temp = temp.next;
-    }
-    temp = headB;
-    while(temp != null) {
-    if(visited.contains(temp)) {
-        return temp;
-    }
-        temp = temp.next;
-    }
-    return null;
-}
-```
-
-### 9.2 反转链表
-
-给你单链表的头节点 `head` ，请你反转链表，并返回反转后的链表。
-
-```
-public ListNode reverseList(ListNode head) {
-    ListNode curr = head;
-    ListNode prev = null;
-    while(curr != null) {
-        ListNode next = curr.next;
-        curr.next = prev; 
-        prev = curr;
-        curr = next;       
-    }
-    return prev;
-}
-```
-
-### 9.3 回文链表
-
-给你一个单链表的头节点 `head` ，请你判断该链表是否为回文链表。如果是，返回 `true` ；否则，返回 `false` 。
-
-```
-public boolean isPalindrome(ListNode head) {
-        List<Integer> vals = new ArrayList<Integer>();
-        ListNode currNode = head;
-        while(currNode != null) {
-            vals.add(currNode.val);
-            currNode = currNode.next;
-        }
-
-        int front = 0;
-        int back = vals.size()-1;
-        while(front < back) {
-            if(vals.get(front) != vals.get(back)) {
-                return false;
-            }
-            front++;
-            back--;
-        }
-        return true;
-}
-```
-
-### 9.4 环形链表
-
-给你一个链表的头节点 `head` ，判断链表中是否有环。
-
-```
-public boolean hasCycle(ListNode head) {
-        Set<ListNode> seen = new HashSet<ListNode>();
-        while (head != null) {
-            if (!seen.add(head)) {
-                return true;
-            }
-            head = head.next;
-        }
-        return false;
-}
-```
-
-### 9.5 合并两个有序链表
-
-将两个升序链表合并为一个新的 **升序** 链表并返回。新链表是通过拼接给定的两个链表的所有节点组成的。
-
-```
-public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
-        if (l1 == null) {
-            return l2;
-        } else if (l2 == null) {
-            return l1;
-        } else if (l1.val < l2.val) {
-            l1.next = mergeTwoLists(l1.next, l2);
-            return l1;
-        } else {
-            l2.next = mergeTwoLists(l1, l2.next);
-            return l2;
-        }
-}
-```
-
-## 10. 二叉树
-
-### 10.1 二叉树的中序遍历
-
-给定一个二叉树的根节点 `root` ，返回 它的 **中序** 遍历。
-
-```
-public List<Integer> inorderTraversal(TreeNode root) {
-        List<Integer> res = new ArrayList<Integer>();
-        inorder(root, res);
-        return res;
-}
-
-public void inorder(TreeNode root, List<Integer> res) {
-        if(root == null) {
-            return;
-        }
-        inorder(root.left, res);
-        res.add(root.val);
-        inorder(root.right, res);
-}
-```
-
-### 10.2 二叉树的最大深度
-
-二叉树的 **最大深度** 是指从根节点到最远叶子节点的最长路径上的节点数。
-
-```
-public int maxDepth(TreeNode root) {
-    if(root == null) {
-        return 0;
-    } else {
-        int letfHeight = maxDepth(root.left);
-        int rightHeight = maxDepth(root.right);
-        return Math.max(letfHeight, rightHeight)+1;
-    }
-}
-```
-
-### 10.3 翻转二叉树
-
-给你一棵二叉树的根节点 `root` ，翻转这棵二叉树，并返回其根节点。
-
-```
-public TreeNode invertTree(TreeNode root) {
-        if(root == null) {
-            return null;
-        }
-        TreeNode left = invertTree(root.left);
-        TreeNode right = invertTree(root.right);
-        root.left = right;
-        root.right =left;
-        return root;
-}
-```
-
-### 10.4 对称二叉树
-
-给你一个二叉树的根节点 `root` ， 检查它是否轴对称。
-
-```
-public boolean isSymmetric(TreeNode root) {
-        return check(root, root);
-}
-
-public boolean check(TreeNode p, TreeNode q) {
-        if(p == null && q == null) {
-            return true;
-        }
-        if(p == null || q == null) {
-            return false;
-        }
-        return p.val == q.val && check(p.left, q.right) && check(p.right, q.left);
-}
-```
-
-### 10.5 二叉树的直径
-
-给你一棵二叉树的根节点，返回该树的 **直径** 。
-
-二叉树的 **直径** 是指树中任意两个节点之间最长路径的 **长度** 。这条路径可能经过也可能不经过根节点 `root` 。
-
-两节点之间路径的 **长度** 由它们之间边数表示。
-
-```
-class Solution {
-    int ans;
-    public int diameterOfBinaryTree(TreeNode root) {
-        ans = 1;
-        depth(root);
-        return ans - 1;
-    }
-
-    public int depth(TreeNode node) {
-        if(node == null) {
-            return 0;
-        }
-        int L = depth(node.left);
-        int R = depth(node.right);
-        ans = Math.max(ans, L+R+1);
-        return Math.max(L, R)+1;
-    }
-}
-```
-
-### 10.6 将有序数组转换为二叉搜索树
-
-给你一个整数数组 `nums` ，其中元素已经按 **升序** 排列，请你将其转换为一棵平衡 二叉搜索树。
-
-```
-class Solution {
-    public TreeNode sortedArrayToBST(int[] nums) {
-        return helper(nums, 0, nums.length - 1);
-    }
-
-    public TreeNode helper(int[] nums, int left, int right) {
-        if(left > right) {
-            return null;
-        }
-        int mid = (left+right)/2;
-        TreeNode root = new TreeNode(nums[mid]);
-        root.left = helper(nums, left, mid-1);
-        root.right = helper(nums, mid+1, right);
-        return root;
-    }
-}
-```
-
-## 11. 二分查找
-
-### 11.1 搜索插入位置
+### 7.1 搜索插入位置
 
 给定一个排序数组和一个目标值，在数组中找到目标值，并返回其索引。如果目标值不存在于数组中，返回它将会被按顺序插入的位置。
 
@@ -654,9 +564,9 @@ public int searchInsert(int[] nums, int target) {
 }
 ```
 
-## 12. 栈
+## 8. 栈
 
-### 12.1 有效的括号
+### 8.1 有效的括号
 
 给定一个只包括 `'('`，`')'`，`'{'`，`'}'`，`'['`，`']'` 的字符串 `s` ，判断字符串是否有效。
 
@@ -693,7 +603,11 @@ public boolean isValid(String s) {
 }
 ```
 
-## 13. ACM 模式 - 处理输入输出
+## 9. 堆
+
+## 10. 图论
+
+## 11. ACM 模式 - 处理输入输出
 
 ```
 import java.util.*;
