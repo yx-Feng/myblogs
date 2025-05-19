@@ -536,9 +536,60 @@ class Solution {
 
 ### 6.3 最长递增子序列
 
-### 6.4 最长回文子串
+给你一个整数数组 `nums` ，找到其中最长严格递增子序列的长度。
 
-### 6.5 最长公共子序列
+**子序列** 是由数组派生而来的序列，删除（或不删除）数组中的元素而不改变其余元素的顺序。例如，`[3,6,2,7]` 是数组 `[0,3,1,6,2,2,7]` 的子序列。
+
+```
+public int lengthOfLIS(int[] nums) {
+    int n = nums.length;
+    if(n == 0) {
+        return 0;
+    }
+    int[] dp = new int[n];
+    dp[0] = 1;
+    int maxLen = 1;
+    for(int i = 0; i < n; i++) {
+        dp[i] = 1;
+        for(int j = 0; j < i; i++) {
+            if(num[i] > num[j]) {
+                dp[i] = Math.max(dp[i], dp[j]+1);
+            }
+        }
+        maxLen = Math.max(maxLen, dp[i]);
+    }
+    return maxLen;
+}
+```
+
+### 6.4 最长公共子序列
+
+给定两个字符串 `text1` 和 `text2`，返回这两个字符串的最长 **公共子序列** 的长度。如果不存在 **公共子序列** ，返回 `0` 。
+
+一个字符串的 **子序列** 是指这样一个新的字符串：它是由原字符串在不改变字符的相对顺序的情况下删除某些字符（也可以不删除任何字符）后组成的新字符串。
+
+- 例如，`"ace"` 是 `"abcde"` 的子序列，但 `"aec"` 不是 `"abcde"` 的子序列。
+
+两个字符串的 **公共子序列** 是这两个字符串所共同拥有的子序列。
+
+```
+public int longestCommonSubsequence(String text1, String text2) {
+    int m = text1.length(), n = text2.length();
+    int[][] dp = new int[m+1][n+1];
+    for(int i = 1; i <= m; i++) {
+        char c1 = text1.charAt(i-1);
+        for(int j = 1; j <= n; j++) {
+            char c2 = text2.charAt(j-1);
+            if(c1 == c2) {
+                dp[i][j] = dp[i-1[j-1]+1;
+            } else {
+                dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);
+            }
+        }
+    }
+    return dp[m][n];
+}
+```
 
 ## 7. 二分查找
 
@@ -605,7 +656,138 @@ public boolean isValid(String s) {
 
 ## 9. 堆
 
+### 9.1 数组中的第K个最大元素
+
+给定整数数组 `nums` 和整数 `k`，请返回数组中第 `k` 个最大的元素。
+
+请注意，你需要找的是数组排序后的第 `k` 个最大的元素，而不是第 `k` 个不同的元素。
+
+你必须设计并实现时间复杂度为 `O(n)` 的算法解决此问题。
+
+```
+public int findKthLargest(int[] nums, int k) {
+    int heapSize = nums.length;
+    buildMaxHeap(nums, heapSize);
+    for(int i = nums.length-1; i >= nums.length-k+1; i--) {
+        swap(nums, 0, i);
+        heapSize--;
+        maxHeapify(nums, 0, heapSize);
+    }
+    return ;
+}
+
+public void buildMaxHeap(int[] a, int heapSize) {
+    for(int i = heapSize/2-1; i >= 0; i--) {
+        maxHeapify(a, i, heapSize);
+    }
+}
+
+public void maxHeapify(int[] a, int i, int heapSize) {
+    int l = i*2+1, r = i*2+2, largest = i;
+    if(l < heapSize && a[l] > a[largest]) {
+        largest = l;
+    }
+    if(r < heapSize && a[r] > a[largest]) {
+        largest = r;
+    }
+    if(largest != i) {
+        swap(a, i, largest);
+        maxHeapify(a, largest, heapSize);
+    }
+}
+
+public void swap(int[] a, int i, int j) {
+    int tmp = a[i];
+    a[i] = a[j];
+    a[j] = tmp;
+}
+```
+
+
+
+### 9.2 前 K 个高频元素
+
+给你一个整数数组 `nums` 和一个整数 `k` ，请你返回其中出现频率前 `k` 高的元素。你可以按 **任意顺序** 返回答案。
+
+=> 使用哈希表记录每个数字出现的次数，建立一个小顶堆，然后遍历哈希表。
+
+- 如果堆的元素个数小于 k，就可以直接插入堆中。
+- 如果堆的元素个数等于 k，则检查堆顶与当前出现次数的大小。如果堆顶更大，说明至少有 k 个数字的出现次数比当前值大，故舍弃当前值；否则，就弹出堆顶，并将当前值插入堆中。
+
+```
+public int[] topKFrequent(int[] nums, int k) {
+    HashMap<Integer, Integer> map = new HashMap();
+    for(int num : nums) {
+        map.put(num, map.getOrDefault(num, 0)+1);
+    }
+    Priority<int[]> pq = new PriorityQueue<int[]>(
+        new Comparator<int[]>(){
+            @Override
+            public int compare(int[] a, int[] b) {
+                return a[1]-b[1];
+            }
+        }
+    );
+    for(Map.Entry<Integer, Integer> entry : map.entrySet()){
+        int num = entry.getKey(), count = entry.getValue();
+        if(pq.size() == k){
+            if(pq.peek() < count){
+                pq.poll();    
+                pq.offer(new int[]{num, count});
+            }
+        } else {
+            pq.offer(new int[]{num, count});
+        }
+    }
+    int ret = new int[k];
+    for(int i = 0; i < k; i++) {
+        ret[i] = pq.poll()[0];
+    }
+    return ret;
+}
+```
+
 ## 10. 图论
+
+### 10.1 岛屿数量
+
+给你一个由 `'1'`（陆地）和 `'0'`（水）组成的的二维网格，请你计算网格中岛屿的数量。
+
+岛屿总是被水包围，并且每座岛屿只能由水平方向和/或竖直方向上相邻的陆地连接形成。
+
+此外，你可以假设该网格的四条边均被水包围。
+
+```
+public int numIslands(char[][] grid) {
+    if(grid == null || grid.length == 0) {
+        return 0;
+    }
+    int nr = grid.length;
+    int nc = grid[0].length;
+    int ans = 0;
+    for(int r = 0; r < nr; r++) {
+        for(int c = 0; c < nc; c++) {
+            if(grid[r][c] == '1') {
+                ans++;
+                dfs(grid, r, c;)
+            }
+        }
+    }
+}
+
+void dfs(char[][] grid, int r, int c) {
+    int nr = grid.length;
+    int nc = grid[0].length;
+    if(r < 0 || c < 0 || r>= nr || c >= nc || grid[r][c] == '0') {
+        return;
+    }
+    grid[r][c] == '0';
+    dfs(grid, r-1, c);
+    dfs(grid, r+1, c);
+    dfs(grid, r, c-1);
+    dfs(grid, r, c+1);
+}
+```
 
 ## 11. ACM 模式 - 处理输入输出
 
