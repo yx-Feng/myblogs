@@ -350,6 +350,8 @@ public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
 
 函数 `get` 和 `put` 必须以 `O(1)` 的平均时间复杂度运行。
 
+**哈希表+双向链表**
+
 ```
 class LRUCache {
     class DLinkedNode {
@@ -438,7 +440,41 @@ class LRUCache {
 你不能只是单纯的改变节点内部的值，而是需要实际进行节点交换。
 
 ```
+public ListNode reverseKGroup(ListNode head, int k) {
+    ListNode dummyNode = new ListNode(0);
+    dummyNode.next = head;
+    ListNode pre = dummyNode;
+    while(head != null) {
+        ListNode tail = pre;
+        for(int i = 0; i < k; i++) {
+            tail = tail.next;
+            if(tail == null) {
+                return dummyNode.next;
+            }
+        }
+        ListNode nextNode = tail.next;
+        ListNode[] reverse = ReverseKNode(head, tail);
+        head = reverse[0];
+        tail = reverse[1];
+        pre.next = head;
+        tail.next = nextNode;
+        head = tail.next;
+        pre = tail;        
+    }
+    return dummyNode.next;
+}
 
+public ListNode[] ReverseKNode(ListNode head, ListNode tail) {
+    ListNode p = head;
+    ListNode prev = tail.next;
+    while(prev != tail) {
+        ListNode next = p.next;
+        p.next = prev;
+        prev = p;
+        p = next;
+    }
+    return new ListNode[]{tail, head};
+}
 ```
 
 ## 5. 贪心
@@ -702,8 +738,6 @@ public void swap(int[] a, int i, int j) {
     a[j] = tmp;
 }
 ```
-
-
 
 ### 9.2 前 K 个高频元素
 
