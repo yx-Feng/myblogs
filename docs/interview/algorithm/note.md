@@ -749,36 +749,36 @@ public void swap(int[] a, int i, int j) {
 - 如果堆的元素个数等于 k，则检查堆顶与当前出现次数的大小。如果堆顶更大，说明至少有 k 个数字的出现次数比当前值大，故舍弃当前值；否则，就弹出堆顶，并将当前值插入堆中。
 
 ```
-public int[] topKFrequent(int[] nums, int k) {
-    HashMap<Integer, Integer> map = new HashMap();
-    for(int num : nums) {
-        map.put(num, map.getOrDefault(num, 0)+1);
-    }
-    Priority<int[]> pq = new PriorityQueue<int[]>(
-        new Comparator<int[]>(){
-            @Override
-            public int compare(int[] a, int[] b) {
-                return a[1]-b[1];
-            }
-        }
-    );
-    for(Map.Entry<Integer, Integer> entry : map.entrySet()){
-        int num = entry.getKey(), count = entry.getValue();
-        if(pq.size() == k){
-            if(pq.peek() < count){
-                pq.poll();    
-                pq.offer(new int[]{num, count});
-            }
-        } else {
-            pq.offer(new int[]{num, count});
-        }
-    }
-    int ret = new int[k];
-    for(int i = 0; i < k; i++) {
-        ret[i] = pq.poll()[0];
-    }
-    return ret;
-}
+    public int[] topKFrequent(int[] nums, int k) {
+        HashMap<Integer, Integer> map = new HashMap();
+        for(int num : nums) {
+            map.put(num, map.getOrDefault(num, 0)+1);
+        }
+        Queue<int[]> pq = new PriorityQueue<int[]>(
+            new Comparator<int[]>() {
+                @Override
+                public int compare(int[] a, int[] b) {
+                    return  a[1]-b[1];
+                }
+            }
+        );
+        for(Map.Entry<Integer, Integer> entry : map.entrySet()) {
+            int num = entry.getKey(), count = entry.getValue();
+            if(pq.size() == k) {
+                if(pq.peek()[1] < count) {
+                    pq.poll();
+                    pq.offer(new int[]{num, count});
+                }
+            } else {
+                pq.offer(new int[]{num, count});
+            }
+        }
+        int[] ret = new int[k];
+        for(int i = 0; i < k; i++) {
+            ret[i] = pq.poll()[0];
+        }
+        return ret;
+    }
 ```
 
 ## 10. 图论

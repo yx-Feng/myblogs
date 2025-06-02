@@ -12,13 +12,32 @@
 
 - 持久性（Durability）：事务提交后，事务内的操作对数据库的修改被永久保存在数据库文件中。
 
-**（2）数据库中的事务可以被嵌套吗？**
+**（2）嵌套事务**
 
-嵌套事务（Nested Transaction）是指一个事务中包含多个子事务，子事务的提交或回滚会影响父事务的状态。
+嵌套事务（Nested Transaction）是指在一个事务中又启动了一个新的事务。
 
-**MySQL/InnoDB**：表面支持，实际通过保存点模拟实现。父事务提交前，所有子事务的修改仍在同一个事务中。子事务的回滚仅撤销到保存点，不影响父事务的其他部分。
+```
+@Transactional // 外层事务
+public void outerMethod() {
+    // 一些数据库操作A
+    innerMethod(); // 调用内部事务方法
+    // 一些数据库操作B
+}
 
-**SQL Server/Oracle**：支持真正的嵌套事务。父事务提交时所有子事务才会提交，父事务回滚则全部回滚。只有当最外层事务提交时，所有操作才会持久化。
+@Transactional // 内层事务
+public void innerMethod() {
+    // 数据库操作C
+    throw new RuntimeException("模拟异常");
+}
+```
+
+在 Spring 中，事务传播行为通过 `@Transactional(propagation = ...)` 控制，常见的几种类型：
+
+- REQUIRED（默认）：外层和内层属于同一个事务。内存事务异常会导致整个事务回滚。外层事务回滚时，内层事务也必须回滚（考虑到事务的原子性）。
+
+- REQUIRES_NEW：内层事务新建一个事务，和外层事务隔离。内层事务异常回滚，不影响外层事务提交。运行只回滚外层事务。
+
+- NESTED：内层事务发生异常时，会回滚到**保存点**，外层事务可以决定是否继续提交。本质是**在同一个物理事务中**，但通过保存点（Savepoint）实现**局部回滚**的能力。
 
 **（3）并发事务问题以及MySQL如何解决（事务的隔离级别）**
 
@@ -321,7 +340,44 @@ SQL注入（SQL Injection）是一种常见的网络攻击方式，攻击者通�
 
 - 最小化数据库权限：限制数据库用户权限，确保即使SQL注入成功，数据库损失最小。
 
-**（2）慢sql优化**
+**（2）慢sql排查**
+
+- 启用慢查询日志（以 MySQL 为例）
+  
+  ```
+  -- 查看当前慢查询设置
+  SHOW VARIABLES LIKE '%slow_query%';
+  
+  -- 开启慢查询日志（临时）
+  SET GLOBAL slow_query_log = 'ON';
+  SET GLOBAL long_query_time = 1;  -- 超过1秒的查询才记录
+  
+  -- 日志位置一般在 /var/lib/mysql/hostname-slow.log
+  ```
+  
+  从慢查询日志中提取语句：使用 `mysqldumpslow` 或 `pt-query-digest` 工具分析日志：
+  
+  ```
+  mysqldumpslow -s t -t 10 /path/to/slow.log  # 按查询时间总和排序
+  # 或
+  pt-query-digest /path/to/slow.log
+  ```
+
+- 使用 `EXPLAIN` 分析
+  
+  ```
+  EXPLAIN SELECT ...;
+  ```
+  
+  关注以下字段：
+  
+  - `type`：访问类型（如 `ALL` 为全表扫描，`ref`、`eq_ref` 更优）
+  
+  - `rows`：扫描的行数，越小越好
+  
+  
+
+**（3）慢sql优化**
 
 通常是在数据库执行时间过长的查询或大规模查询时，采取的一系列措施。
 

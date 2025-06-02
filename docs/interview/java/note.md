@@ -883,44 +883,21 @@ AQS 是一个用于构建锁和同步器的框架，它使用一个整型的状�
 
 ### 5.线程池
 
-**（1）在 Java 中，线程池怎么创建？**
-
-通常使用 `Executors` 工厂类中的静态方法。
-
-```
-// 创建一个固定大小的线程池
-ExecutorService executorService = Executors.newFixedThreadPool(5);
-
-
-// 创建一个单线程池
-ExecutorService executorService = Executors.newSingleThreadExecutor();
-```
-
-**（2）线程池的作用**
+**（1）线程池的作用**
 
 管理和复用线程，从而有效地减少线程创建和销毁的开销，提高程序性能。
 
 在线程池中，多个任务可以被并发执行，因为线程池能够管理多个线程并行处理任务。
 
-**（3）为什么要用动态性线程池**
+**（2）为什么要用动态性线程池**
 
 主要是为了**在任务量变化时灵活调整线程数量**，优化资源利用，通过复用线程，避免频繁创建和销毁线程，提高系统的效率和吞吐量。在高负载时，它能增加线程处理任务，低负载时则减少线程，节省资源。
 
-**（4）提交任务流程**
-
-①提交任务：调用`execute()`方法（无返回值）或者`submit()`方法（有返回值）来提交任务。
-
-②选择合适的线程：线程池内部有一个任务队列（`BlockingQueue`），线程池通过不同的线程选择策略将任务分配到线程中。如果线程池中有空闲线程，任务会直接分配给空闲线程。如果线程池中的线程都在工作，那么任务会被放入队列中等待执行。
-
-③线程执行任务：一旦线程空闲出来，或者任务从队列中取出，线程池会选择合适的线程来执行任务。任务执行完成后，线程会被回收或复用。
-
-④任务执行完成：如果任务是通过`submit()`提交的，返回的`Future`对象可以用来获取任务执行结果、检查是否完成或取消任务。
-
-**（5）线程的状态**
+**（3）线程的状态**
 
 新建（New）、就绪（Runnable）、正在运行（Running）、阻塞（Blocked）、等待（Waiting）、超时等待（Timed Waiting）、终止（Terminated）
 
-**（6）线程池的实现原理**
+**（4）线程池的实现原理**
 
 线程池是一种用于管理和复用线程的机制，在 Java 中，`java.util.concurrent` 包提供了强大的线程池支持，以 `ThreadPoolExecutor` 类为核心。
 
@@ -946,7 +923,23 @@ ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 - 执行拒绝策略：如果线程池中的线程数量已经达到最大线程数，且任务队列也已满，此时会执行拒绝策略来处理新提交的任务。
 
-**（7）线程池的核心参数**
+**（5）线程池怎么创建？线程池的核心参数？**
+
+**① 使用 ThreadPoolExecutor 创建线程池**
+
+```
+public ThreadPoolExecutor(
+    int corePoolSize,                // 核心线程数
+    int maximumPoolSize,             // 最大线程数
+    long keepAliveTime,              // 非核心线程的存活时间
+    TimeUnit unit,                   // 时间单位（秒、毫秒等）
+    BlockingQueue<Runnable> workQueue,  // 任务队列
+    ThreadFactory threadFactory,     // 线程工厂（可选，用于自定义线程名等）
+    RejectedExecutionHandler handler // 拒绝策略（队列满 + 最大线程数也满时）
+)
+```
+
+常用参数：
 
 - corePoolSize（核心线程数）：线程池保持的最小线程数。
 
@@ -956,52 +949,32 @@ ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 - workQueue（任务队列）：用来保存待执行任务的阻塞队列。
 
-- handler（拒绝策略）。
+- handler（**拒绝策略**）。
+  
+  - **AbortPolicy（默认策略）**：当任务被拒绝时，直接抛出 `RejectedExecutionException` 异常，阻止系统正常工作。
+  
+  - **CallerRunsPolicy**：当任务被拒绝时，由提交任务的线程（调用 `execute` 方法的线程）来执行该任务。
+  
+  - **DiscardPolicy**：当任务被拒绝时，直接丢弃该任务，不会抛出任何异常，也不会有任何提示。
+  
+  - **DiscardOldestPolicy**：当任务被拒绝时，丢弃任务队列中最老的任务（即队列头部的任务），然后尝试重新提交当前任务。
+  
+  - 除了这四种内置的拒绝策略，你还可以通过实现 `RejectedExecutionHandler` 接口来自定义拒绝策略。
 
-**（8）线程池如何设置核心线程数**
-
-1. 通过 `ThreadPoolExecutor` 类的构造函数来设置。
-   
-   该构造函数中的corePoolSize参数对应于核心线程数。
-
-```
-int corePoolSize = 5; // 设置核心线程数
-int maximumPoolSize = 10; // 设置最大线程数
-long keepAliveTime = 60L; // 设置空闲线程的最大存活时间
-TimeUnit unit = TimeUnit.SECONDS; // 时间单位为秒
-BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<>(50); // 设置任务队列
-
-ThreadPoolExecutor executor = new ThreadPoolExecutor(
-    corePoolSize,
-    maximumPoolSize,
-    keepAliveTime,
-    unit,
-    workQueue
-);
-```
-
-2. 使用 `Executors.newFixedThreadPool` 创建固定大小的线程池
+**② 使用Executors 工具类**
 
 ```
-int poolSize = 5; // 设置固定线程池大小（核心线程数即为 poolSize）
-ExecutorService executor = Executors.newFixedThreadPool(poolSize);
+// 无界队列，拒绝策略默认
+ExecutorService pool = Executors.newFixedThreadPool(4);
+// 最大线程无限制，可能 OOM
+ExecutorService pool = Executors.newCachedThreadPool();
+// 单线程，无界队列
+ExecutorService pool = Executors.newSingleThreadExecutor();
+// 定时任务支持
+ScheduledExecutorService pool = Executors.newScheduledThreadPool(2);
 ```
 
-**（9）线程池的拒绝策略**
-
-线程池的拒绝策略（Rejection Policy）是指当线程池中的任务数量达到最大值且所有工作线程都在忙碌时，如何处理新提交的任务。
-
-- **AbortPolicy（默认策略）**：当任务被拒绝时，直接抛出 `RejectedExecutionException` 异常，阻止系统正常工作。
-
-- **CallerRunsPolicy**：当任务被拒绝时，由提交任务的线程（调用 `execute` 方法的线程）来执行该任务。
-
-- **DiscardPolicy**：当任务被拒绝时，直接丢弃该任务，不会抛出任何异常，也不会有任何提示。
-
-- **DiscardOldestPolicy**：当任务被拒绝时，丢弃任务队列中最老的任务（即队列头部的任务），然后尝试重新提交当前任务。
-
-- 除了这四种内置的拒绝策略，你还可以通过实现 `RejectedExecutionHandler` 接口来自定义拒绝策略。
-
-**（10）线程池线程出异常，主线程怎么感知**
+**（6）线程池线程出异常，主线程怎么感知**
 
 ①使用 `Future` 对象获取异常信息
 
@@ -1116,7 +1089,7 @@ public class CustomThreadFactoryExceptionHandling {
 }
 ```
 
-**（11）往线程池提交一个任务但是这个任务里有一个子操作也是往相同的线程池提交一个任务，会有什么问题**
+**（7）往线程池提交一个任务但是这个任务里有一个子操作也是往相同的线程池提交一个任务，会有什么问题**
 
 如果线程池线程数较小（尤其是 =1），假设线程池大小为 N，且你恰好提交了 N 个类似任务 A。
 
@@ -1609,9 +1582,7 @@ public class PrototypeExample {
 行为型模式：用于描述对象之间的通信和责任分配，包括模板方法、观察者、责任链等模式
 
 - 策略、模板方法、观察者、迭代子模式、责任链模式、命令模式、备忘录模式、状态模式、访问者模式、中介者模式、解释器模式
-5. 
-
-### 8. 你所理解的AQS
+5. ### 8. 你所理解的AQS
 
 AQS 即 AbstractQueuedSynchronizer，是 Java 并发包（`java.util.concurrent`，简称 JUC）中一个非常核心的抽象类，位于 `java.util.concurrent.locks` 包下，由 Doug Lea 开发。它为构建锁和同步器提供了一个通用的框架，许多我们常用的并发工具类都是基于 AQS 实现的。
 
