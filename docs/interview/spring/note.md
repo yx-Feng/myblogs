@@ -328,14 +328,21 @@ IoC：是一种程序设计思想，强调控制权的转移。在传统的面�
     public ResponseResult add(@Valid @RequestBody ClientNavCommentAddDTO addDTO) {}
     ```
 
-### 16. bean的生命周期
+### 16. bean的生命周期 / Spring Bean 加载到内存的步骤
 
-- 实例化 -> 当 Spring 容器启动并扫描到需要管理的 Bean 时，通过反射或工厂方法创建 Bean 实例。
-- 属性注入 -> Spring 容器为实例化的 Bean 注入它的依赖属性。
-- 初始化前（`postProcessBeforeInitialization`） -> 在 Bean 初始化之前，Spring 允许开发者通过实现 `BeanPostProcessor` 接口的 `postProcessBeforeInitialization()` 方法，定义自定义逻辑。这个阶段可以对 Bean 进行一些修改或操作。
-- 初始化
-- 初始化后（`postProcessAfterInitialization`） -> 在 Bean 初始化完成后，Spring 再次调用 `BeanPostProcessor` 的 `postProcessAfterInitialization()` 方法，允许开发者在 Bean 准备好之后执行自定义逻辑或进一步处理 Bean。
-- 使用 Bean -> Bean 准备完毕后，Spring 容器会将其交给应用程序使用。
+- Spring 在启动时扫描所有 Bean，生成元数据（类名、作用域、依赖关系）。
+- 实例化 Bean。属性注入
+- 初始化阶段。
+  - BeanPostProcessor.before。Bean 创建后，初始化前可修改 Bean。
+  
+  - `@PostConstruct`。执行用户定义的初始化方法。
+  
+  - InitializingBean.afterPropertiesSet()。如果实现了接口，会被调用。
+  
+  - `init-method`（XML中）。显式配置的初始化方法。
+  
+  - BeanPostProcessor.after。初始化后可以再次增强 Bean。
+- 初始化完成后，放入一级缓存，供整个容器共享。
 - 销毁 -> 当 Spring 容器关闭时，或 Bean 的生命周期结束时，Spring 会对 Bean 进行销毁操作。
 
 ### 17. springcloud异步线程注解

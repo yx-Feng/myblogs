@@ -1628,7 +1628,7 @@ Java 中的类加载器有不同的层次结构，主要包括启动类加载器
 
 **1. 懒汉式**
 
-在第一次使用实例时才进行实例化。线程不安全。为了保证线程安全，可以考虑给getInstance()加synchronized关键字。
+在第一次使用实例时才进行实例化。线程不安全。为了保证线程安全，可以考虑给 getInstance() 加 **synchronized 关键字**。
 
 线程不安全：在多线程环境中，线程 A 和线程 B 可能同时执行到 `if (instance == null)` 这一判断语句。都会执行 `instance = new Singleton();` 这行代码，从而创建出两个不同的 `Singleton` 实例。
 
