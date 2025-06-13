@@ -61,7 +61,7 @@ Spring事务管理支持：
 
 - 方法调用不通过代理
   
-  - Spring事务是通过 AOP 代理来处理的，如果直接在同一个类内调用带有事务注解的方法，那么该方法将不会触发代理，也就不会启动事务。
+  - Spring事务是通过 AOP 代理来处理的，同一个类中方法内部调用不会走代理，事务失效（不会触发 AOP）。
   
   ```
   public class MyService {
@@ -331,8 +331,11 @@ IoC：是一种程序设计思想，强调控制权的转移。在传统的面�
 ### 16. bean的生命周期 / Spring Bean 加载到内存的步骤
 
 - Spring 在启动时扫描所有 Bean，生成元数据（类名、作用域、依赖关系）。
+
 - 实例化 Bean。属性注入
+
 - 初始化阶段。
+  
   - BeanPostProcessor.before。Bean 创建后，初始化前可修改 Bean。
   
   - `@PostConstruct`。执行用户定义的初始化方法。
@@ -342,7 +345,9 @@ IoC：是一种程序设计思想，强调控制权的转移。在传统的面�
   - `init-method`（XML中）。显式配置的初始化方法。
   
   - BeanPostProcessor.after。初始化后可以再次增强 Bean。
+
 - 初始化完成后，放入一级缓存，供整个容器共享。
+
 - 销毁 -> 当 Spring 容器关闭时，或 Bean 的生命周期结束时，Spring 会对 Bean 进行销毁操作。
 
 ### 17. springcloud异步线程注解
