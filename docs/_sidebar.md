@@ -82,4 +82,6 @@
   
   - [算法](interview/algorithm/note)
   
+  - [测试](interview/test_dev/note)
+  
   - [其它](interview/others/note)
