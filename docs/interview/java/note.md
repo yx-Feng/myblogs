@@ -555,7 +555,9 @@ JDK 1.7 的 ConcurrentHashMap 采用 Segment 分段锁，多个线程可以并�
 
 JDK 1.8 的 ConcurrentHashMap 摒弃了 `Segment` 分段锁的设计，采用了数组 + 链表 + 红黑树的数据结构，与 `HashMap` 的结构类似，锁的粒度细化到桶（`bin`）级别。
 
-采用 CAS + Synchronized 机制，在高并发情况下进一步优化，减少了锁的粒度，提高了吞吐量。
+写操作：首先通过 CAS尝试对空桶插入节点，成功则写入完成。如果 CAS 失败，使用 synchronized 对该桶加锁，安全地插入。
+
+读操作：读操作无锁，使用 volatile 保证可见性，遍历链表或树即可。（有哈希冲突，桶中可能包含链表或红黑树）
 
 **CAS（比较并交换）**
 

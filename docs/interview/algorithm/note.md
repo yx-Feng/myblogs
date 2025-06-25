@@ -127,6 +127,49 @@ public static void quickSort(int[] arr, int low, int high) {
 }
 ```
 
+```
+public class QuickSort {
+
+    public static void quickSort(int[] arr, int left, int right) {
+        if (left >= right) return;
+
+        int pivotIndex = partition(arr, left, right);
+
+        quickSort(arr, left, pivotIndex - 1);   // 左半边递归
+        quickSort(arr, pivotIndex + 1, right);  // 右半边递归
+    }
+
+    private static int partition(int[] arr, int left, int right) {
+        int pivot = arr[right]; // 选最右元素为基准
+        int i = left - 1;
+
+        for (int j = left; j < right; j++) {
+            if (arr[j] <= pivot) {
+                i++;
+                swap(arr, i, j);
+            }
+        }
+
+        swap(arr, i + 1, right);
+        return i + 1;
+    }
+
+    private static void swap(int[] arr, int i, int j) {
+        if (i == j) return;
+        int temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+    }
+
+    // 测试
+    public static void main(String[] args) {
+        int[] arr = {9, 4, 6, 2, 8, 1, 7};
+        quickSort(arr, 0, arr.length - 1);
+        System.out.println(Arrays.toString(arr));
+    }
+}
+```
+
 ## 2. 哈希表
 
 ### 2.1 两数之和
@@ -583,7 +626,6 @@ public int lengthOfLIS(int[] nums) {
         return 0;
     }
     int[] dp = new int[n];
-    dp[0] = 1;
     int maxLen = 1;
     for(int i = 0; i < n; i++) {
         dp[i] = 1;
