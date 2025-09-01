@@ -1,4 +1,178 @@
-## 0. 理论
+## 0. 常用函数
+
+**字符串 => 整数**
+
+```
+int num = Integer.parseInt(str);
+Integer num = Integer.valueOf(str);
+```
+
+**整数 => 字符串**
+
+```
+String str = String.valueOf(num);
+String str = Integer.toString(num);
+String str = num + "";
+```
+
+**数组 => List**
+
+```
+// 1. 引用类型数组 → List
+String[] strArray = {"apple", "banana", "cherry"};
+List<String> strList = Arrays.asList(strArray);
+
+// 2. 基本类型数组 → 需先转为包装类数组，直接转会把 int[] 当作单个元素
+Integer[] integerArray = {1, 2, 3};
+List<Integer> intList = Arrays.asList(integerArray);
+
+// 3.手动遍历添加
+
+// 4.利用 Stream API 转换
+// 4.1 引用类型数组 → List
+String[] strArray = {"a", "b", "c"};
+List<String> strList = Arrays.stream(strArray).collect(Collectors.toList());
+// 4.2 基本类型数组 → List
+int[] intArray = {1, 2, 3};
+List<Integer> intList = Arrays.stream(intArray).boxed() // 转为 Integer 流
+                                     .collect(Collectors.toList()); // 收集为 List
+```
+
+**List => 数组**
+
+```
+// 1. 带参 toArray(T[] a)
+List<String> strList = new ArrayList<>();
+String[] strArray2 = strList.toArray(new String[0]); // 传入空数组，自动适配长度
+
+// 2.利用Stream API 
+List<Integer> intList = new ArrayList<>();
+List<Double> doubleList = new ArrayList<>();
+int[] intArray = intList.stream().mapToInt(Integer::intValue).toArray(); // 收集为 int[]
+double[] doubleArray = doubleList.stream().mapToDouble(Double::doubleValue).toArray();
+```
+
+**排序**
+
+```
+int[] arr = {3, 1, 4, 1, 5};
+// 升序排序
+Arrays.sort(arr); 
+Collections.sort(list);
+List<Integer> list = Arrays.asList(3, 1, 4);
+List<Integer> sortedAsc = list.stream().sorted().collect(Collectors.toList());
+
+// 自定义排序
+int[][] twoDArray = {{3, 1},{1, 4},{2, 5}};
+// 按第1列（索引0）升序排序
+Arrays.sort(twoDArray, (a, b) -> Integer.compare(a[0], b[0]));
+// 按第2列（索引1）降序排序
+Arrays.sort(twoDArray, (a, b) -> Integer.compare(b[1], a[1]));
+// 对List<String>按长度降序排序
+Collections.sort(strs, (s1, s2) -> Integer.compare(s2.length(), s1.length()));
+```
+
+**栈**
+
+```
+// 创建栈（用Deque模拟）
+Deque<String> stack = new ArrayDeque<>(); 
+// 入栈（push）
+stack.push("A");
+stack.push("B");
+stack.push("C");
+// 查看栈顶
+System.out.println("栈顶：" + stack.peek());
+// 出栈
+System.out.println("出栈：" + stack.pop());
+```
+
+**队列**
+
+```
+// 创建队列（LinkedList实现，或ArrayDeque）
+Queue<Integer> queue = new LinkedList<>();
+// 入队（offer）
+queue.offer(10);
+queue.offer(20);
+queue.offer(30);      
+// 查看队头
+System.out.println("队头元素：" + queue.peek()); // 输出：10
+// 出队（poll）
+System.out.println("出队元素：" + queue.poll()); // 输出：10
+System.out.println("出队后队头：" + queue.peek()); // 输出：20    
+// 判断队列是否为空
+System.out.println("队列是否为空：" + queue.isEmpty()); // 输出：false
+
+// 优先队列
+
+// 创建优先级队列（默认升序）
+Queue<Integer> pq = new PriorityQueue<>();
+// 按int[]的第1列降序排序（大顶堆效果）
+PriorityQueue<int[]> pq2 = new PriorityQueue<>(
+  (a, b) -> Integer.compare(b[1], a[1]) // 注意b在前，a在后
+);
+// 先按第0列升序，第0列相等时按第1列降序
+PriorityQueue<int[]> pq3 = new PriorityQueue<>((a, b) -> {
+  if (a[0] != b[0]) {
+    return Integer.compare(a[0], b[0]); // 第0列升序
+  } else {
+    return Integer.compare(b[1], a[1]); // 第1列降序
+  }
+});
+```
+
+
+
+**输入输出**
+
+```
+import java.util.*;
+import java.lang.*;
+
+
+public class Main {
+    public static void main(String[] args) {
+        // 数据输入
+        Scanner in = new Scanner(System.in);
+        // 读数字
+        int numLen = in.nextInt();
+        int[] numArr = new int[numLen];
+        int i = 0;
+        while(in.hasNextInt() && i < numLen) {
+            numArr[i] = in.nextInt();
+            i++;
+        }
+        // 读字符串
+        int strLen = in.nextInt();
+        in.nextLine();
+        String[] strArr = new String[strLen];
+        int j = 0;
+        while(in.hasNextLine() && j < strLen) {
+            strArr[j] = in.nextLine();
+            j++;
+        }
+        // 处理
+        Solution solution = new Solution();
+        String result = solution.process(numArr, strArr);
+    }
+}
+
+
+class Solution {
+    public String process(int[] nums, String[] strs) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(Arrays.toString(nums));
+        sb.append(" && ");
+        sb.append(Arrays.toString(strs));
+        return sb.toString();
+    }
+}
+```
+
+
+
+## 1. 理论
 
 ①排序：
 
@@ -862,51 +1036,5 @@ void dfs(char[][] grid, int r, int c) {
     dfs(grid, r+1, c);
     dfs(grid, r, c-1);
     dfs(grid, r, c+1);
-}
-```
-
-## 11. ACM 模式 - 处理输入输出
-
-```
-import java.util.*;
-import java.lang.*;
-
-
-public class Main {
-    public static void main(String[] args) {
-        // 数据输入
-        Scanner in = new Scanner(System.in);
-        // 读数字
-        int numLen = in.nextInt();
-        int[] numArr = new int[numLen];
-        int i = 0;
-        while(in.hasNextInt() && i < numLen) {
-            numArr[i] = in.nextInt();
-            i++;
-        }
-        // 读字符串
-        int strLen = in.nextInt();
-        in.nextLine();
-        String[] strArr = new String[strLen];
-        int j = 0;
-        while(in.hasNextLine() && j < strLen) {
-            strArr[j] = in.nextLine();
-            j++;
-        }
-        // 处理
-        Solution solution = new Solution();
-        String result = solution.process(numArr, strArr);
-    }
-}
-
-
-class Solution {
-    public String process(int[] nums, String[] strs) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(Arrays.toString(nums));
-        sb.append(" && ");
-        sb.append(Arrays.toString(strs));
-        return sb.toString();
-    }
 }
 ```
