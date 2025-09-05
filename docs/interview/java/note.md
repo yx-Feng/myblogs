@@ -1317,13 +1317,13 @@ public class AlternatePrint {
 
 ### 7. Java的设计模式有哪些
 
-设计模式是指：面对同类软件工程设计问题，总结出来的设计经验，一种通用的解决方案
+（1）单例模式
 
-创建型模式：用于对象的创建，包括单例、工厂等模式
+保证一个类只有一个实例，并提供全局访问点。
 
-- 工厂方法
+（2）工厂方法模式
 
-工厂方法模式定义了一个用于创建对象的接口，但由子类决定实例化哪个类。工厂方法将对象的创建延迟到子类。
+定义一个创建对象的接口，但由子类决定实例化哪个类。
 
 ```
 // 产品接口
@@ -1370,7 +1370,7 @@ public class FactoryMethodExample {
 }
 ```
 
-- 抽象工厂
+（3）抽象工厂
 
 抽象工厂模式提供一个接口，用于创建一系列相关或依赖的对象，而无需指定具体类。它提供了多个工厂方法来生成不同类型的产品。
 
@@ -1446,132 +1446,49 @@ public class AbstractFactoryExample {
 }
 ```
 
-- 单例
-
-单例模式确保一个类只有一个实例，并提供全局访问点。
-
-- 建造者
-
-建造者模式将一个复杂对象的构建过程与其表示分离，使得同样的构建过程可以创建不同的表示。
-
-```
-// 产品类
-class Car {
-    private String engine;
-    private String wheels;
-
-    public void setEngine(String engine) {
-        this.engine = engine;
-    }
-
-    public void setWheels(String wheels) {
-        this.wheels = wheels;
-    }
-
-    public String toString() {
-        return "Car with " + engine + " engine and " + wheels + " wheels";
-    }
-}
-
-// 建造者接口
-interface CarBuilder {
-    void buildEngine();
-    void buildWheels();
-    Car getResult();
-}
-
-// 具体建造者
-class SportsCarBuilder implements CarBuilder {
-    private Car car = new Car();
-
-    public void buildEngine() {
-        car.setEngine("Sports engine");
-    }
-
-    public void buildWheels() {
-        car.setWheels("Sports wheels");
-    }
-
-    public Car getResult() {
-        return car;
-    }
-}
-
-// 导演类
-class Director {
-    private CarBuilder builder;
-
-    public Director(CarBuilder builder) {
-        this.builder = builder;
-    }
-
-    public Car construct() {
-        builder.buildEngine();
-        builder.buildWheels();
-        return builder.getResult();
-    }
-}
-
-// 使用建造者模式
-public class BuilderExample {
-    public static void main(String[] args) {
-        CarBuilder builder = new SportsCarBuilder();
-        Director director = new Director(builder);
-        Car car = director.construct();
-        System.out.println(car);
-    }
-}
-```
-
-- 原型
+（4）原型模式
 
 原型模式通过复制现有的对象来创建新的对象，而不是通过构造函数来创建。它用于避免重复的创建操作，并提高性能。
 
 适用场景：
 
-- 当对象的创建成本较高时，可以通过复制现有对象来提高效率。
-- 当对象之间有较复杂的依赖关系时，使用原型模式更合适。
-
 ```
-// 原型接口
-interface Prototype {
-    Prototype clone();
-}
-
-// 具体原型类
-class ConcretePrototype implements Prototype {
+class Student implements Cloneable {
     private String name;
+    private int age;
 
-    public ConcretePrototype(String name) {
+    public Student(String name, int age) {
         this.name = name;
+        this.age = age;
     }
 
-    public Prototype clone() {
-        return new ConcretePrototype(this.name);
+    // 重写 clone 方法
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone(); // 调用 Object 的 clone()
     }
 
+    @Override
     public String toString() {
-        return "Prototype: " + name;
+        return "Student{name='" + name + "', age=" + age + "}";
     }
 }
 
-// 使用原型模式
-public class PrototypeExample {
-    public static void main(String[] args) {
-        ConcretePrototype prototype = new ConcretePrototype("Original");
-        ConcretePrototype clone = (ConcretePrototype) prototype.clone();
-        System.out.println(clone);  // 输出: Prototype: Original
+public class PrototypeDemo {
+    public static void main(String[] args) throws CloneNotSupportedException {
+        Student s1 = new Student("小明", 18);
+        Student s2 = (Student) s1.clone(); // 克隆
+
+        System.out.println(s1); // Student{name='小明', age=18}
+        System.out.println(s2); // Student{name='小明', age=18}
+        System.out.println(s1 == s2); // false → 已经是两个对象
     }
 }
 ```
 
-结构型模式：用于描述对象之间的组合关系，包括代理、享元等模式
+（5）观察者模式
 
-- 适配器、装饰器、代理、外观、桥接、组合、享元
-
-行为型模式：用于描述对象之间的通信和责任分配，包括模板方法、观察者、责任链等模式
-
-- 策略、模板方法、观察者、迭代子模式、责任链模式、命令模式、备忘录模式、状态模式、访问者模式、中介者模式、解释器模式
+一个对象变化，通知多个观察者。
 
 ### 8. 布隆过滤器(Bloom Filter)
 
